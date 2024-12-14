@@ -85,31 +85,22 @@ class RaspberyPiCamera:
             self.logger.debug("Sensor resolution: " + str(self.sensor_resolution))
             self.logger.debug("Camera properties: " + str(self.camera_properties))
             self.logger.debug("Camera controls: " + str(self.picam2.camera_controls))
-            # Define used configurations.
+            # Keep the aspect ratio from the sensor.
             max_resolution = self.sensor_resolution  # RPi-GC: (1456, 1088).
+            size_factor = max_resolution[0] / max_resolution[1]
+            lores_height = int(480 * size_factor)
+            # Define used configurations.
             self.max_video_config = self.picam2.create_video_configuration(
                 main={"size": max_resolution},
-                lores={"size": (640, 480)},
+                lores={"size": (lores_height, 480)},
                 controls={"FrameDurationLimits": (33333, 33333)},  # 30 fps.
                 transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
             )
-            self.hd_video_config = self.picam2.create_video_configuration(
-                main={"size": (1280, 720)},
-                lores={"size": (640, 480)},
-                controls={"FrameDurationLimits": (33333, 33333)},  # 30 fps.
-                transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
-            )
-            self.low_video_config = self.picam2.create_video_configuration(
-                main={"size": (640, 480)},
-                lores={"size": (320, 240)},
-                controls={"FrameDurationLimits": (33333, 33333)},  # 30 fps.
-                transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
-            )
-            self.max_still_config = self.picam2.create_still_configuration(
-                main={"size": max_resolution},
-                lores={"size": (640, 480)},
-                transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
-            )
+            # self.max_still_config = self.picam2.create_still_configuration(
+            #     main={"size": max_resolution},
+            #     lores={"size": (lores_height, 480)},
+            #     transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
+            # )
         except Exception as e:
             self.logger.debug("Exception in setup_camera: ", str(e))
 
@@ -133,7 +124,7 @@ class RaspberyPiCamera:
         """ """
         try:
             # Configure camera.
-            self.picam2.configure(self.hd_video_config)
+            self.picam2.configure(self.max_video_config)
             # Decoder and output for video. Circular output used.
             self.video_encoder = encoders.H264Encoder()
             # Buffersize=60 at 30 fps = 2 sec.
