@@ -1,2 +1,3 @@
 # wirc_2025_backend
-Wireless IR Camera - backend - DEVELOPMENT
+
+Wireless IR Camera - backend - EARLY DEVELOPMENT

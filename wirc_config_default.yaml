@@ -1,0 +1,24 @@
+# Configurations for CloudedBats WIRC-2025.
+---
+wirc_app:
+  port: 8082
+  host: "0.0.0.0"
+  log_level: info
+
+record:
+  targets:
+    - id: sda1
+      name: USB-1
+      media_path: /media/USB-sda1
+      rec_dir: wirc_recordings
+    - id: sdb1
+      name: USB-2
+      media_path: /media/USB-sdb1
+      rec_dir: wirc_recordings
+    - id: local
+      name: Local
+      rec_dir: /user/wurb/wirc_recordings
+      free_disk_limit: 500 # Unit MB.
+
+# wirc_logger:
+#   max_client_messages: 50

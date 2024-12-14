@@ -1,0 +1,14 @@
+[Unit]
+Description=CloudedBats WIRC-2025 IS camera for bats.  
+After=network.target
+### Before=nginx.service
+
+[Service]
+Restart=always
+TimeoutStopSec=10s
+User=wirc
+WorkingDirectory=/home/wurb/wirc_2025
+ExecStart=/home/wurb/wirc_2025/venv/bin/python3 /home/wurb/wirc_2025/wirc_main.py
+
+[Install]
+WantedBy=multi-user.target
