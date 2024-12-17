@@ -51,9 +51,9 @@ async def shutdown_event():
 
 # Include modules.
 app.include_router(wirc_api.preview_router)
-app.include_router(wirc_api.camera_router)
-# app.include_router(wirc_api.video_router)
-# app.include_router(wirc_api.image_router)
+app.include_router(wirc_api.cameras_router)
+app.include_router(wirc_api.directories_router)
+app.include_router(wirc_api.files_router)
 
 
 # @app.get("/", tags=["HTML pages"], description="Main application page loaded as HTML.")

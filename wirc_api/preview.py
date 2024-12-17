@@ -30,14 +30,14 @@ async def preview_streamer_mjpeg():
                     )
                 # Asyncio sleep needed to catch removed clients.
                 await asyncio.sleep(0)
-    except asyncio.CancelledError as e:
+    except asyncio.CancelledError:
         logger.debug("Streaming client removed.")
     except Exception as e:
-        logger.debug("Exception in mjpeg_streamer: ", str(e))
+        logger.debug("Exception in mjpeg_streamer: " + str(e))
 
 
 @preview_router.get(
-    "/preview-mjpeg", tags=["Preview"], description="Preview streamed as Motion JPEG."
+    "/preview/stream.mjpeg", tags=["Preview"], description="Preview streamed as Motion JPEG."
 )
 # async def stream_mjpeg(request: fastapi.Request):
 async def preview_stream_mjpeg():

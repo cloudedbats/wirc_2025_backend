@@ -6,6 +6,7 @@ jinja2
 aiofiles
 websockets
 requests
+python-multipart
 # Camera.
 ### Use: sudo apt install -y python3-picamera2
 ### and: python -m venv --system-site-packages venv

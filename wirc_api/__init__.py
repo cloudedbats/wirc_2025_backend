@@ -3,8 +3,7 @@
 # Cloudedbats WIRC-2025.
 
 from wirc_api.preview import preview_router
-from wirc_api.camera import camera_router
-
-# from wirc_api.video import video_router
-# from wirc_api.image import image_router
+from wirc_api.cameras import cameras_router
+from wirc_api.directories import directories_router
+from wirc_api.files import files_router
 from wirc_api.main import app
