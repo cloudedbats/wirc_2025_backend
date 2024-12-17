@@ -45,7 +45,7 @@ class WircManager(object):
         try:
             await wirc_core.rpi_camera.start_camera()
         except asyncio.CancelledError:
-            self.logger.debug("CancelledError in camera_control_loop: ", str(e))
+            self.logger.debug("CancelledError in camera_control_loop.")
             await wirc_core.rpi_camera.stop_camera()
         except Exception as e:
-            self.logger.debug("Exception in camera_control_loop: ", str(e))
+            self.logger.debug("Exception in camera_control_loop: " + str(e))
