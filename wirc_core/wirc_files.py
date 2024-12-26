@@ -41,45 +41,45 @@ class WircFiles(object):
                             result[dir_name] = dir_path
         return result
 
-    async def delete_directory(self):
+    async def delete_directory(self, dir_path):
         """ """
         # TODO - delete_directory not implemented.
         raise FileNotFoundError("Delete not implemeted.")
         return {}
 
-    async def get_files(self, directory, media_type=None):
+    async def get_files(self, dir_path, media_type=None):
         """ """
         video_files = {}
         image_files = {}
         if media_type in ["video", None]:
-            video_files = await self.get_video_files(directory)
+            video_files = await self.get_video_files(dir_path)
         if media_type in ["image", None]:
-            image_files = await self.get_image_files(directory)
+            image_files = await self.get_image_files(dir_path)
         return video_files | image_files
 
-    async def get_video_files(self, directory):
+    async def get_video_files(self, dir_path):
         """ """
         result = {}
-        if directory:
-            dir_path = pathlib.Path(directory)
+        if dir_path:
+            dir_path = pathlib.Path(dir_path)
             for file_path in sorted(dir_path.glob("*.mp4")):
-                dir_name = file_path.name
-                dir_path = str(file_path.resolve())
-                result[dir_name] = dir_path
+                file_name = file_path.name
+                file_path = str(file_path.resolve())
+                result[file_name] = file_path
         return result
 
-    async def get_image_files(self, directory):
+    async def get_image_files(self, dir_path):
         """ """
         result = {}
-        if directory:
-            dir_path = pathlib.Path(directory)
+        if dir_path:
+            dir_path = pathlib.Path(dir_path)
             for file_path in sorted(dir_path.glob("*.jpg")):
-                dir_name = file_path.name
-                dir_path = str(file_path.resolve())
-                result[dir_name] = dir_path
+                file_name = file_path.name
+                file_path = str(file_path.resolve())
+                result[file_name] = file_path
         return result
 
-    async def delete_file(self):
+    async def delete_file(self, file_path):
         """ """
         # TODO - delete_file not implemented.
         raise FileNotFoundError("Delete not implemeted.")

@@ -35,15 +35,15 @@ async def get_directories():
 
 
 @directories_router.delete(
-    "/directories/{directory}",
+    "/directories",
     tags=["Directories"],
     description="Delete directory.",
 )
-async def delete_directory(directory: str):
+async def delete_directory(dir_path: str):
     """ """
     try:
         logger.debug("API called: delete_directory.")
-        json_data = await wirc_core.wirc_files.delete_directory()
+        json_data = await wirc_core.wirc_files.delete_directory(dir_path)
         return JSONResponse(content={"removed": True}, status_code=200)
     except FileNotFoundError:
         return JSONResponse(

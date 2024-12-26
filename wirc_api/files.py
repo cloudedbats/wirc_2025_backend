@@ -26,11 +26,11 @@ files_router = fastapi.APIRouter()
     tags=["Files"],
     description="Get files in directory.",
 )
-async def get_files(directory: str, media_type: str = None):
+async def get_files(dir_path: str, media_type: str = None):
     """ """
     try:
         logger.debug("API called: get_files.")
-        json_data = await wirc_core.wirc_files.get_files(directory, media_type=media_type)
+        json_data = await wirc_core.wirc_files.get_files(dir_path, media_type=media_type)
         return JSONResponse(content=json_data)
     except Exception as e:
         message = "API - get_files. Exception: " + str(e)
@@ -59,7 +59,7 @@ async def download_file(file_path: str):
 
 
 @files_router.delete(
-    "/files/{directory}",
+    "/files",
     tags=["Files"],
     description="Delete file.",
 )

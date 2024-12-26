@@ -55,11 +55,15 @@ class RaspberyPiCamera:
         self.preview_streamer.start_stream()
         # Camera.
         await self.setup_camera()
+        asyncio.sleep(0)
         await self.run_video_encoder()
+        asyncio.sleep(0)
         await self.set_camera_controls(
             saturation=self.default_saturation,
         )
+        asyncio.sleep(0)
         await self.run_preview_encoder()
+        asyncio.sleep(0)
 
     async def stop_camera(self):
         """ """

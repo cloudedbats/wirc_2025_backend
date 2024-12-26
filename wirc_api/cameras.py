@@ -82,3 +82,26 @@ async def set_analogue_gain(analogue_gain: float):
     except Exception as e:
         message = "API - set_analogue_gain. Exception: " + str(e)
         logger.debug(message)
+
+
+@cameras_router.post(
+    "/cameras/commands", tags=["Cameras"], description="Commands to stop, start and restart."
+)
+async def camera_commands(command: str):
+    """ """
+    try:
+        logger.debug("API called: camera_command: " + command)
+        if command == "start":
+            await wirc_core.rpi_camera.start_camera()
+            asyncio.sleep(0)
+        if command == "stop":
+            await wirc_core.rpi_camera.stop_camera()
+            asyncio.sleep(0)
+        if command == "restart":
+            await wirc_core.rpi_camera.stop_camera()
+            asyncio.sleep(0)
+            await wirc_core.rpi_camera.start_camera()
+            asyncio.sleep(0)
+    except Exception as e:
+        message = "API - camera_commands"+ str(e)
+        logger.debug(message)
