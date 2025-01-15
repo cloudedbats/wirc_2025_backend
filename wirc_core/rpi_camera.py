@@ -55,15 +55,15 @@ class RaspberyPiCamera:
         self.preview_streamer.start_stream()
         # Camera.
         await self.setup_camera()
-        asyncio.sleep(0)
+        await asyncio.sleep(0)
         await self.run_video_encoder()
-        asyncio.sleep(0)
+        await asyncio.sleep(0)
         await self.set_camera_controls(
             saturation=self.default_saturation,
         )
-        asyncio.sleep(0)
+        await asyncio.sleep(0)
         await self.run_preview_encoder()
-        asyncio.sleep(0)
+        await asyncio.sleep(0)
 
     async def stop_camera(self):
         """ """
@@ -109,6 +109,7 @@ class RaspberyPiCamera:
                 lores={"size": (lores_height, 480)},
                 # controls={"FrameDurationLimits": (29, 40000)},
                 transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
+                # buffer_count=8,
             )
             # self.max_still_config = self.picam2.create_still_configuration(
             #     main={"size": max_resolution},
@@ -218,6 +219,11 @@ class RaspberyPiCamera:
 
     async def capture_jpeg(self):
         """ """
+        if self.video_capture_active:
+                self.logger.warning(
+                    "Capture jpeg: Terminated since video is captured now."
+                )
+                return
         try:
             now = datetime.datetime.now()
             date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
@@ -247,10 +253,9 @@ class RaspberyPiCamera:
                 self.picam2.helpers.save(img, metadata, str(image_path))
 
                 # self.image_capture_active = True
-                # request = self.picam2.capture_request()
-                # request.save("main", str(image_path))
-                # metadata = request.get_metadata()
-
+                # with self.picam2.captured_request() as request:
+                #     request.save("main", str(image_path))
+                #     metadata = request.get_metadata()
             finally:
                 self.image_capture_active = False
                 # if request != None:

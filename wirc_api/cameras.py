@@ -93,15 +93,15 @@ async def camera_commands(command: str):
         logger.debug("API called: camera_command: " + command)
         if command == "start":
             await wirc_core.rpi_camera.start_camera()
-            asyncio.sleep(0)
+            await asyncio.sleep(0)
         if command == "stop":
             await wirc_core.rpi_camera.stop_camera()
-            asyncio.sleep(0)
+            await asyncio.sleep(0)
         if command == "restart":
             await wirc_core.rpi_camera.stop_camera()
-            asyncio.sleep(0)
+            await asyncio.sleep(0)
             await wirc_core.rpi_camera.start_camera()
-            asyncio.sleep(0)
+            await asyncio.sleep(0)
     except Exception as e:
         message = "API - camera_commands"+ str(e)
         logger.debug(message)
