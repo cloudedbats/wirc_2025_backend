@@ -5,20 +5,88 @@ wirc_app:
   host: "0.0.0.0"
   log_level: info
 
-record:
-  targets:
-    - id: sda1
-      name: USB-1
-      media_path: /media/USB-sda1
-      rec_dir: wirc_recordings
-    - id: sdb1
-      name: USB-2
-      media_path: /media/USB-sdb1
-      rec_dir: wirc_recordings
-    - id: local
-      name: Local
-      rec_dir: /user/wurb/wirc_recordings
-      free_disk_limit: 500 # Unit MB.
+cam0:
+  name: Camera-A (cam0)
+# video_mode: on-demand
+  active: true
+  monochrome: true
+  orientation:
+    hflip: 0
+    vflip: 0
+  settings: 
+    saturation: auto
+    exposure_ms: 1000
+    analogue_gain: auto
+  video:
+    horizontal_size_px: max
+    framerate_fps: 30
+    pre_buffer_frames: 60
+    length_after_buffer_s: 4
+    file_prefix: wircA
+    rec_dir: /home/wurb/wirc_recordings
+
+cam1:
+  name: Camera-B (cam1)
+# video_mode: on-demand
+  active: true
+  monochrome: false
+  orientation:
+    hflip: 0
+    vflip: 0
+  settings: 
+    saturation: auto
+    exposure_ms: auto
+    analogue_gain: auto
+  video:
+    horizontal_size_px: max
+    framerate_fps: 30
+    pre_buffer_frames: 60
+    length_after_buffer_s: 4
+    file_prefix: wircB
+    rec_dir: /home/wurb/wirc_recordings
+
+preview:
+  horizontal_size_px: 480
+  
+# video_modes:
+#   - mode_name: On demand
+#     mode_value: on-demand
+#   - mode_name: On trigger
+#     mode_value: on-trigger
+#   - mode_name: Contineous
+#     mode_value: contineous
+
+# record:
+#   targets:
+#     - id: sda1
+#       name: USB-1
+#       media_path: /media/USB-sda1
+#       rec_dir: wirc_recordings
+#     - id: sdb1
+#       name: USB-2
+#       media_path: /media/USB-sdb1
+#       rec_dir: wirc_recordings
+#     - id: local
+#       name: Local
+#       rec_dir: /user/wurb/wirc_recordings
+#       free_disk_limit: 500 # Unit MB.
+
 
 # wirc_logger:
 #   max_client_messages: 50
+
+### Used in Python ###
+# self.rpi_camera
+# self.cam_monochrome
+# self.saturation
+# self.exposure_ms
+# self.analogue_gain
+# self.hflip
+# self.vflip
+# self.video_horizontal_size_px
+# self.video_framerate_fps
+# self.video_pre_buffer_frames
+# self.video_length_after_buffer_s
+# self.file_prefix
+# self.rec_dir
+# self.preview_horizontal_size_px

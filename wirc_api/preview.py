@@ -16,10 +16,17 @@ logger = logging.getLogger(wirc_core.logger_name)
 preview_router = fastapi.APIRouter()
 
 
-async def preview_streamer_mjpeg():
+async def preview_streamer_mjpeg(rpi_camera="cam0"):
     """ """
+    output = None
     try:
-        output = wirc_core.rpi_camera.get_preview_streamer()
+        if rpi_camera == "cam0":
+            output = wirc_core.rpi_cam0.get_preview_streamer()
+        if rpi_camera == "cam1":
+            output = wirc_core.rpi_cam1.get_preview_streamer()
+        if output == None:
+            logger.debug("Wrong camera selected for streaming.")
+            return
         while output.is_running:
             with output.condition:
                 output.condition.wait()
@@ -37,15 +44,17 @@ async def preview_streamer_mjpeg():
 
 
 @preview_router.get(
-    "/preview/stream.mjpeg", tags=["Preview"], description="Preview streamed as Motion JPEG."
+    "/preview/stream.mjpeg",
+    tags=["Preview"],
+    description="Preview streamed as Motion JPEG.",
 )
 # async def stream_mjpeg(request: fastapi.Request):
-async def preview_stream_mjpeg():
+async def preview_stream_mjpeg(rpi_camera: str = "cam0"):
     """ """
     try:
         logger.debug("API called: preview_stream_mjpeg.")
         return StreamingResponse(
-            preview_streamer_mjpeg(),
+            preview_streamer_mjpeg(rpi_camera=rpi_camera),
             media_type="multipart/x-mixed-replace;boundary=frame",
         )
     except Exception as e:

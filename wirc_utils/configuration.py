@@ -53,6 +53,10 @@ class Configuration:
         value = self.get_value(key_path)
         if value:
             result = value
+        if result in ["False", "false"]:
+            result = False
+        if result in ["True", "true"]:
+            result = True
         return result
 
     def get_value(self, key_path):
@@ -79,4 +83,6 @@ class Configuration:
                     break
             result = config_default_dict
 
+        # if result == "":
+        #     print("DEBUG: Config key missing: " + key_path)
         return result

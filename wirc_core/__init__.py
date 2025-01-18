@@ -14,7 +14,7 @@ __version__ = "2025.0.0-development"
 # Absolute paths to working directory and executable.
 workdir_path = pathlib.Path(__file__).parent.parent.resolve()
 executable_path = pathlib.Path(os.path.dirname(sys.argv[0]))
-getcwd_path = pathlib.Path(getcwd()) # TODO - for test.
+getcwd_path = pathlib.Path(getcwd())  # TODO - for test.
 print()
 print("DEBUG: Working directory path: ", str(workdir_path))
 print("DEBUG: Executable path: ", str(executable_path))
@@ -50,5 +50,6 @@ wirc_settings = WircSettings(config, logger_name=logger_name)
 wirc_manager = WircManager(config, logger_name=logger_name)
 wirc_files = WircFiles(config, logger_name=logger_name)
 
-# Camera.
-rpi_camera = RaspberyPiCamera(config, logger_name=logger_name)
+# Cameras.
+rpi_cam0 = RaspberyPiCamera(config, logger_name=logger_name, rpi_camera="cam0")
+rpi_cam1 = RaspberyPiCamera(config, logger_name=logger_name, rpi_camera="cam1")

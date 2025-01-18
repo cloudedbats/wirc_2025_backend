@@ -18,11 +18,12 @@ import libcamera
 class RaspberyPiCamera:
     """ """
 
-    def __init__(self, config={}, logger_name="DefaultLogger"):
+    def __init__(self, config={}, logger_name="DefaultLogger", rpi_camera="cam0"):
         """ """
         self.config = config
         self.logger = logging.getLogger(logger_name)
         #
+        self.rpi_camera = rpi_camera
         self.clear()
         self.configure()
         # For preview streaming.
@@ -31,22 +32,37 @@ class RaspberyPiCamera:
 
     def clear(self):
         """ """
-        self.max_video_config = None
-        self.hd_video_config = None
-        self.low_video_config = None
-        self.max_still_config = None
+        self.video_configuration = None
         self.video_capture_active = False
         self.image_capture_active = False
 
     def configure(self):
         """ """
-        self.hflip = 0
-        self.vflip = 0
-        self.recordings_dir = "/home/wurb/wirc_recordings"
-        self.recordings_dir = "/home/wurb/wirc_recordings"
-        self.default_saturation = 0.0
-        self.circular_buffersize = 60
-        self.video_length_s = 5
+        cam = self.rpi_camera
+        self.cam_monochrome = self.config.get(cam + ".monochrome", False)
+        self.saturation = self.config.get(cam + ".settings.saturation", "auto")
+        self.exposure_ms = self.config.get(cam + ".settings.exposure_ms", "auto")
+        self.analogue_gain = self.config.get(cam + ".settings.analogue_gain", "auto")
+        self.hflip = self.config.get(cam + ".orientation.hflip", 0)
+        self.vflip = self.config.get(cam + ".orientation.vflip", 0)
+        self.video_horizontal_size_px = self.config.get(
+            cam + ".video.horizontal_size_px", "max"
+        )
+        self.video_framerate_fps = self.config.get(cam + ".video.framerate_fps", 30)
+        self.video_pre_buffer_frames = self.config.get(
+            cam + ".video.pre_buffer_frames", 60
+        )
+        self.video_length_after_buffer_s = self.config.get(
+            cam + ".video.length_after_buffer_s", 4
+        )
+        self.file_prefix = self.config.get(cam + ".video.file_prefix", "wirc-" + cam)
+        self.rec_dir = self.config.get(
+            cam + ".video.rec_dir", "/home/wurb/wirc_recordings"
+        )
+        #
+        self.preview_horizontal_size_px = self.config.get(
+            "preview.horizontal_size_px", 480
+        )
 
     async def start_camera(self):
         """ """
@@ -58,9 +74,7 @@ class RaspberyPiCamera:
         await asyncio.sleep(0)
         await self.run_video_encoder()
         await asyncio.sleep(0)
-        await self.set_camera_controls(
-            saturation=self.default_saturation,
-        )
+        await self.config_camera_controls()
         await asyncio.sleep(0)
         await self.run_preview_encoder()
         await asyncio.sleep(0)
@@ -86,8 +100,11 @@ class RaspberyPiCamera:
                     await asyncio.sleep(0)
                 except:
                     pass
-            # Create a new camera object.
-            self.picam2 = Picamera2()
+            # Create a new camera object, cam0 or cam1.
+            rpi_camera_index = 0
+            if self.rpi_camera == "cam1":
+                rpi_camera_index = 1
+            self.picam2 = Picamera2(camera_num=rpi_camera_index)
             # Generic info...
             self.global_camera_info = Picamera2.global_camera_info()
             self.sensor_resolution = self.picam2.sensor_resolution
@@ -102,23 +119,48 @@ class RaspberyPiCamera:
             # Keep the aspect ratio from the sensor.
             max_resolution = self.sensor_resolution  # RPi-GC: (1456, 1088).
             size_factor = max_resolution[0] / max_resolution[1]
-            lores_height = int(480 * size_factor)
+            if self.video_horizontal_size_px == "max":
+                main_height = int(max_resolution[0])
+                main_width = int(max_resolution[1])
+            else:
+                main_width = int(self.preview_horizontal_size_px)
+                main_height = int(main_width * size_factor)
+            lores_width = int(self.preview_horizontal_size_px)
+            lores_height = int(lores_width * size_factor)
             # Define used configurations.
-            self.max_video_config = self.picam2.create_video_configuration(
-                main={"size": max_resolution},
-                lores={"size": (lores_height, 480)},
-                # controls={"FrameDurationLimits": (29, 40000)},
+            self.video_configuration = self.picam2.create_video_configuration(
+                main={"size": (main_height, main_width)},
+                lores={"size": (lores_height, lores_width)},
                 transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
-                # buffer_count=8,
             )
-            # self.max_still_config = self.picam2.create_still_configuration(
-            #     main={"size": max_resolution},
-            #     lores={"size": (lores_height, 480)},
-            #     transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
-            # )
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in setup_camera: " + str(e))
+
+    async def config_camera_controls(self):
+        """ """
+        saturation = self.saturation
+        exposure_ms = self.exposure_ms
+        analogue_gain = self.analogue_gain
+        video_framerate_fps = self.video_framerate_fps
+        if self.saturation == "auto":
+            saturation = 0
+        if self.exposure_ms == "auto":
+            exposure_ms = 0
+        if self.analogue_gain == "auto":
+            analogue_gain = 0
+        try:
+            if not self.cam_monochrome:
+                try:
+                    self.picam2.controls.Saturation = int(saturation)
+                except:
+                    pass
+            self.picam2.controls.ExposureTime = int(exposure_ms)
+            self.picam2.controls.AnalogueGain = int(analogue_gain)
+            self.picam2.controls.FrameRate = int(video_framerate_fps)
+            await asyncio.sleep(0)
+        except Exception as e:
+            self.logger.debug("Exception in config_camera_controls: " + str(e))
 
     async def set_camera_controls(
         self,
@@ -128,14 +170,19 @@ class RaspberyPiCamera:
     ):
         """ """
         try:
-            with self.picam2.controls as controls:
+            if not self.cam_monochrome:
                 if saturation != None:
-                    controls.Saturation = saturation
-                if exposure_time != None:
-                    controls.ExposureTime = exposure_time
-                if analogue_gain != None:
-                    controls.AnalogueGain = analogue_gain
-                # controls.FrameRate = 30.0
+                    if saturation == "auto":
+                        saturation = 0
+                    self.picam2.controls.Saturation = int(saturation)
+            if exposure_time != None:
+                if exposure_time == "auto":
+                    exposure_time = 0
+                self.picam2.controls.ExposureTime = int(exposure_time)
+            if analogue_gain != None:
+                if analogue_gain == "auto":
+                    analogue_gain = 0
+                self.picam2.controls.AnalogueGain = int(analogue_gain)
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in set_controls: " + str(e))
@@ -144,12 +191,12 @@ class RaspberyPiCamera:
         """ """
         try:
             # Configure camera.
-            self.picam2.configure(self.max_video_config)
+            self.picam2.configure(self.video_configuration)
             # Decoder and output for video. Circular output used.
             self.video_encoder = encoders.H264Encoder()
             # Buffersize=60 at 30 fps = 2 sec.
             self.video_output = outputs.CircularOutput(
-                buffersize=self.circular_buffersize,
+                buffersize=int(self.video_pre_buffer_frames),
             )
             # Start the circular output.
             self.picam2.start_recording(
@@ -163,7 +210,8 @@ class RaspberyPiCamera:
         """ """
         try:
             # Setup preview stream.
-            self.preview_encoder = encoders.MJPEGEncoder(10000000)
+            self.preview_encoder = encoders.MJPEGEncoder()
+            # self.preview_encoder = encoders.MJPEGEncoder(10000000)
             self.preview_encoder.output = outputs.FileOutput(self.preview_streamer)
             self.picam2.start_encoder(self.preview_encoder, name="lores")
             await asyncio.sleep(0)
@@ -176,10 +224,10 @@ class RaspberyPiCamera:
             now = datetime.datetime.now()
             date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
             date_and_time = now.strftime("%Y%m%dT%H%M%S")
-            video_dir = pathlib.Path(self.recordings_dir, date_dir_name)
+            video_dir = pathlib.Path(self.rec_dir, date_dir_name)
             if not video_dir.exists():
                 video_dir.mkdir(parents=True)
-            video_file = "video_" + date_and_time
+            video_file = self.file_prefix + "_" + date_and_time
             video_file_h264 = video_file + ".h264"
             video_file_mp4 = video_file + ".mp4"
             video_h264_path = pathlib.Path(video_dir, video_file_h264)
@@ -190,8 +238,10 @@ class RaspberyPiCamera:
             try:
                 self.video_capture_active = True
                 self.video_output.start()
-                video_length_s = self.video_length_s - self.circular_buffersize / 30.0 # Valid only for 30 fps.
-                await asyncio.sleep(video_length_s)
+                # video_length_s = (
+                #     self.video_length_s - self.circular_buffersize / 30.0
+                # )  # Valid only for 30 fps.
+                await asyncio.sleep(float(self.video_length_after_buffer_s))
                 self.video_output.stop()
                 self.logger.info("Video stored: " + str(video_h264_path))
             finally:
@@ -220,15 +270,13 @@ class RaspberyPiCamera:
     async def capture_jpeg(self):
         """ """
         if self.video_capture_active:
-                self.logger.warning(
-                    "Capture jpeg: Terminated since video is captured now."
-                )
-                return
+            self.logger.warning("Capture jpeg: Terminated since video is captured now.")
+            return
         try:
             now = datetime.datetime.now()
             date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
             date_and_time = now.strftime("%Y%m%dT%H%M%S")
-            image_dir = pathlib.Path(self.recordings_dir, date_dir_name)
+            image_dir = pathlib.Path(self.rec_dir, date_dir_name)
             if not image_dir.exists():
                 image_dir.mkdir(parents=True)
             image_file = "image_" + date_and_time + ".jpg"

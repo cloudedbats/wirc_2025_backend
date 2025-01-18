@@ -17,11 +17,15 @@ class WircManager(object):
 
     def clear(self):
         """ """
+        self.cam0_active = True
+        self.cam1_active = False
         self.camera_control_task = None
         self.camera_control_task = None
 
     def configure(self):
         """ """
+        self.cam0_active = self.config.get("cam0.active", True)
+        self.cam1_active = self.config.get("cam1.active", False)
         config = self.config
         # self.min_number_of_satellites = config.get(
         #     "gps_reader.min_number_of_satellites", 3
@@ -43,9 +47,17 @@ class WircManager(object):
     async def camera_control_loop(self):
         """ """
         try:
-            await wirc_core.rpi_camera.start_camera()
+            if self.cam0_active:
+                self.logger.debug("RPi camera 'cam0' activated.")
+                await wirc_core.rpi_cam0.start_camera()
+            if self.cam1_active:
+                self.logger.debug("RPi camera 'cam1' activated.")
+                await wirc_core.rpi_cam1.start_camera()
         except asyncio.CancelledError:
             self.logger.debug("CancelledError in camera_control_loop.")
-            await wirc_core.rpi_camera.stop_camera()
+            if self.cam0_active:
+                await wirc_core.rpi_cam0.stop_camera()
+            if self.cam1_active:
+                await wirc_core.rpi_cam1.stop_camera()
         except Exception as e:
             self.logger.debug("Exception in camera_control_loop: " + str(e))
