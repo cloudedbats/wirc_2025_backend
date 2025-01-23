@@ -36,7 +36,8 @@ async def save_jpeg():
     """ """
     try:
         logger.debug("API called: save_jpeg.")
-        await wirc_core.rpi_cam0.capture_jpeg()
+        await wirc_core.rpi_cam0.capture_image()
+        # await wirc_core.rpi_cam0.capture_jpeg()
     except Exception as e:
         message = "API - save_jpeg. Exception: " + str(e)
         logger.debug(message)

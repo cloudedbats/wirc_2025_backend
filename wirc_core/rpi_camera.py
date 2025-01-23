@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://cloudedbats.github.io
+# Project: https://github.com/cloudedbats/wirc_2025_backend
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -18,106 +18,149 @@ import libcamera
 class RaspberyPiCamera:
     """ """
 
-    def __init__(self, config={}, logger_name="DefaultLogger", rpi_camera="cam0"):
+    def __init__(self, logger_name="DefaultLogger"):
         """ """
-        self.config = config
         self.logger = logging.getLogger(logger_name)
-        #
-        self.rpi_camera = rpi_camera
         self.clear()
-        self.configure()
+        self.camera_config_done = False
         # For preview streaming.
         self.preview_streamer = PreviewStreamingOutput()
-        self.picam2 = None
 
     def clear(self):
         """ """
+        self.picam2 = None
         self.video_configuration = None
+        # self.still_configuration = None
         self.video_capture_active = False
         self.image_capture_active = False
 
-    def configure(self):
+    def get_global_camera_info(self):
         """ """
-        cam = self.rpi_camera
-        self.cam_monochrome = self.config.get(cam + ".monochrome", False)
-        self.saturation = self.config.get(cam + ".settings.saturation", "auto")
-        self.exposure_ms = self.config.get(cam + ".settings.exposure_ms", "auto")
-        self.analogue_gain = self.config.get(cam + ".settings.analogue_gain", "auto")
-        self.hflip = self.config.get(cam + ".orientation.hflip", 0)
-        self.vflip = self.config.get(cam + ".orientation.vflip", 0)
-        self.video_horizontal_size_px = self.config.get(
-            cam + ".video.horizontal_size_px", "max"
-        )
-        self.video_framerate_fps = self.config.get(cam + ".video.framerate_fps", 30)
-        self.video_pre_buffer_frames = self.config.get(
-            cam + ".video.pre_buffer_frames", 60
-        )
-        self.video_length_after_buffer_s = self.config.get(
-            cam + ".video.length_after_buffer_s", 4
-        )
-        self.file_prefix = self.config.get(cam + ".video.file_prefix", "wirc-" + cam)
-        self.rec_dir = self.config.get(
-            cam + ".video.rec_dir", "/home/wurb/wirc_recordings"
-        )
+        self.global_camera_info = Picamera2.global_camera_info()
+        return self.global_camera_info
+
+    def camera_config(
+        self,
+        rpi_camera_id="cam0",
+        cam_monochrome=False,
+        saturation="auto",
+        exposure_ms="auto",
+        analogue_gain="auto",
+        hflip=0,
+        vflip=0,
+        video_horizontal_size_px="max",
+        video_framerate_fps=30,
+        video_pre_buffer_frames=60,
+        video_length_after_buffer_s=4,
+        video_file_prefix="video",
+        image_file_prefix="image",
+        rec_dir="wirc_recordings",
+        preview_horizontal_size_px=480,
+    ):
+        """ """
+        self.camera_config_done = True
         #
-        self.preview_horizontal_size_px = self.config.get(
-            "preview.horizontal_size_px", 480
-        )
+        self.rpi_camera_id = rpi_camera_id
+        self.cam_monochrome = cam_monochrome
+        self.saturation = saturation
+        self.exposure_ms = exposure_ms
+        self.analogue_gain = analogue_gain
+        self.hflip = hflip
+        self.vflip = vflip
+        self.video_horizontal_size_px = video_horizontal_size_px
+        self.video_framerate_fps = video_framerate_fps
+        self.video_pre_buffer_frames = video_pre_buffer_frames
+        self.video_length_after_buffer_s = video_length_after_buffer_s
+        self.video_file_prefix = video_file_prefix
+        self.image_file_prefix = image_file_prefix
+        self.rec_dir = rec_dir
+        self.preview_horizontal_size_px = preview_horizontal_size_px
 
     async def start_camera(self):
         """ """
         self.clear()
-        # Prepare for preview stream output.
-        self.preview_streamer.start_stream()
         # Camera.
-        await self.setup_camera()
+        await self.camera_setup()
         await asyncio.sleep(0)
-        await self.run_video_encoder()
-        await asyncio.sleep(0)
+        # Configure for video and preview.
+        self.picam2.configure(self.video_configuration)
+        # Controls.
         await self.config_camera_controls()
         await asyncio.sleep(0)
-        await self.run_preview_encoder()
+        # Video.
+        await self.start_video_encoder()
+        await asyncio.sleep(0)
+        # Preview.
+        await self.start_preview_encoder()
         await asyncio.sleep(0)
 
     async def stop_camera(self):
         """ """
-        # Stop preview stream output.
-        self.preview_streamer.stop_stream()
+        # Video and preview encoders.
+        await self.stop_video_encoder()
+        await asyncio.sleep(0)
+        await self.stop_preview_encoder()
+        await asyncio.sleep(0)
         # Camera.
         try:
-            self.picam2.close()
+            await self.picam2.close()
+            self.picam2 == None
             await asyncio.sleep(0)
         except:
             print("FAILED: self.picam2.close()")
 
-    async def setup_camera(self):
+    async def camera_setup(self):
         """ """
         try:
+            # Used default config if not already done.
+            if self.camera_config_done == False:
+                self.camera_config()
             # Close if already running.
             if self.picam2 != None:
                 try:
-                    self.picam2.close()
-                    await asyncio.sleep(0)
+                    self.stop_camera()
                 except:
                     pass
             # Create a new camera object, cam0 or cam1.
             rpi_camera_index = 0
-            if self.rpi_camera == "cam1":
+            if self.rpi_camera_id == "cam1":
                 rpi_camera_index = 1
-            self.picam2 = Picamera2(camera_num=rpi_camera_index)
+            try:
+                self.picam2 = Picamera2(camera_num=rpi_camera_index)
+            except Exception as e:
+                self.logger.debug("Exception in setup_camera: " + str(e))
+                self.picam2 = None
+                return
             # Generic info...
-            self.global_camera_info = Picamera2.global_camera_info()
-            self.sensor_resolution = self.picam2.sensor_resolution
-            self.camera_properties = self.picam2.camera_properties
-            self.sensor_modes = self.picam2.sensor_modes
+            # global_camera_info = Picamera2.global_camera_info()
+            sensor_resolution = self.picam2.sensor_resolution
+            camera_properties = self.picam2.camera_properties
+            sensor_modes = self.picam2.sensor_modes
             # ...to debug log.
-            self.logger.debug("Global camera info: " + str(self.global_camera_info))
-            self.logger.debug("Sensor modes: " + str(self.sensor_modes))
-            self.logger.debug("Sensor resolution: " + str(self.sensor_resolution))
-            self.logger.debug("Camera properties: " + str(self.camera_properties))
-            self.logger.debug("Camera controls: " + str(self.picam2.camera_controls))
+            # self.logger.debug("Global camera info: " + str(global_camera_info))
+            self.logger.debug(
+                "Sensor modes (" + self.rpi_camera_id + "): " + str(sensor_modes)
+            )
+            self.logger.debug(
+                "Sensor resolution ("
+                + self.rpi_camera_id
+                + "): "
+                + str(sensor_resolution)
+            )
+            self.logger.debug(
+                "Camera properties ("
+                + self.rpi_camera_id
+                + "): "
+                + str(camera_properties)
+            )
+            self.logger.debug(
+                "Camera controls ("
+                + self.rpi_camera_id
+                + "): "
+                + str(self.picam2.camera_controls)
+            )
             # Keep the aspect ratio from the sensor.
-            max_resolution = self.sensor_resolution  # RPi-GC: (1456, 1088).
+            max_resolution = sensor_resolution  # RPi-GC: (1456, 1088).
             size_factor = max_resolution[0] / max_resolution[1]
             if self.video_horizontal_size_px == "max":
                 main_height = int(max_resolution[0])
@@ -127,18 +170,26 @@ class RaspberyPiCamera:
                 main_height = int(main_width * size_factor)
             lores_width = int(self.preview_horizontal_size_px)
             lores_height = int(lores_width * size_factor)
-            # Define used configurations.
+            # Define video configuration.
             self.video_configuration = self.picam2.create_video_configuration(
                 main={"size": (main_height, main_width)},
                 lores={"size": (lores_height, lores_width)},
                 transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
             )
+            # # Define image configuration.
+            # self.still_configuration = self.picam2.create_still_configuration(
+            #     # main={"size": (main_height, main_width)},
+            #     main={"size": max_resolution},
+            #     transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
+            # )
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in setup_camera: " + str(e))
 
     async def config_camera_controls(self):
         """ """
+        if self.picam2 == None:
+            return
         saturation = self.saturation
         exposure_ms = self.exposure_ms
         analogue_gain = self.analogue_gain
@@ -169,12 +220,17 @@ class RaspberyPiCamera:
         analogue_gain=None,
     ):
         """ """
+        if self.picam2 == None:
+            return
         try:
             if not self.cam_monochrome:
                 if saturation != None:
                     if saturation == "auto":
                         saturation = 0
-                    self.picam2.controls.Saturation = int(saturation)
+                    try:
+                        self.picam2.controls.Saturation = int(saturation)
+                    except:
+                        pass
             if exposure_time != None:
                 if exposure_time == "auto":
                     exposure_time = 0
@@ -187,11 +243,9 @@ class RaspberyPiCamera:
         except Exception as e:
             self.logger.debug("Exception in set_controls: " + str(e))
 
-    async def run_video_encoder(self):
+    async def start_video_encoder(self):
         """ """
         try:
-            # Configure camera.
-            self.picam2.configure(self.video_configuration)
             # Decoder and output for video. Circular output used.
             self.video_encoder = encoders.H264Encoder()
             # Buffersize=60 at 30 fps = 2 sec.
@@ -206,9 +260,21 @@ class RaspberyPiCamera:
         except Exception as e:
             self.logger.debug("Exception in run_camera: " + str(e))
 
-    async def run_preview_encoder(self):
+    async def stop_video_encoder(self):
         """ """
         try:
+            if self.video_output:
+                self.video_output.stop()
+            if self.video_encoder:
+                self.video_encoder.stop()
+            await asyncio.sleep(0)
+        except Exception as e:
+            self.logger.debug("Exception in stop_preview_encoder: " + str(e))
+
+    async def start_preview_encoder(self):
+        """ """
+        try:
+            self.preview_streamer.start_stream()
             # Setup preview stream.
             self.preview_encoder = encoders.MJPEGEncoder()
             # self.preview_encoder = encoders.MJPEGEncoder(10000000)
@@ -216,10 +282,24 @@ class RaspberyPiCamera:
             self.picam2.start_encoder(self.preview_encoder, name="lores")
             await asyncio.sleep(0)
         except Exception as e:
-            self.logger.debug("Exception in run_camera: " + str(e))
+            self.logger.debug("Exception in run_preview_encoder: " + str(e))
+
+    async def stop_preview_encoder(self):
+        """ """
+        try:
+            self.preview_streamer.stop_stream()
+            await asyncio.sleep(0)
+            self.preview_encoder.output.stop()
+            await asyncio.sleep(0)
+            self.preview_encoder.stop()
+            await asyncio.sleep(0)
+        except Exception as e:
+            self.logger.debug("Exception in stop_preview_encoder: " + str(e))
 
     async def record_video(self):
         """ """
+        if self.picam2 == None:
+            return
         try:
             now = datetime.datetime.now()
             date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
@@ -227,7 +307,7 @@ class RaspberyPiCamera:
             video_dir = pathlib.Path(self.rec_dir, date_dir_name)
             if not video_dir.exists():
                 video_dir.mkdir(parents=True)
-            video_file = self.file_prefix + "_" + date_and_time
+            video_file = self.video_file_prefix + "_" + date_and_time
             video_file_h264 = video_file + ".h264"
             video_file_mp4 = video_file + ".mp4"
             video_h264_path = pathlib.Path(video_dir, video_file_h264)
@@ -267,7 +347,7 @@ class RaspberyPiCamera:
         except Exception as e:
             self.logger.debug("Exception in record_video: " + str(e))
 
-    async def capture_jpeg(self):
+    async def capture_image(self):
         """ """
         if self.video_capture_active:
             self.logger.warning("Capture jpeg: Terminated since video is captured now.")
@@ -279,7 +359,7 @@ class RaspberyPiCamera:
             image_dir = pathlib.Path(self.rec_dir, date_dir_name)
             if not image_dir.exists():
                 image_dir.mkdir(parents=True)
-            image_file = "image_" + date_and_time + ".jpg"
+            image_file = self.image_file_prefix + "_" + date_and_time + ".jpg"
             image_path = pathlib.Path(image_dir, image_file)
             # Capture image in request.
             # request = None
@@ -293,6 +373,9 @@ class RaspberyPiCamera:
                 return
 
             try:
+                # Stop preview (sometimes it stops working otherwise, reason unclear).
+                await self.stop_preview_encoder()
+
                 self.image_capture_active = True
                 (buffer,), metadata = self.picam2.capture_buffers(["main"])
                 img = self.picam2.helpers.make_image(
@@ -304,10 +387,14 @@ class RaspberyPiCamera:
                 # with self.picam2.captured_request() as request:
                 #     request.save("main", str(image_path))
                 #     metadata = request.get_metadata()
+
             finally:
                 self.image_capture_active = False
                 # if request != None:
                 #     request.release()
+                # Back to preview mode
+                await self.start_preview_encoder()
+
             if metadata != None:
                 print(
                     "Metadata Jpeg -",
@@ -321,8 +408,9 @@ class RaspberyPiCamera:
                     metadata.get("AnalogueGain", ""),
                 )
             self.logger.info("Jpeg stored: " + str(image_path))
+
         except Exception as e:
-            self.logger.debug("Exception in capture_jpeg: " + str(e))
+            self.logger.debug("Exception in capture_image: " + str(e))
 
     def get_preview_streamer(self):
         """ """
@@ -342,28 +430,28 @@ class PreviewStreamingOutput(io.BufferedIOBase):
         """ """
         self.frame = None
         self.is_running = True
-        try:
-            self.condition.notify_all()  # TODO Needed?
-        except:
-            print("DEBUG: condition.notify_all 1 failed...")
+        # try:
+        #     self.condition.notify_all()  # TODO Needed?
+        # except Exception as e:
+        #     print("Exception: PreviewStreamingOutput start_stream: ", e)
 
     def stop_stream(self):
         """ """
         self.frame = None
         self.is_running = False
         try:
-            self.condition.notify_all()
-        except:
-            print("DEBUG: condition.notify_all 2 failed...")
+            self.condition.release()
+        except Exception as e:
+            print("Exception: PreviewStreamingOutput stop_stream: ", e)
 
     def write(self, buf):
         """ """
         with self.condition:
-            # if self.is_running == False:
-            #     return
+            if self.is_running == False:
+                return
             self.frame = buf
             # print("BUFFER: ", len(self.frame))
             try:
                 self.condition.notify_all()
-            except:
-                print("DEBUG: condition.notify_all 3 failed...")
+            except Exception as e:
+                print("Exception: PreviewStreamingOutput write: ", e)

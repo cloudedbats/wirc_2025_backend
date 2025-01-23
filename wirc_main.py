@@ -35,7 +35,7 @@ async def main():
 
         # WIRC core startup.
         logger.debug("WIRC - main. Startup core.")
-        wirc_core.wirc_manager.startup()
+        await wirc_core.wirc_manager.startup()
         await asyncio.sleep(0)
 
         # API and app config.
