@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://cloudedbats.github.io
+# Project: https://github.com/cloudedbats/wirc_2025_backend
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -27,14 +27,14 @@ app = fastapi.FastAPI(
 
 # Relative paths.
 static_path = pathlib.Path(wirc_core.workdir_path, "wirc_api/static")
-# templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_app/templates")
+templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_api/templates")
 
 app.mount(
     "/static",
     fastapi.staticfiles.StaticFiles(directory=static_path),
     name="static",
 )
-# templates = fastapi.templating.Jinja2Templates(directory=templates_path)
+templates = fastapi.templating.Jinja2Templates(directory=templates_path)
 
 
 @app.on_event("startup")
@@ -55,22 +55,26 @@ app.include_router(wirc_api.cameras_router)
 app.include_router(wirc_api.directories_router)
 app.include_router(wirc_api.files_router)
 
+# Include modules.
+app.include_router(wirc_api.web_preview_router)
+app.include_router(wirc_api.web_about_router)
 
-# @app.get("/", tags=["HTML pages"], description="Main application page loaded as HTML.")
-# async def load_main_application_page(request: fastapi.Request):
-#     """ """
-#     try:
-#         logger.debug("API called: webpage.")
-#         return templates.TemplateResponse(
-#             "index.html",
-#             {
-#                 "request": request,
-#                 "wirc_version": wirc_core.__version__,
-#             },
-#         )
-#     except Exception as e:
-#         message = "API - load_main_application_page. Exception: " + str(e)
-#         logger.debug(message)
+
+@app.get("/", tags=["HTML pages"], description="Main application page (HTML).")
+async def load_main_application_page(request: fastapi.Request):
+    """ """
+    try:
+        logger.debug("API called: webpage.")
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "wirc_version": wirc_core.__version__,
+            },
+        )
+    except Exception as e:
+        message = "API - load_main_application_page. Exception: " + str(e)
+        logger.debug(message)
 
 
 @app.get("/favicon.ico", include_in_schema=False)

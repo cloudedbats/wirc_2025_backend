@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CloudedBats WIRC-2025</title>
+
+    <!-- Bulma stylesheets: https://bulma.io/ -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/bulma.min.css') }}">
+
+    <script src="{{ url_for('static', path='js/main.js') }}"></script>
+    <script src="{{ url_for('static', path='js/preview.js') }}"></script>
+    <script src="{{ url_for('static', path='js/preview_client.js') }}"></script>
+    <!-- <script src="{{ url_for('static', path='js/main.js/?v=100') }}"></script>-->
+    <!-- <script src="{{ url_for('static', path='js/preview.js/?v=100') }}"></script>-->
+    <!-- <script src="{{ url_for('static', path='js/preview_client.js/?v=100') }}"></script>-->
+</head>
+
+<body onLoad="fetchModules()">
+    <section class="hero is-fullheight is-fullwidth">
+        <div class="hero-head has-background-black">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    <a class="navbar-item" href="https://cloudedbats.github.io">
+                        <img src="{{ url_for('static', path='images/cloudedbats_logo.png') }}">
+                    </a>
+                    <p class="navbar-item p-0">
+                        <span
+                            class="is-clickable is-family-sans-serif has-text-weight-bold has-text-info is-size-6 mr-3"
+                            onclick="activateModuleAbout()">
+                            CloudedBats WIRC
+                        </span>
+                    </p>
+                </div>
+            </nav>
+            <div class="container is-fluid mb-3">
+                <div class="buttons is-centered">
+                    <button id="modulePreviewId" onclick="activateModulePreview()"
+                        class="button is-small is-rounded has-text-weight-bold is-info is-inverted">Preview</button>
+                    <!-- <button id="moduleLiveId" onclick="activateModuleLive()"
+                        class="button is-small is-rounded has-text-weight-bold is-info is-inverted">Live</button>
+                    <button id="moduleAnnotationsId" onclick="activateModuleAnnotations()"
+                        class="button is-small is-rounded has-text-weight-bold is-info is-inverted">Annotations</button>
+                    <button id="moduleAdminId" onclick="activateModuleAdministration()"
+                        class="button is-small is-rounded has-text-weight-bold is-info is-inverted">Administration</button> -->
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-body has-background-grey m-0 p-0">
+            <!-- <div class="has-background-grey"> -->
+            <div class="container is-fluid">
+                <div id="heroBodyPreviewId" class="is-centered is-hidden">
+                    <p class="title m-5">NOT LOADED...</p>
+                </div>
+                <div id="heroBodyAboutId" class="is-centered is-hidden">
+                    <p class="title m-5">NOT LOADED...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-foot has-background-grey-dark">
+            <nav class="tabs">
+                <div class="container is-fluid my-3 mx-5">
+                    <ul class="is-pulled-left">
+                        <li>
+                            <p class="has-text-white">Detector time:</p>
+                        </li>
+                        <li>
+                            <p class="has-text-white pl-1"><span id="detectorTimeId"></span></p>
+                        </li>
+                    </ul>
+                    <ul class="is-pulled-right">
+                        <li>
+                            <p class="is-clickable has-text-white" onclick="activateModuleAbout()">About</>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </section>
+
+</body>
+
+</html>

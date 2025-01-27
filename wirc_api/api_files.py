@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://cloudedbats.github.io
+# Project: https://github.com/cloudedbats/wirc_2025_backend
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -30,7 +30,9 @@ async def get_files(dir_path: str, media_type: str = None):
     """ """
     try:
         logger.debug("API called: get_files.")
-        json_data = await wirc_core.wirc_files.get_files(dir_path, media_type=media_type)
+        json_data = await wirc_core.wirc_files.get_files(
+            dir_path, media_type=media_type
+        )
         return JSONResponse(content=json_data)
     except Exception as e:
         message = "API - get_files. Exception: " + str(e)

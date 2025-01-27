@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://cloudedbats.github.io
+# Project: https://github.com/cloudedbats/wirc_2025_backend
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -30,6 +30,36 @@ async def record_video():
 
 
 @cameras_router.post(
+    "/cameras/start-video",
+    tags=["Cameras"],
+    description="Start continuous video recording.",
+)
+async def start_video():
+    """ """
+    try:
+        logger.debug("API called: start_video.")
+        await wirc_core.rpi_cam0.start_video()
+    except Exception as e:
+        message = "API - start_video. Exception: " + str(e)
+        logger.debug(message)
+
+
+@cameras_router.post(
+    "/cameras/stop-video",
+    tags=["Cameras"],
+    description="Stop continuous video recording.",
+)
+async def stop_video():
+    """ """
+    try:
+        logger.debug("API called: stop_video.")
+        await wirc_core.rpi_cam0.stop_video()
+    except Exception as e:
+        message = "API - stop_video. Exception: " + str(e)
+        logger.debug(message)
+
+
+@cameras_router.post(
     "/cameras/save-jpeg", tags=["Cameras"], description="Save image as Jpeg."
 )
 async def save_jpeg():
@@ -37,7 +67,6 @@ async def save_jpeg():
     try:
         logger.debug("API called: save_jpeg.")
         await wirc_core.rpi_cam0.capture_image()
-        # await wirc_core.rpi_cam0.capture_jpeg()
     except Exception as e:
         message = "API - save_jpeg. Exception: " + str(e)
         logger.debug(message)
