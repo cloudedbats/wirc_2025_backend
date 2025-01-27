@@ -32,6 +32,7 @@ class RaspberyPiCamera:
         self.video_configuration = None
         # self.still_configuration = None
         self.video_capture_active = False
+        self.video_rec_active = False
         self.image_capture_active = False
 
     def get_global_camera_info(self):
@@ -346,6 +347,72 @@ class RaspberyPiCamera:
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in record_video: " + str(e))
+
+    async def start_video(self):
+        """ """
+        if self.picam2 == None:
+            return
+        try:
+            self.video_capture_active = True
+            self.video_rec_active = True
+            #
+            now = datetime.datetime.now()
+            date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
+            video_dir = pathlib.Path(self.rec_dir, date_dir_name)
+            if not video_dir.exists():
+                video_dir.mkdir(parents=True)
+
+            while self.video_rec_active:
+                now = datetime.datetime.now()
+                date_and_time = now.strftime("%Y%m%dT%H%M%S")
+                video_file = self.video_file_prefix + "_" + date_and_time
+                video_file_h264 = video_file + ".h264"
+                video_file_mp4 = video_file + ".mp4"
+                video_h264_path = pathlib.Path(video_dir, video_file_h264)
+                video_mp4_path = pathlib.Path(video_dir, video_file_mp4)
+                self.video_output.fileoutput = str(video_h264_path)
+                try:
+                    self.video_capture_active = True
+                    self.video_output.start()
+
+
+                    # await asyncio.sleep(float(self.video_length_after_buffer_s))
+                    await asyncio.sleep(5.0)
+
+
+                    self.video_output.stop()
+                    self.logger.info("Video stored: " + str(video_h264_path))
+                finally:
+                    self.video_capture_active = False
+                await asyncio.sleep(0)
+
+                # From H264 to MP4 using ffmpeg.
+                command = [
+                    "ffmpeg",
+                    "-loglevel",
+                    "warning",
+                    "-hide_banner",
+                    "-stats",
+                    "-y",  # Overwrite.
+                    "-i",
+                    str(video_h264_path),  # From H264.
+                    "-c",
+                    "copy",
+                    str(video_mp4_path),  # To MP4.
+                ]
+                subprocess.run(command, check=True)
+                await asyncio.sleep(0)
+            #
+            self.video_capture_active = False
+        except Exception as e:
+            self.logger.debug("Exception in start_video: " + str(e))
+
+    async def stop_video(self):
+        """ """
+        try:
+            self.video_rec_active = False
+        except Exception as e:
+            self.logger.debug("Exception in stop_video: " + str(e))
 
     async def capture_image(self):
         """ """
