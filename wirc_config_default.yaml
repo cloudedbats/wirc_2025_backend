@@ -15,7 +15,7 @@ cam0:
     vflip: 0
   settings: 
     saturation: auto
-    exposure_ms: 1000
+    exposure_time_us: 1000
     analogue_gain: auto
   video:
     horizontal_size_px: max
@@ -40,7 +40,7 @@ cam1:
     vflip: 0
   settings: 
     saturation: auto
-    exposure_ms: auto
+    exposure_time_us: auto
     analogue_gain: auto
   video:
     horizontal_size_px: max
@@ -65,6 +65,9 @@ camera_modes:
     mode_value: video-continuous
   - mode_name: Image (Jpeg)
     mode_value: image
+
+client_info:
+  max_log_rows: 50
 
 # record:
 #   targets:

@@ -21,7 +21,7 @@ async function setExposureTime (exposureTimeMicroSec) {
 
 async function captureImage () {
   try {
-    let urlString = '/cameras/save-jpeg/'
+    let urlString = '/cameras/capture-image/'
     let params = {}
     await fetch(urlString, {
       method: 'POST',
@@ -122,6 +122,13 @@ function startWebsocket (wsUrl) {
     if ('logRows' in dataJson === true) {
       updateLogTable(dataJson.logRows)
     }
+
+    if ('cam0_exposure_time_us' in dataJson === true) {
+      updateExposureTime(dataJson.cam0_exposure_time_us)
+    }
+    // if ('"cam1_exposure_time_us"' in dataJson === true) {
+    //   updateLogTable(dataJson.logRows)
+    // }
   }
   ws.onclose = function (event) {
     // Try to reconnect in 5th seconds. Will continue...

@@ -23,7 +23,7 @@ async def record_video():
     """ """
     try:
         logger.debug("API called: record_video.")
-        await wirc_core.rpi_cam0.record_video()
+        await wirc_core.wirc_manager.record_video()
     except Exception as e:
         message = "API - record_video. Exception: " + str(e)
         logger.debug(message)
@@ -38,7 +38,7 @@ async def start_video():
     """ """
     try:
         logger.debug("API called: start_video.")
-        await wirc_core.rpi_cam0.start_video()
+        await wirc_core.wirc_manager.start_video()
     except Exception as e:
         message = "API - start_video. Exception: " + str(e)
         logger.debug(message)
@@ -53,22 +53,22 @@ async def stop_video():
     """ """
     try:
         logger.debug("API called: stop_video.")
-        await wirc_core.rpi_cam0.stop_video()
+        await wirc_core.wirc_manager.stop_video()
     except Exception as e:
         message = "API - stop_video. Exception: " + str(e)
         logger.debug(message)
 
 
 @cameras_router.post(
-    "/cameras/save-jpeg", tags=["Cameras"], description="Save image as Jpeg."
+    "/cameras/capture-image", tags=["Cameras"], description="Capture and save image."
 )
-async def save_jpeg():
+async def capture_image():
     """ """
     try:
-        logger.debug("API called: save_jpeg.")
-        await wirc_core.rpi_cam0.capture_image()
+        logger.debug("API called: capture_image.")
+        await wirc_core.wirc_manager.capture_image()
     except Exception as e:
-        message = "API - save_jpeg. Exception: " + str(e)
+        message = "API - capture_image. Exception: " + str(e)
         logger.debug(message)
 
 
@@ -80,7 +80,7 @@ async def set_saturation(saturation: float):
     try:
         saturation = float(saturation)
         logger.debug("API called: set_saturation.")
-        await wirc_core.rpi_cam0.set_camera_controls(saturation=saturation)
+        await wirc_core.wirc_manager.set_saturation(saturation)
     except Exception as e:
         message = "API - set_saturation. Exception: " + str(e)
         logger.debug(message)
@@ -94,7 +94,7 @@ async def set_exposure_time(time_us: int):
     try:
         exposure_time_us = int(time_us)
         logger.debug("API called: set_exposure_time.")
-        await wirc_core.rpi_cam0.set_camera_controls(exposure_time=exposure_time_us)
+        await wirc_core.wirc_manager.set_exposure_time(exposure_time_us)
     except Exception as e:
         message = "API - set_exposure_time. Exception: " + str(e)
         logger.debug(message)
@@ -108,7 +108,7 @@ async def set_analogue_gain(analogue_gain: float):
     try:
         analogue_gain = float(analogue_gain)
         logger.debug("API called: set_analogue_gain.")
-        await wirc_core.rpi_cam0.set_camera_controls(analogue_gain=analogue_gain)
+        await wirc_core.wirc_manager.set_analogue_gain(analogue_gain)
     except Exception as e:
         message = "API - set_analogue_gain. Exception: " + str(e)
         logger.debug(message)
@@ -124,15 +124,15 @@ async def camera_commands(command: str):
     try:
         logger.debug("API called: camera_command: " + command)
         if command == "start":
-            await wirc_core.rpi_cam0.start_camera()
+            await wirc_core.wirc_manager.start_camera()
             await asyncio.sleep(0)
         if command == "stop":
-            await wirc_core.rpi_cam0.stop_camera()
+            await wirc_core.wirc_manager.stop_camera()
             await asyncio.sleep(0)
         if command == "restart":
-            await wirc_core.rpi_cam0.stop_camera()
+            await wirc_core.wirc_manager.stop_camera()
             await asyncio.sleep(0)
-            await wirc_core.rpi_cam0.start_camera()
+            await wirc_core.wirc_manager.start_camera()
             await asyncio.sleep(0)
     except Exception as e:
         message = "API - camera_commands" + str(e)

@@ -35,6 +35,8 @@ from wirc_core.rpi_camera import RaspberyPiCamera
 # from wirc_core.wirc_control import WircControl
 from wirc_core.wirc_manager import WircManager
 from wirc_core.wirc_settings import WircSettings
+from wirc_core.wirc_client_status import WircClientStatus
+from wirc_core.wirc_client_info import WircClientInfo
 from wirc_core.wirc_files import WircFiles
 
 
@@ -51,5 +53,7 @@ rpi_cam0 = RaspberyPiCamera(logger_name=logger_name)
 rpi_cam1 = RaspberyPiCamera(logger_name=logger_name)
 # Basic wirc.
 wirc_settings = WircSettings(config, logger_name=logger_name)
+wirc_client_status = WircClientStatus(config, logger_name=logger_name)
+wirc_client_info = WircClientInfo(config, logger_name=logger_name)
 wirc_manager = WircManager(config, logger_name=logger_name)
 wirc_files = WircFiles(config, logger_name=logger_name)

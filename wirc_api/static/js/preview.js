@@ -48,11 +48,13 @@ function stopVideoClicked () {
 }
 
 function showStatusClicked () {
-  showStatus()
+  // showStatus();
+  alert('Not implemented...')
 }
 
 function setDetectorTimeClicked () {
-  setDetectorTime()
+  // setDetectorTime();
+  alert('Not implemented...')
 }
 
 function exposureTimeOnChange () {
@@ -64,6 +66,14 @@ function exposureTimeOnChange () {
 // Functions used to updates fields based on response contents.
 function updateStatus (status) {
   byId('detectorTimeId').innerHTML = status.detectorTime
+}
+
+function updateExposureTime (exposureTime) {
+  if (exposureTime == 0) {
+    byId('exposureTimeId').value = 'auto'
+  } else {
+    byId('exposureTimeId').value = exposureTime
+  }
 }
 
 function updateLogTable (logRows) {

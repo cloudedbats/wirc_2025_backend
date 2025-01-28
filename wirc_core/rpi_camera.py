@@ -45,7 +45,7 @@ class RaspberyPiCamera:
         rpi_camera_id="cam0",
         cam_monochrome=False,
         saturation="auto",
-        exposure_ms="auto",
+        exposure_time_us="auto",
         analogue_gain="auto",
         hflip=0,
         vflip=0,
@@ -64,7 +64,7 @@ class RaspberyPiCamera:
         self.rpi_camera_id = rpi_camera_id
         self.cam_monochrome = cam_monochrome
         self.saturation = saturation
-        self.exposure_ms = exposure_ms
+        self.exposure_time_us = exposure_time_us
         self.analogue_gain = analogue_gain
         self.hflip = hflip
         self.vflip = vflip
@@ -192,13 +192,13 @@ class RaspberyPiCamera:
         if self.picam2 == None:
             return
         saturation = self.saturation
-        exposure_ms = self.exposure_ms
+        exposure_time_us = self.exposure_time_us
         analogue_gain = self.analogue_gain
         video_framerate_fps = self.video_framerate_fps
         if self.saturation == "auto":
             saturation = 0
-        if self.exposure_ms == "auto":
-            exposure_ms = 0
+        if self.exposure_time_us == "auto":
+            exposure_time_us = 0
         if self.analogue_gain == "auto":
             analogue_gain = 0
         try:
@@ -207,7 +207,7 @@ class RaspberyPiCamera:
                     self.picam2.controls.Saturation = int(saturation)
                 except:
                     pass
-            self.picam2.controls.ExposureTime = int(exposure_ms)
+            self.picam2.controls.ExposureTime = int(exposure_time_us)
             self.picam2.controls.AnalogueGain = int(analogue_gain)
             self.picam2.controls.FrameRate = int(video_framerate_fps)
             await asyncio.sleep(0)
@@ -217,7 +217,7 @@ class RaspberyPiCamera:
     async def set_camera_controls(
         self,
         saturation=None,
-        exposure_time=None,
+        exposure_time_us=None,
         analogue_gain=None,
     ):
         """ """
@@ -232,10 +232,10 @@ class RaspberyPiCamera:
                         self.picam2.controls.Saturation = int(saturation)
                     except:
                         pass
-            if exposure_time != None:
-                if exposure_time == "auto":
-                    exposure_time = 0
-                self.picam2.controls.ExposureTime = int(exposure_time)
+            if exposure_time_us != None:
+                if exposure_time_us == "auto":
+                    exposure_time_us = 0
+                self.picam2.controls.ExposureTime = int(exposure_time_us)
             if analogue_gain != None:
                 if analogue_gain == "auto":
                     analogue_gain = 0

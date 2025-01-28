@@ -27,12 +27,14 @@ class WircManager(object):
         self.cam1_active = False
         self.camera_control_task = None
         self.camera_control_task = None
+        self.cam0_info = ""
+        self.cam1_info = ""
 
     def configure(self):
         """ """
-        self.cam0_model = ""
+        self.cam0_model = "---"
         self.cam0_num = -1
-        self.cam1_model = ""
+        self.cam1_model = "---"
         self.cam1_num = -1
         #
         global_camera_info = wirc_core.rpi_cam0.get_global_camera_info()
@@ -52,22 +54,23 @@ class WircManager(object):
         if self.cam1_num == -1:
             self.cam1_active = False
 
-        print(
-            "cam0 Model: "
-            + self.cam0_model
-            + " Num: "
-            + str(self.cam0_num)
-            + " Active: "
-            + str(self.cam0_active)
-        )
-        print(
-            "cam1 Model: "
-            + self.cam1_model
-            + " Num: "
-            + str(self.cam1_num)
-            + " Active: "
-            + str(self.cam1_active)
-        )
+        info = "Camera-A (cam0)     Model: "
+        info += self.cam0_model
+        # info += " Num: "
+        # info += str(self.cam0_num)
+        info += "     Active: "
+        info += str(self.cam0_active)
+        self.cam0_info = info
+        print(self.cam0_info)
+
+        info = "Camera-B (cam1)     Model: "
+        info += self.cam1_model
+        # info += " Num: "
+        # info += str(self.cam1_num)
+        info += "     Active: "
+        info += str(self.cam1_active)
+        self.cam1_info = info
+        print(self.cam1_info)
 
         if self.cam0_active:
             cam = "cam0"
@@ -76,7 +79,9 @@ class WircManager(object):
                 rpi_camera_id=cam,
                 cam_monochrome=self.config.get(cam + ".monochrome", False),
                 saturation=self.config.get(cam + ".settings.saturation", "auto"),
-                exposure_ms=self.config.get(cam + ".settings.exposure_ms", "auto"),
+                exposure_time_us=self.config.get(
+                    cam + ".settings.exposure_time_us", "auto"
+                ),
                 analogue_gain=self.config.get(cam + ".settings.analogue_gain", "auto"),
                 hflip=self.config.get(cam + ".orientation.hflip", 0),
                 vflip=self.config.get(cam + ".orientation.vflip", 0),
@@ -110,7 +115,9 @@ class WircManager(object):
                 rpi_camera_id=cam,
                 cam_monochrome=self.config.get(cam + ".monochrome", False),
                 saturation=self.config.get(cam + ".settings.saturation", "auto"),
-                exposure_ms=self.config.get(cam + ".settings.exposure_ms", "auto"),
+                exposure_time_us=self.config.get(
+                    cam + ".settings.exposure_time_us", "auto"
+                ),
                 analogue_gain=self.config.get(cam + ".settings.analogue_gain", "auto"),
                 hflip=self.config.get(cam + ".orientation.hflip", 0),
                 vflip=self.config.get(cam + ".orientation.vflip", 0),
@@ -138,10 +145,78 @@ class WircManager(object):
                 ),
             )
 
+    def get_preview_streamer(self, rpi_camera="cam0"):
+        """ """
+        output = None
+        if rpi_camera == "cam0":
+            output = wirc_core.rpi_cam0.get_preview_streamer()
+        if rpi_camera == "cam1":
+            output = wirc_core.rpi_cam1.get_preview_streamer()
+        return output
+
+    async def record_video(self, rpi_camera="cam"):
+        """ """
+        wirc_core.wirc_client_info.write_log("info", "Single video...")
+        await wirc_core.rpi_cam0.record_video()
+        wirc_core.wirc_client_info.write_log("info", "Single video finished.")
+
+    async def start_video(self, rpi_camera="cam0"):
+        """ """
+        wirc_core.wirc_client_info.write_log("info", "Continuous video started...")
+        await wirc_core.rpi_cam0.start_video()
+
+    async def stop_video(self, rpi_camera="cam0"):
+        """ """
+        wirc_core.wirc_client_info.write_log("info", "Continuous video stopped.")
+        await wirc_core.rpi_cam0.stop_video()
+
+    async def capture_image(self, rpi_camera="cam0"):
+        """ """
+        wirc_core.wirc_client_info.write_log("info", "Image captured.")
+        await wirc_core.rpi_cam0.capture_image()
+
+    async def set_saturation(self, saturation, rpi_camera="cam0"):
+        """ """
+        await wirc_core.rpi_cam0.set_camera_controls(saturation=saturation)
+
+    async def set_exposure_time(self, exposure_time_us, rpi_camera="cam0"):
+        """ """
+        await wirc_core.rpi_cam0.set_camera_controls(exposure_time_us=exposure_time_us)
+        wirc_core.wirc_client_status.set_exposure_time_us(
+            exposure_time_us, rpi_camera="cam0"
+        )
+
+    async def set_analogue_gain(self, analogue_gain, rpi_camera="cam0"):
+        """ """
+        await wirc_core.rpi_cam0.set_camera_controls(analogue_gain=analogue_gain)
+
+    async def start_camera(self, rpi_camera="cam0"):
+        """ """
+        await wirc_core.rpi_cam0.start_camera()
+
+    async def stop_camera(self, rpi_camera="cam0"):
+        """ """
+        await wirc_core.rpi_cam0.stop_camera()
+
     async def startup(self):
         """ """
-
         try:
+            wirc_core.wirc_client_info.write_log("info", self.cam1_info)
+            wirc_core.wirc_client_info.write_log("info", self.cam0_info)
+
+            exposure_time_us = self.config.get(
+                "cam0" + ".settings.exposure_time_us", "auto"
+            )
+            wirc_core.wirc_client_status.set_exposure_time_us(
+                exposure_time_us, rpi_camera="cam0"
+            )
+            exposure_time_us = self.config.get(
+                "cam1" + ".settings.exposure_time_us", "auto"
+            )
+            wirc_core.wirc_client_status.set_exposure_time_us(
+                exposure_time_us, rpi_camera="cam1"
+            )
+
             if self.cam0_active:
                 self.logger.debug("RPi camera 'cam0' activated.")
                 await wirc_core.rpi_cam0.start_camera()
