@@ -9,7 +9,7 @@ cam0:
   name: Camera-A (cam0)
   camera_mode: video
   active: true
-  monochrome: true
+  monochrome: false
   orientation:
     hflip: 0
     vflip: 0
@@ -17,6 +17,8 @@ cam0:
     saturation: auto
     exposure_time_us: 1000
     analogue_gain: auto
+  preview:
+    size_divisor: 2.0
   video:
     horizontal_size_px: max
     framerate_fps: 30
@@ -40,8 +42,10 @@ cam1:
     vflip: 0
   settings: 
     saturation: auto
-    exposure_time_us: auto
+    exposure_time_us: 1000
     analogue_gain: auto
+  preview:
+    size_divisor: 2.0
   video:
     horizontal_size_px: max
     framerate_fps: 30

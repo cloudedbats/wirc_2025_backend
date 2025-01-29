@@ -30,7 +30,6 @@ class RaspberyPiCamera:
         """ """
         self.picam2 = None
         self.video_configuration = None
-        # self.still_configuration = None
         self.video_capture_active = False
         self.video_rec_active = False
         self.image_capture_active = False
@@ -49,6 +48,7 @@ class RaspberyPiCamera:
         analogue_gain="auto",
         hflip=0,
         vflip=0,
+        preview_size_divisor=2.0,
         video_horizontal_size_px="max",
         video_framerate_fps=30,
         video_pre_buffer_frames=60,
@@ -56,7 +56,6 @@ class RaspberyPiCamera:
         video_file_prefix="video",
         image_file_prefix="image",
         rec_dir="wirc_recordings",
-        preview_horizontal_size_px=480,
     ):
         """ """
         self.camera_config_done = True
@@ -68,6 +67,7 @@ class RaspberyPiCamera:
         self.analogue_gain = analogue_gain
         self.hflip = hflip
         self.vflip = vflip
+        self.preview_size_divisor = preview_size_divisor
         self.video_horizontal_size_px = video_horizontal_size_px
         self.video_framerate_fps = video_framerate_fps
         self.video_pre_buffer_frames = video_pre_buffer_frames
@@ -75,7 +75,6 @@ class RaspberyPiCamera:
         self.video_file_prefix = video_file_prefix
         self.image_file_prefix = image_file_prefix
         self.rec_dir = rec_dir
-        self.preview_horizontal_size_px = preview_horizontal_size_px
 
     async def start_camera(self):
         """ """
@@ -169,20 +168,15 @@ class RaspberyPiCamera:
             else:
                 main_width = int(self.preview_horizontal_size_px)
                 main_height = int(main_width * size_factor)
-            lores_width = int(self.preview_horizontal_size_px)
-            lores_height = int(lores_width * size_factor)
+            lores_width = int(main_width / self.preview_size_divisor)
+            lores_height = int(main_height / self.preview_size_divisor)
+
             # Define video configuration.
             self.video_configuration = self.picam2.create_video_configuration(
                 main={"size": (main_height, main_width)},
                 lores={"size": (lores_height, lores_width)},
                 transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
             )
-            # # Define image configuration.
-            # self.still_configuration = self.picam2.create_still_configuration(
-            #     # main={"size": (main_height, main_width)},
-            #     main={"size": max_resolution},
-            #     transform=libcamera.Transform(hflip=self.hflip, vflip=self.vflip),
-            # )
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in setup_camera: " + str(e))
@@ -375,10 +369,8 @@ class RaspberyPiCamera:
                     self.video_capture_active = True
                     self.video_output.start()
 
-
                     # await asyncio.sleep(float(self.video_length_after_buffer_s))
                     await asyncio.sleep(5.0)
-
 
                     self.video_output.stop()
                     self.logger.info("Video stored: " + str(video_h264_path))

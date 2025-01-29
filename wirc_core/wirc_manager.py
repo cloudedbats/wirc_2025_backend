@@ -85,6 +85,7 @@ class WircManager(object):
                 analogue_gain=self.config.get(cam + ".settings.analogue_gain", "auto"),
                 hflip=self.config.get(cam + ".orientation.hflip", 0),
                 vflip=self.config.get(cam + ".orientation.vflip", 0),
+                preview_size_divisor=self.config.get(cam + ".preview.size_divisor", 0),
                 video_horizontal_size_px=self.config.get(
                     cam + ".video.horizontal_size_px", "max"
                 ),
@@ -103,9 +104,6 @@ class WircManager(object):
                 ),
                 rec_dir=self.config.get(
                     cam + ".video.storage.rec_dir", "/home/wurb/wirc_recordings"
-                ),
-                preview_horizontal_size_px=self.config.get(
-                    "preview.horizontal_size_px", 480
                 ),
             )
         if self.cam0_active:
@@ -121,6 +119,7 @@ class WircManager(object):
                 analogue_gain=self.config.get(cam + ".settings.analogue_gain", "auto"),
                 hflip=self.config.get(cam + ".orientation.hflip", 0),
                 vflip=self.config.get(cam + ".orientation.vflip", 0),
+                preview_size_divisor=self.config.get(cam + ".preview.size_divisor", 0),
                 video_horizontal_size_px=self.config.get(
                     cam + ".video.horizontal_size_px", "max"
                 ),
@@ -139,9 +138,6 @@ class WircManager(object):
                 ),
                 rec_dir=self.config.get(
                     cam + ".video.storage.rec_dir", "/home/wurb/wirc_recordings"
-                ),
-                preview_horizontal_size_px=self.config.get(
-                    "preview.horizontal_size_px", 480
                 ),
             )
 

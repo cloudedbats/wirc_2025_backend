@@ -7,6 +7,7 @@
 import pathlib
 import yaml
 import logging
+import collections
 
 
 class Configuration:
@@ -21,6 +22,8 @@ class Configuration:
         """ """
         self.config = {}
         self.config_default = {}
+        self.config_flattend = {}
+        self.config_default_flattend = {}
 
     def load_config(
         self,
@@ -41,48 +44,40 @@ class Configuration:
                 "Configuration - Config file missing. Copy of default config made: "
                 + config_path.name
             )
-        # Load config files.
+        # Load config-default files.
         with open(config_default_path) as file:
             self.config_default = yaml.load(file, Loader=yaml.FullLoader)
+        self.config_default_flattend = self.flatten_dict(self.config_default)
+        # Load config files.
         with open(config_path) as file:
             self.config = yaml.load(file, Loader=yaml.FullLoader)
+        self.config_flattend = self.flatten_dict(self.config)
 
-    def get(self, key_path, default=""):
+    def flatten_dict(self, dictionary, parent_key=False, separator="."):
         """ """
-        result = default
-        value = self.get_value(key_path)
-        if value:
-            result = value
-        if result in ["False", "false"]:
-            result = False
-        if result in ["True", "true"]:
-            result = True
-        return result
-
-    def get_value(self, key_path):
-        """ """
-        result = ""
-        config_dict = self.config
-        config_default_dict = self.config_default
-
-        key_parts = key_path.split(".")
-        for key_part in key_parts:
-            if key_part in config_dict:
-                config_dict = config_dict[key_part]
+        items = []
+        for key, value in dictionary.items():
+            new_key = str(parent_key) + separator + key if parent_key else key
+            if isinstance(value, collections.abc.MutableMapping):
+                items.extend(self.flatten_dict(value, new_key, separator).items())
+            elif isinstance(value, list):
+                for k, v in enumerate(value):
+                    items.extend(self.flatten_dict({str(k): v}, new_key).items())
             else:
-                config_dict = ""
-                break
-        result = config_dict
+                items.append((new_key, value))
+        return dict(items)
 
-        if not result:
-            for key_part in key_parts:
-                if key_part in config_default_dict:
-                    config_default_dict = config_default_dict[key_part]
-                else:
-                    config_default_dict = ""
-                    break
-            result = config_default_dict
+    def get(self, key_flat, default=""):
+        """ """
+        value = default
+        if key_flat in self.config_flattend:
+            value = self.config_flattend[key_flat]
+        else:
+            if key_flat in self.config_default_flattend:
+                value = self.config_default_flattend[key_flat]
 
-        # if result == "":
-        #     print("DEBUG: Config key missing: " + key_path)
-        return result
+        if value in ["False", "false"]:
+            value = False
+        if value in ["True", "true"]:
+            value = True
+        return value
