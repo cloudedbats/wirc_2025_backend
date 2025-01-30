@@ -14,13 +14,15 @@
                     </div>
                 </div>
 
-                <p class="title is-4">
-                    Preview
+                <p class="title is-5">
+                    <span id="previewTitleId">Camera-A (cam0)</span> - preview
                 </p>
 
                 <section id="previewBodyId" class="section has-background-grey-lighter p-1">
                     <div class="field is-grouped is-grouped-centered p-1">
-                        <img src="preview/stream.mjpeg" width=640" height="400" />
+
+                        <img id="mjpegStreamId" src="preview/stream.mjpeg" />
+
                     </div>
 
                     <div class="field is-grouped is-grouped-centered pt-0">
@@ -37,11 +39,11 @@
                     <div class="field is-grouped is-grouped-centered pt-0">
                         <button style="margin:1px;" class="button is-small is-rounded is-info has-text-weight-bold"
                             onclick="startVideoClicked()">
-                            Start continuous video
+                            Start video
                         </button>
                         <button style="margin:1px;" class="button is-small is-rounded is-info has-text-weight-bold"
                             onclick="stopVideoClicked()">
-                            Stop continuous video
+                            Stop video
                         </button>
                     </div>
 
@@ -147,29 +149,19 @@
                         </ul>
                     </div> -->
 
-                    <div class="field is-grouped is-grouped-centered pt-2">
-                        <label class="pr-3">Camera</label>
+                    <div class="field is-grouped is-grouped-centered pt-2 pb-5">
+                        <label class="pr-3">Select camera</label>
                         <div class="select is-rounded is-info is-size-7">
                             <div class="control">
                                 <div class="select is-size-7">
-                                    <select id="previewLengthId">
-                                        <option value="cam0">Camera-A</option>
+                                    <select id="rpiCameraSelectId" onchange="rpiCameraSelectOnChange()">
+                                        <option value="cam0">Camera-A (cam0)</option>
+                                        <option value="cam1">Camera-B (cam1)</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
-                        <!-- <label class="pl-5 pr-3">Exposure time</label>
-                        <div class="select is-rounded is-info is-size-7">
-                            <div class="control">
-                                <div class="select is-size-7">
-                                    <select id="previewLengthId">
-                                        <option value="auto">Auto</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div> -->
                     </div>
-
                 </section>
             </div>
         </article>

@@ -1,10 +1,10 @@
-async function setExposureTime (exposureTimeMicroSec) {
+async function setExposureTime(exposureTimeMicroSec) {
   if (exposureTimeMicroSec == 'auto') {
     exposureTimeMicroSec = 0
   }
   try {
     let urlString =
-      'cameras/exposure-time?time_us=' + parseInt(exposureTimeMicroSec)
+      'cameras/exposure-time?time_us=' + parseInt(exposureTimeMicroSec) + '&rpi_camera=' + selectedRPiCamera
     let params = {}
     await fetch(urlString, {
       method: 'POST',
@@ -19,9 +19,9 @@ async function setExposureTime (exposureTimeMicroSec) {
   }
 }
 
-async function captureImage () {
+async function captureImage() {
   try {
-    let urlString = '/cameras/capture-image/'
+    let urlString = '/cameras/capture-image/' + '?rpi_camera=' + selectedRPiCamera
     let params = {}
     await fetch(urlString, {
       method: 'POST',
@@ -36,9 +36,9 @@ async function captureImage () {
   }
 }
 
-async function videoSingle () {
+async function videoSingle() {
   try {
-    let urlString = '/cameras/record-video/'
+    let urlString = '/cameras/record-video/' + '?rpi_camera=' + selectedRPiCamera
     let params = {}
     await fetch(urlString, {
       method: 'POST',
@@ -53,9 +53,9 @@ async function videoSingle () {
   }
 }
 
-async function startVideo () {
+async function startVideo() {
   try {
-    let urlString = '/cameras/start-video/'
+    let urlString = '/cameras/start-video/' + '?rpi_camera=' + selectedRPiCamera
     let params = {}
     await fetch(urlString, {
       method: 'POST',
@@ -70,9 +70,9 @@ async function startVideo () {
   }
 }
 
-async function stopVideo () {
+async function stopVideo() {
   try {
-    let urlString = '/cameras/stop-video/'
+    let urlString = '/cameras/stop-video/' + '?rpi_camera=' + selectedRPiCamera
     let params = {}
     await fetch(urlString, {
       method: 'POST',
@@ -87,7 +87,7 @@ async function stopVideo () {
   }
 }
 
-async function setDetectorTime () {
+async function setDetectorTime() {
   try {
     let posixTimeMs = new Date().getTime()
     // let urlString = "/preview/setTime/?posixtime=" + posixTimeMs;
@@ -99,7 +99,7 @@ async function setDetectorTime () {
   }
 }
 
-async function previewStatus () {
+async function previewStatus() {
   try {
     let urlString = '/preview/preview-status/'
     await fetch(urlString)
@@ -111,7 +111,7 @@ async function previewStatus () {
 
 let waitTextNr = 0
 
-function startWebsocket (wsUrl) {
+function startWebsocket(wsUrl) {
   // let ws = new WebSocket("ws://localhost:8082/ws");
   let ws = new WebSocket(wsUrl)
   ws.onmessage = function (event) {

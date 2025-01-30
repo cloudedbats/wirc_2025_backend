@@ -23,10 +23,6 @@ async def preview_streamer_mjpeg(rpi_camera="cam0"):
     output = None
     try:
         output = wirc_core.wirc_manager.get_preview_streamer(rpi_camera)
-        # if rpi_camera == "cam0":
-        #     output = wirc_core.rpi_cam0.get_preview_streamer()
-        # if rpi_camera == "cam1":
-        #     output = wirc_core.rpi_cam1.get_preview_streamer()
         if output == None:
             logger.debug("Wrong camera selected for streaming.")
             return

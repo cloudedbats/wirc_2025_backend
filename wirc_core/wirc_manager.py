@@ -141,58 +141,75 @@ class WircManager(object):
                 ),
             )
 
+    def _select_picamera(self, rpi_camera="cam0"):
+        """ """
+        rpicam = wirc_core.rpi_cam0
+        if rpi_camera == "cam1":
+            rpicam = wirc_core.rpi_cam1
+        return rpicam
+
     def get_preview_streamer(self, rpi_camera="cam0"):
         """ """
+        rpicam = self._select_picamera(rpi_camera)
         output = None
         if rpi_camera == "cam0":
-            output = wirc_core.rpi_cam0.get_preview_streamer()
+            output = rpicam.get_preview_streamer()
         if rpi_camera == "cam1":
-            output = wirc_core.rpi_cam1.get_preview_streamer()
+            output = rpicam.get_preview_streamer()
         return output
 
     async def record_video(self, rpi_camera="cam"):
         """ """
+        rpicam = self._select_picamera(rpi_camera)
         wirc_core.wirc_client_info.write_log("info", "Single video...")
-        await wirc_core.rpi_cam0.record_video()
+        await rpicam.record_video()
         wirc_core.wirc_client_info.write_log("info", "Single video finished.")
 
     async def start_video(self, rpi_camera="cam0"):
         """ """
+        rpicam = self._select_picamera(rpi_camera)
         wirc_core.wirc_client_info.write_log("info", "Continuous video started...")
-        await wirc_core.rpi_cam0.start_video()
+        await rpicam.start_video()
 
     async def stop_video(self, rpi_camera="cam0"):
         """ """
+        rpicam = self._select_picamera(rpi_camera)
         wirc_core.wirc_client_info.write_log("info", "Continuous video stopped.")
-        await wirc_core.rpi_cam0.stop_video()
+        await rpicam.stop_video()
 
     async def capture_image(self, rpi_camera="cam0"):
         """ """
+        rpicam = self._select_picamera(rpi_camera)
         wirc_core.wirc_client_info.write_log("info", "Image captured.")
-        await wirc_core.rpi_cam0.capture_image()
+        await rpicam.capture_image()
 
     async def set_saturation(self, saturation, rpi_camera="cam0"):
         """ """
-        await wirc_core.rpi_cam0.set_camera_controls(saturation=saturation)
+        rpicam = self._select_picamera(rpi_camera)
+        await rpicam.set_camera_controls(saturation=saturation)
 
     async def set_exposure_time(self, exposure_time_us, rpi_camera="cam0"):
         """ """
-        await wirc_core.rpi_cam0.set_camera_controls(exposure_time_us=exposure_time_us)
+        rpicam = self._select_picamera(rpi_camera)
+        await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
         wirc_core.wirc_client_status.set_exposure_time_us(
-            exposure_time_us, rpi_camera="cam0"
+            exposure_time_us, rpi_camera=rpi_camera
         )
 
     async def set_analogue_gain(self, analogue_gain, rpi_camera="cam0"):
         """ """
-        await wirc_core.rpi_cam0.set_camera_controls(analogue_gain=analogue_gain)
+        rpicam = self._select_picamera(rpi_camera)
+        await rpicam.set_camera_controls(analogue_gain=analogue_gain)
 
     async def start_camera(self, rpi_camera="cam0"):
         """ """
-        await wirc_core.rpi_cam0.start_camera()
+        rpicam = self._select_picamera(rpi_camera)
+        await rpicam.start_camera()
 
     async def stop_camera(self, rpi_camera="cam0"):
         """ """
-        await wirc_core.rpi_cam0.stop_camera()
+        rpicam = self._select_picamera(rpi_camera)
+        await rpicam.stop_camera()
 
     async def startup(self):
         """ """

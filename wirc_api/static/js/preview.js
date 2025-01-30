@@ -1,3 +1,6 @@
+var selectedRPiCamera = "cam0";
+var selectedRPiCameraName = "Camera-A (cam0)";
+
 // // Used for the main tabs in the settings tile.
 // function hideShowSettingsTabs(tabName) {
 //     byId("tabSettingsBasicId").classList.remove("is-active");
@@ -19,7 +22,7 @@
 //     };
 // };
 
-function previewToggleSettings () {
+function previewToggleSettings() {
   if (byId('previewSettingsId').classList.contains('is-hidden')) {
     byId('previewBodyId').classList.add('is-hidden')
     byId('previewSettingsId').classList.remove('is-hidden')
@@ -31,44 +34,64 @@ function previewToggleSettings () {
   }
 }
 
-function captureImageClicked () {
+function captureImageClicked() {
   captureImage()
+  // Refresh preview stream after image is needed.
+  setTimeout(refreshPreviewStream, 1000)
 }
 
-function videoSingleClicked () {
+function videoSingleClicked() {
   videoSingle()
 }
 
-function startVideoClicked () {
+function startVideoClicked() {
   startVideo()
 }
 
-function stopVideoClicked () {
+function stopVideoClicked() {
   stopVideo()
 }
 
-function showStatusClicked () {
+function showStatusClicked() {
   // showStatus();
   alert('Not implemented...')
 }
 
-function setDetectorTimeClicked () {
+function setDetectorTimeClicked() {
   // setDetectorTime();
   alert('Not implemented...')
 }
 
-function exposureTimeOnChange () {
+function exposureTimeOnChange() {
   let selectedValue =
     byId('exposureTimeId').options[byId('exposureTimeId').selectedIndex].value
   setExposureTime(selectedValue)
 }
 
+function rpiCameraSelectOnChange() {
+  let selectedValue =
+    byId('rpiCameraSelectId').options[byId('rpiCameraSelectId').selectedIndex].value
+  let selectedName =
+    byId('rpiCameraSelectId').options[byId('rpiCameraSelectId').selectedIndex].text
+  // Save to global.
+  selectedRPiCamera = selectedValue
+  selectedRPiCameraName = selectedName
+  refreshPreviewStream()
+}
+
+function refreshPreviewStream() {
+  let image = byId('mjpegStreamId');
+  image.src = "";
+  image.src = 'preview/stream.mjpeg' + '?rpi_camera=' + selectedRPiCamera;
+  byId('previewTitleId').textContent = selectedRPiCameraName;
+}
+
 // Functions used to updates fields based on response contents.
-function updateStatus (status) {
+function updateStatus(status) {
   byId('detectorTimeId').innerHTML = status.detectorTime
 }
 
-function updateExposureTime (exposureTime) {
+function updateExposureTime(exposureTime) {
   if (exposureTime == 0) {
     byId('exposureTimeId').value = 'auto'
   } else {
@@ -76,7 +99,7 @@ function updateExposureTime (exposureTime) {
   }
 }
 
-function updateLogTable (logRows) {
+function updateLogTable(logRows) {
   htmlTableRows = ''
   for (rowIndex in logRows) {
     htmlTableRows += '<tr><td>'
