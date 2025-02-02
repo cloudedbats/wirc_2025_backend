@@ -68,6 +68,12 @@ function exposureTimeOnChange() {
   setExposureTime(selectedValue)
 }
 
+function analogueGainOnChange() {
+  let selectedValue =
+    byId('analogueGainId').options[byId('analogueGainId').selectedIndex].value
+  setAnalogueGain(selectedValue)
+}
+
 function rpiCameraSelectOnChange() {
   let selectedValue =
     byId('rpiCameraSelectId').options[byId('rpiCameraSelectId').selectedIndex].value
@@ -91,11 +97,33 @@ function updateStatus(status) {
   byId('detectorTimeId').innerHTML = status.detectorTime
 }
 
-function updateExposureTime(exposureTime) {
+function updateExposureTime(cam0ExposureTime, cam1ExposureTime) {
+  let exposureTime = ""
+  if (selectedRPiCamera == 'cam0') {
+    exposureTime = cam0ExposureTime
+  }
+  else if (selectedRPiCamera == 'cam1') {
+    exposureTime = cam1ExposureTime
+  }
   if (exposureTime == 0) {
     byId('exposureTimeId').value = 'auto'
   } else {
     byId('exposureTimeId').value = exposureTime
+  }
+}
+
+function updateAnalogueGain(cam0AnalogueGain, cam1AnalogueGain) {
+  let analogueGain = ""
+  if (selectedRPiCamera == 'cam0') {
+    analogueGain = cam0AnalogueGain
+  }
+  else if (selectedRPiCamera == 'cam1') {
+    analogueGain = cam1AnalogueGain
+  }
+  if (analogueGain == 0) {
+    byId('analogueGainId').value = 'auto'
+  } else {
+    byId('analogueGainId').value = analogueGain
   }
 }
 

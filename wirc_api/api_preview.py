@@ -84,6 +84,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         ws_json["cam1_exposure_time_us"] = (
             status_dict.get("cam1_exposure_time_us", ""),
         )
+        ws_json["cam0_analogue_gain"] = status_dict.get("cam0_analogue_gain", "")
+        ws_json["cam1_analogue_gain"] = (status_dict.get("cam1_analogue_gain", ""),)
         ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()
         # Send update to client.
         await websocket.send_json(ws_json)
@@ -118,9 +120,16 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
                 ws_json["cam0_exposure_time_us"] = status_dict.get(
                     "cam0_exposure_time_us", ""
                 )
-                ws_json["cam1_exposure_time_us"] = (
-                    status_dict.get("cam1_exposure_time_us", ""),
+                ws_json["cam1_exposure_time_us"] = status_dict.get(
+                    "cam1_exposure_time_us", ""
                 )
+                ws_json["cam0_analogue_gain"] = status_dict.get(
+                    "cam0_analogue_gain", ""
+                )
+                ws_json["cam1_analogue_gain"] = status_dict.get(
+                    "cam1_analogue_gain", ""
+                )
+
             if logging_event.is_set():
                 logging_event = wirc_core.wirc_client_info.get_logging_event()
                 ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()

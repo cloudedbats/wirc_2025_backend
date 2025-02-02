@@ -89,12 +89,18 @@ class WircManager(object):
                 video_horizontal_size_px=self.config.get(
                     cam + ".video.horizontal_size_px", "max"
                 ),
+                video_vertical_size_px=self.config.get(
+                    cam + ".video.vertical_size_px", "max"
+                ),
                 video_framerate_fps=self.config.get(cam + ".video.framerate_fps", 30),
                 video_pre_buffer_frames=self.config.get(
                     cam + ".video.pre_buffer_frames", 60
                 ),
-                video_length_after_buffer_s=self.config.get(
-                    cam + ".video.length_after_buffer_s", 4
+                video_single_length_s=self.config.get(
+                    cam + ".video.single_length_s", 5
+                ),
+                video_continuous_length_s=self.config.get(
+                    cam + ".video.continuous_length_s", 5
                 ),
                 video_file_prefix=self.config.get(
                     cam + ".video.file_prefix", "wirc-" + cam
@@ -123,12 +129,18 @@ class WircManager(object):
                 video_horizontal_size_px=self.config.get(
                     cam + ".video.horizontal_size_px", "max"
                 ),
+                video_vertical_size_px=self.config.get(
+                    cam + ".video.vertical_size_px", "max"
+                ),
                 video_framerate_fps=self.config.get(cam + ".video.framerate_fps", 30),
                 video_pre_buffer_frames=self.config.get(
                     cam + ".video.pre_buffer_frames", 60
                 ),
-                video_length_after_buffer_s=self.config.get(
-                    cam + ".video.length_after_buffer_s", 4
+                video_single_length_s=self.config.get(
+                    cam + ".video.single_length_s", 5
+                ),
+                video_continuous_length_s=self.config.get(
+                    cam + ".video.continuous_length_s", 5
                 ),
                 video_file_prefix=self.config.get(
                     cam + ".video.file_prefix", "wirc-" + cam
@@ -200,6 +212,9 @@ class WircManager(object):
         """ """
         rpicam = self._select_picamera(rpi_camera)
         await rpicam.set_camera_controls(analogue_gain=analogue_gain)
+        wirc_core.wirc_client_status.set_analogue_gain(
+            analogue_gain, rpi_camera=rpi_camera
+        )
 
     async def start_camera(self, rpi_camera="cam0"):
         """ """

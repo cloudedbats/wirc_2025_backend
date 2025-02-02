@@ -19,6 +19,27 @@ async function setExposureTime(exposureTimeMicroSec) {
   }
 }
 
+async function setAnalogueGain(analogueGain) {
+  if (analogueGain == 'auto') {
+    analogueGain = 0
+  }
+  try {
+    let urlString =
+      'cameras/analogue-gain?analogue_gain=' + parseInt(analogueGain) + '&rpi_camera=' + selectedRPiCamera
+    let params = {}
+    await fetch(urlString, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(params)
+    })
+  } catch (err) {
+    alert('ERROR setAnalogueGain: ' + err)
+    console.log(err)
+  }
+}
+
 async function captureImage() {
   try {
     let urlString = '/cameras/capture-image/' + '?rpi_camera=' + selectedRPiCamera
@@ -124,7 +145,10 @@ function startWebsocket(wsUrl) {
     }
 
     if ('cam0_exposure_time_us' in dataJson === true) {
-      updateExposureTime(dataJson.cam0_exposure_time_us)
+      updateExposureTime(dataJson.cam0_exposure_time_us,dataJson.cam1_exposure_time_us)
+    }
+    if ('cam0_analogue_gain' in dataJson === true) {
+      updateAnalogueGain(dataJson.cam0_analogue_gain, dataJson.cam1_analogue_gain)
     }
     // if ('"cam1_exposure_time_us"' in dataJson === true) {
     //   updateLogTable(dataJson.logRows)

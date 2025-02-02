@@ -26,6 +26,8 @@ class WircClientStatus:
         self.status_event = None
         self.cam0_exposure_time_us = None
         self.cam1_exposure_time_us = None
+        self.cam0_analogue_gain = None
+        self.cam1_analogue_gain = None
 
     def configure(self):
         """ """
@@ -47,6 +49,15 @@ class WircClientStatus:
             self.trigger_status_event()
         if rpi_camera == "cam1":
             self.cam1_exposure_time_us = exposure_time_us
+            self.trigger_status_event()
+
+    def set_analogue_gain(self, analogue_gain, rpi_camera="cam0"):
+        """ """
+        if rpi_camera == "cam0":
+            self.cam0_analogue_gain = analogue_gain
+            self.trigger_status_event()
+        if rpi_camera == "cam1":
+            self.cam1_analogue_gain = analogue_gain
             self.trigger_status_event()
 
     # def write_log(self, msg_type, message):
@@ -100,6 +111,8 @@ class WircClientStatus:
     def get_status_dict(self):
         """ """
         status_dict = {}
-        status_dict["cam0_exposure_time_us"] = self.cam0_exposure_time_us
-        status_dict["cam1_exposure_time_us"] = self.cam1_exposure_time_us
+        status_dict["cam0_exposure_time_us"] = str(self.cam0_exposure_time_us)
+        status_dict["cam1_exposure_time_us"] = str(self.cam1_exposure_time_us)
+        status_dict["cam0_analogue_gain"] = str(self.cam0_analogue_gain)
+        status_dict["cam1_analogue_gain"] = str(self.cam1_analogue_gain)
         return status_dict

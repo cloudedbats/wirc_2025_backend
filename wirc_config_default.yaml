@@ -21,9 +21,11 @@ cam0:
     size_divisor: 2.0
   video:
     horizontal_size_px: max
+    vertical_size_px: max
     framerate_fps: 30
     pre_buffer_frames: 60
-    length_after_buffer_s: 4
+    single_length_s: 5
+    continuous_length_s: 10
     file_prefix: wircA
   image:
     file_prefix: wircA
@@ -31,6 +33,9 @@ cam0:
     rec_dir: /home/wurb/wirc_recordings
     remove_old_rec: true
     free_space_limit_mb: 500
+  # picamera2_controls:
+  #   AeEnable: false
+
 
 cam1:
   name: Camera-B (cam1)
@@ -48,9 +53,11 @@ cam1:
     size_divisor: 2.0
   video:
     horizontal_size_px: max
+    vertical_size_px: max
     framerate_fps: 30
     pre_buffer_frames: 60
-    length_after_buffer_s: 4
+    single_length_s: 5
+    continuous_length_s: 10
     file_prefix: wircB
   image:
     file_prefix: wircB
@@ -58,17 +65,8 @@ cam1:
     rec_dir: /home/wurb/wirc_recordings
     remove_old_rec: true
     free_space_limit_mb: 500
-
-preview:
-  horizontal_size_px: 480
-  
-camera_modes:
-  - mode_name: Video (on demand)
-    mode_value: video
-  - mode_name: Video (continuous)
-    mode_value: video-continuous
-  - mode_name: Image (Jpeg)
-    mode_value: image
+  # picamera2_controls:
+  #   AeEnable: false
 
 client_info:
   max_log_rows: 50

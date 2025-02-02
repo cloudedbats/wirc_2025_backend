@@ -32,7 +32,7 @@
                         </button>
                         <button style="margin:1px;" class="button is-small is-rounded is-info has-text-weight-bold"
                             onclick=" videoSingleClicked()">
-                            Record single video
+                            Single video
                         </button>
                     </div>
 
@@ -48,7 +48,7 @@
                     </div>
 
                     <div class="field is-grouped is-grouped-centered pt-2">
-                        <label class="pl-5 pr-3 pt-1 is-size-7">Exposure time:</label>
+                        <label class="pr-1 pt-1 is-size-7">Exposure:</label>
                         <div class="select is-rounded is-info is-size-7">
                             <div class="control">
                                 <div class="select is-size-7">
@@ -56,7 +56,7 @@
                                         <option value="auto">Auto</option>
                                         <option value="33333">1/30 sec</option>
                                         <option value="25000">1/40 sec</option>
-                                        <option value="29000">1/50 sec</option>
+                                        <option value="20000">1/50 sec</option>
                                         <option value="16667">1/60 sec</option>
                                         <option value="12500">1/80 sec</option>
                                         <option value="10000">1/100 sec</option>
@@ -85,6 +85,32 @@
                                         <option value="50">1/20000 sec</option>
                                         <option value="40">1/25000 sec</option>
                                         <option value="31">1/32000 sec</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <label class="pl-2 pr-1 pt-1 is-size-7">Gain:</label>
+                        <div class="select is-rounded is-info is-size-7">
+                            <div class="control">
+                                <div class="select is-size-7">
+                                    <select id="analogueGainId" onchange="analogueGainOnChange()">
+                                        <option value="auto">Auto</option>
+                                        <option value="1.0">1.0</option>
+                                        <option value="2.0">2.0</option>
+                                        <option value="3.0">3.0</option>
+                                        <option value="4.0">4.0</option>
+                                        <option value="5.0">5.0</option>
+                                        <option value="6.0">6.0</option>
+                                        <option value="7.0">7.0</option>
+                                        <option value="8.0">8.0</option>
+                                        <option value="9.0">9.0</option>
+                                        <option value="10.0">10.0</option>
+                                        <option value="11.0">11.0</option>
+                                        <option value="12.0">12.0</option>
+                                        <option value="13.0">13.0</option>
+                                        <option value="14.0">14.0</option>
+                                        <option value="15.0">15.0</option>
                                     </select>
                                 </div>
                             </div>
