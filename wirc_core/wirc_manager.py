@@ -245,6 +245,19 @@ class WircManager(object):
                 exposure_time_us, rpi_camera="cam1"
             )
 
+            analogue_gain = self.config.get(
+                "cam0" + ".settings.analogue_gain", "auto"
+            )
+            wirc_core.wirc_client_status.set_analogue_gain(
+                analogue_gain, rpi_camera="cam0"
+            )
+            analogue_gain = self.config.get(
+                "cam1" + ".settings.analogue_gain", "auto"
+            )
+            wirc_core.wirc_client_status.set_analogue_gain(
+                analogue_gain, rpi_camera="cam1"
+            )
+
             if self.cam0_active:
                 self.logger.debug("RPi camera 'cam0' activated.")
                 await wirc_core.rpi_cam0.start_camera()

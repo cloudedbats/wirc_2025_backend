@@ -103,10 +103,10 @@ async def set_exposure_time(time_us: int, rpi_camera: str = "cam0"):
 @cameras_router.post(
     "/cameras/analogue-gain", tags=["Cameras"], description="Set analogue gain."
 )
-async def set_analogue_gain(analogue_gain: float, rpi_camera: str = "cam0"):
+async def set_analogue_gain(analogue_gain: int, rpi_camera: str = "cam0"):
     """ """
     try:
-        analogue_gain = float(analogue_gain)
+        analogue_gain = int(analogue_gain)
         logger.debug("API called: set_analogue_gain.")
         await wirc_core.wirc_manager.set_analogue_gain(analogue_gain, rpi_camera)
     except Exception as e:
