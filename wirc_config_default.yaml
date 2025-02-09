@@ -21,7 +21,7 @@ cam0:
     size_divisor: 2.0
   video:
     horizontal_size_px: max
-    vertical_size_px: max
+    vertical_size_px: auto
     framerate_fps: 30
     pre_buffer_frames: 60
     single_length_s: 5
@@ -53,7 +53,7 @@ cam1:
     size_divisor: 2.0
   video:
     horizontal_size_px: max
-    vertical_size_px: max
+    vertical_size_px: auto
     framerate_fps: 30
     pre_buffer_frames: 60
     single_length_s: 5
