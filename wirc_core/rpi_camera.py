@@ -21,6 +21,7 @@ class RaspberyPiCamera:
         """ """
         self.logger = logging.getLogger(logger_name)
         self.camera_status = ""
+        self.camera_config_done = False
         self.clear()
         # For preview streaming.
         self.preview_streamer = PreviewStreamingOutput()
@@ -35,7 +36,6 @@ class RaspberyPiCamera:
         self.camera_controls = None
         #
         self.camera_status = "Cleared"
-        self.camera_config_done = False
         self.image_capture_active = False
         self.video_h264_path = None
         self.video_mp4_path = None
