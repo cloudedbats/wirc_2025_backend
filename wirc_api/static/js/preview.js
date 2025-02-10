@@ -85,8 +85,8 @@ function rpiCameraSelectOnChange() {
 
 function refreshPreviewStream() {
   let image = byId('mjpegStreamId');
-  image.src = "";
   image.src = 'preview/stream.mjpeg' + '?rpi_camera=' + selectedRPiCamera;
+  image.src += '&dummy=' + Math.random(); // To avoid cache.
   byId('previewTitleId').textContent = selectedRPiCameraName;
 }
 
