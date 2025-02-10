@@ -74,6 +74,12 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         # Get event notification objects.
         status_event = wirc_core.wirc_client_status.get_status_event()
         logging_event = wirc_core.wirc_client_info.get_logging_event()
+        cam0_streaming_start_event = (
+            wirc_core.rpi_cam0.preview_streamer.get_streaming_start_event()
+        )
+        cam1_streaming_start_event = (
+            wirc_core.rpi_cam1.preview_streamer.get_streaming_start_event()
+        )
         # Update client.
         ws_json = {}
         ws_json["status"] = {
@@ -87,6 +93,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         ws_json["cam0_analogue_gain"] = status_dict.get("cam0_analogue_gain", "")
         ws_json["cam1_analogue_gain"] = (status_dict.get("cam1_analogue_gain", ""),)
         ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()
+        ws_json["cam0_streaming_started"] = True
+        ws_json["cam1_streaming_started"] = True
         # Send update to client.
         await websocket.send_json(ws_json)
         # Loop.
@@ -95,10 +103,18 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             task_1 = asyncio.create_task(asyncio.sleep(1.0), name="ws-sleep-event")
             task_2 = asyncio.create_task(status_event.wait(), name="ws-status-event")
             task_3 = asyncio.create_task(logging_event.wait(), name="ws-logging-event")
+            task_4 = asyncio.create_task(
+                cam0_streaming_start_event.wait(), name="ws-cam0-stream-event"
+            )
+            task_5 = asyncio.create_task(
+                cam1_streaming_start_event.wait(), name="ws-cam1-stream-event"
+            )
             events = [
                 task_1,
                 task_2,
                 task_3,
+                task_4,
+                task_5,
             ]
             done, pending = await asyncio.wait(
                 events, return_when=asyncio.FIRST_COMPLETED
@@ -114,6 +130,7 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             ws_json["status"] = {
                 "detectorTime": time.strftime("%Y-%m-%d %H:%M:%S"),
             }
+
             if status_event.is_set():
                 status_event = wirc_core.wirc_client_status.get_status_event()
                 status_dict = wirc_core.wirc_client_status.get_status_dict()
@@ -133,6 +150,19 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             if logging_event.is_set():
                 logging_event = wirc_core.wirc_client_info.get_logging_event()
                 ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()
+
+            if cam0_streaming_start_event.is_set():
+                cam0_streaming_start_event = (
+                    wirc_core.rpi_cam0.preview_streamer.get_streaming_start_event()
+                )
+                ws_json["cam0_streaming_started"] = True
+
+            if cam1_streaming_start_event.is_set():
+                cam1_streaming_start_event = (
+                    wirc_core.rpi_cam1.preview_streamer.get_streaming_start_event()
+                )
+                ws_json["cam1_streaming_started"] = True
+
             # Send to client.
             await websocket.send_json(ws_json)
 

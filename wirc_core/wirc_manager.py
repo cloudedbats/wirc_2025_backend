@@ -170,9 +170,7 @@ class WircManager(object):
         metadata = await rpicam.start_video(
             video_length_s, video_dir, video_file_h264, video_file_mp4
         )
-        wirc_core.wirc_client_info.write_log(
-            "info", "Video recorded: " + video_file_mp4
-        )
+        wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
     async def start_video(self, rpi_camera="cam0"):
         """ """
@@ -211,9 +209,7 @@ class WircManager(object):
                 metadata = await rpicam.start_video(
                     video_length_s, video_dir, video_file_h264, video_file_mp4
                 )
-                wirc_core.wirc_client_info.write_log(
-                    "info", "Video recorded: " + video_file_mp4
-                )
+                wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
         except Exception as e:
             self.logger.debug("Exception in start_video : " + str(e))
@@ -259,7 +255,7 @@ class WircManager(object):
                 metadata = await rpicam.capture_image(image_dir, image_file)
 
                 wirc_core.wirc_client_info.write_log(
-                    "info", "Image saved: " + str(image_dir)
+                    "info", "Image: " + str(image_file)
                 )
             finally:
                 pass

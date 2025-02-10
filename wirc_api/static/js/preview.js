@@ -36,8 +36,6 @@ function previewToggleSettings() {
 
 function captureImageClicked() {
   captureImage()
-  // Refresh preview stream after image is needed.
-  setTimeout(refreshPreviewStream, 1000)
 }
 
 function videoSingleClicked() {

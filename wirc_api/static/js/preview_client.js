@@ -145,14 +145,23 @@ function startWebsocket(wsUrl) {
     }
 
     if ('cam0_exposure_time_us' in dataJson === true) {
-      updateExposureTime(dataJson.cam0_exposure_time_us,dataJson.cam1_exposure_time_us)
+      updateExposureTime(dataJson.cam0_exposure_time_us, dataJson.cam1_exposure_time_us)
     }
     if ('cam0_analogue_gain' in dataJson === true) {
       updateAnalogueGain(dataJson.cam0_analogue_gain, dataJson.cam1_analogue_gain)
     }
-    // if ('"cam1_exposure_time_us"' in dataJson === true) {
-    //   updateLogTable(dataJson.logRows)
-    // }
+
+    if ('cam0_streaming_started' in dataJson === true) {
+      if (selectedRPiCamera == 'cam0') {
+        refreshPreviewStream()
+      }
+    }
+    if ('cam1_streaming_started' in dataJson === true) {
+      if (selectedRPiCamera == 'cam1') {
+        refreshPreviewStream()
+      }
+    }
+
   }
   ws.onclose = function (event) {
     // Try to reconnect in 5th seconds. Will continue...

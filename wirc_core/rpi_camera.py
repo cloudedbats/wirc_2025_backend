@@ -407,6 +407,7 @@ class PreviewStreamingOutput(io.BufferedIOBase):
     def __init__(self):
         """ """
         self.condition = threading.Condition()
+        self.streaming_event = None
         self.frame = None
         self.is_running = False
 
@@ -414,6 +415,7 @@ class PreviewStreamingOutput(io.BufferedIOBase):
         """ """
         self.frame = None
         self.is_running = True
+        self.streaming_start_event()
         # try:
         #     self.condition.notify_all()  # TODO Needed?
         # except Exception as e:
@@ -439,3 +441,16 @@ class PreviewStreamingOutput(io.BufferedIOBase):
                 self.condition.notify_all()
             except Exception as e:
                 print("Exception: PreviewStreamingOutput write: ", e)
+
+    def streaming_start_event(self):
+        """Release event."""
+        # Event: Create a new and release the old.
+        old_event = self.get_streaming_start_event()
+        self.streaming_event = asyncio.Event()
+        old_event.set()
+
+    def get_streaming_start_event(self):
+        """Used by consumers."""
+        if self.streaming_event == None:
+            self.streaming_event = asyncio.Event()
+        return self.streaming_event
