@@ -19,8 +19,6 @@ To download and manage recorded files you have to use an SFTP client, like FileZ
 
 TODO: Image.
 
-
-
 The simple web app that is a part of the WIRC-2025-backend. Watching birds in daylight now, flying bats with IR-light is not possible in February in Sweden. Image: CloudedBats - CC0.
 
 The web user interface only contains the most basic functionality and settings.
@@ -88,10 +86,10 @@ Install the software in this repository.
     source venv/bin/activate
     pip install -r requirements.txt
 
-    sudo cp /home/wurb/raspberrypi_files/wirc_2024.service /etc/systemd/system/
+    sudo cp /home/wurb/wirc_2025_backend/raspberrypi_files/wirc_2025.service /etc/systemd/system/
     sudo systemctl daemon-reload
-    sudo systemctl enable wirc_2024.service
-    sudo systemctl start wirc_2024.service
+    sudo systemctl enable wirc_2025.service
+    sudo systemctl start wirc_2025.service
 
 ## Attached cameras
 
@@ -113,13 +111,30 @@ Raspberry Pi 5 supports two cameras (cam0 and cam1) and the other models support
     dtoverlay=ov9281,cam0
     dtoverlay=imx296,cam1
 
+A reboot is needed after the update of the "config.txt" file.
+
+    sudo reboot
+
+## Web app and API
+
+Then it should be possible to start the web application in a browser connected to the same local network.
+
+    http://wurb01c.local:8082
+
+The API if you want to use it as a backend, can be found here:
+
+    http://wurb01c.local:8082/docs
+
 ## Remote access
 
 TODO.
 
-## Web app and API
+## Feedback
 
-TODO.
+This system was developed during a period when bats hibernate.
+Therefore, I have not tested it on flying bats yet and there will probably be changes when
+theory meets reality.
+Please provide feedback if you try it yourself. Contact details below.
 
 ## Contact
 
