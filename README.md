@@ -17,9 +17,10 @@ To download and manage recorded files you have to use an SFTP client, like FileZ
 
 ## The web user interface
 
-TODO: Image.
+![WIRC-2025-web](WIRC-2025-backend-web.png?raw=true  "WIRC-2025-backend - web example.")
 
-The simple web app that is a part of the WIRC-2025-backend. Watching birds in daylight now, flying bats with IR-light is not possible in February in Sweden. Image: CloudedBats - CC0.
+This is an example screenshot from the simple web app that is a part of the WIRC-2025-backend. 
+I'm watching birds in daylight now, flying bats with IR-light is not possible in February in Sweden.
 
 The web user interface only contains the most basic functionality and settings.
 Then there is a possibility to make adjustments in a configuration file called "wirc_config.yaml".
