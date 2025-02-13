@@ -28,8 +28,7 @@ Then there is a possibility to make adjustments in a configuration file called "
 
 There are some more information available in this GitHub repository:
 
-TODO: https://github.com/cloudedbats/wirc_camera_basics
-
+https://github.com/cloudedbats/wirc_camera_basics
 
 ## Installation
 
@@ -125,9 +124,28 @@ The API if you want to use it as a backend, can be found here:
 
     http://wurb01c.local:8082/docs
 
+## Configuration, logging and recorded files
+
+There are three dirctories with important content when using WIRC.
+
+- **/home/wurb/wirc_settings** contains a yaml file with extra configuration parameters.
+- **/home/wurb/wirc_logging** contains log files.
+- **/home/wurb/wirc_recordings** contains the recorded videos and captured images.
+
 ## Remote access
 
-TODO.
+The instructions above is about a Raspberry Pi connected to a local network.
+Then it should be accesses with ".local", like in this example: **http://wurb01c.local:8082**
+
+If the Raspberry Pi is setup like a hotspot it should be accessed like this **http://10.42.0.1:8080**
+A detaild instruction for this is available in the "CloudedBats WURB-2024" repository.
+
+My personal favorite is to use **Tailscale**, https://tailscale.com/, where even remotely deployed detectors 
+can be accessed in the same way as if they where locally installed. 
+The address will then be **http://wurb01c:8082** if it is accessed from a desktop computer or mobile phone 
+where Tailscale is installed.
+The requirement is then that the Raspberry Pi is connected to internet, and this can be done with cable, wifi or 
+by using a 4G/LTE modem.
 
 ## Feedback
 
