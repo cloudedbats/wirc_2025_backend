@@ -67,8 +67,8 @@ Connect to the Raspberry Pi with SSH and do an update.
 Install some linus packages that is common for both WURB and WIRC.
 
     sudo apt install git python3-venv python3-dev -y
-    sudoapt install  libatlas-base-dev libopenblas-dev -y
-    sudoapt install pulseaudio pmount -y
+    sudo apt install  libatlas-base-dev libopenblas-dev -y
+    sudo apt install pulseaudio pmount -y
 
 Additions for camera support.
 
