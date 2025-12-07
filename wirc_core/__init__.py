@@ -30,6 +30,7 @@ config_file = "wirc_config.yaml"
 config_default_file = pathlib.Path(workdir_path, "wirc_config_default.yaml")
 
 from wirc_core.rpi_camera import RaspberyPiCamera
+from wirc_core.thermal_camera import ThermalCamera
 
 # from wirc_core.wirc_config import WircConfig
 # from wirc_core.wirc_control import WircControl
@@ -50,7 +51,9 @@ config.load_config(
 )
 # Cameras.
 rpi_cam0 = RaspberyPiCamera(logger_name=logger_name)
-rpi_cam1 = RaspberyPiCamera(logger_name=logger_name)
+# rpi_cam1 = RaspberyPiCamera(logger_name=logger_name)
+rpi_cam1 = ThermalCamera(logger_name=logger_name)
+
 # Basic wirc.
 wirc_settings = WircSettings(config, logger_name=logger_name)
 wirc_client_status = WircClientStatus(config, logger_name=logger_name)

@@ -8,9 +8,8 @@ import asyncio
 import pathlib
 import logging
 import io
-import threading
 import subprocess
-from picamera2 import Picamera2, encoders, outputs
+from picamera2 import Picamera2, encoders, outputs, Metadata
 import libcamera
 
 
@@ -24,7 +23,11 @@ class RaspberyPiCamera:
         self.camera_config_done = False
         self.clear()
         # For preview streaming.
+        self.preview_queue = asyncio.Queue(maxsize=10)
         self.preview_streamer = PreviewStreamingOutput()
+        self.preview_streamer.set_preview_queue(self.preview_queue)
+        self.streaming_event = None
+        self.streaming_start_event()
 
     def clear(self):
         """ """
@@ -255,9 +258,7 @@ class RaspberyPiCamera:
             # Decoder and output for video. Circular output used.
             self.video_encoder = encoders.H264Encoder()
             # Buffersize=60 at 30 fps = 2 sec.
-            self.video_output = outputs.CircularOutput(
-                buffersize=int(self.video_pre_buffer_frames),
-            )
+            self.video_output = outputs.CircularOutput2(buffer_duration_ms=1000)
             # Start the circular output.
             self.picam2.start_recording(
                 self.video_encoder, self.video_output, name="main"
@@ -280,7 +281,7 @@ class RaspberyPiCamera:
     async def start_preview_encoder(self):
         """ """
         try:
-            self.preview_streamer.start_stream()
+            # self.preview_streamer.start_stream()
             # Setup preview stream.
             self.preview_encoder = encoders.MJPEGEncoder()
             # self.preview_encoder = encoders.MJPEGEncoder(10000000)
@@ -293,7 +294,7 @@ class RaspberyPiCamera:
     async def stop_preview_encoder(self):
         """ """
         try:
-            self.preview_streamer.stop_stream()
+            # self.preview_streamer.stop_stream()
             await asyncio.sleep(0)
             self.preview_encoder.output.stop()
             await asyncio.sleep(0)
@@ -312,8 +313,23 @@ class RaspberyPiCamera:
         if self.picam2 == None:
             return
         try:
+
+            metadata = Metadata(self.picam2.capture_metadata())
+            exposure = metadata.ExposureTime
+            gain = metadata.AnalogueGain
+            exposure = int(round(1000000 / exposure, 0))
+            gain = round(gain, 1)
+            metadata_string = "exp" + str(exposure) + "gain" + str(gain)
+            print("DEBUG ExposureTime: ", 1000000 / exposure, "Gain: ", gain)
+            print(metadata_string)
+            out_path = str(self.video_mp4_path).replace(
+                ".mp4", "_" + metadata_string + ".mp4"
+            )
+
+            self.video_output.stop()
             self.camera_status = "Video started"
-            self.video_output.fileoutput = str(self.video_h264_path)
+            # self.video_output.open_output(outputs.PyavOutput(str(self.video_mp4_path)))
+            self.video_output.open_output(outputs.PyavOutput(out_path))
             self.video_output.start()
             await asyncio.sleep(float(lenght_s))
             await self.stop_video()
@@ -326,7 +342,8 @@ class RaspberyPiCamera:
             return
         try:
             try:
-                self.video_output.stop()
+                # self.video_output.stop()
+                self.video_output.close_output()
                 self.logger.info("Video stored: " + str(self.video_h264_path))
             finally:
                 self.camera_status = "Video stopped"
@@ -396,52 +413,6 @@ class RaspberyPiCamera:
 
         return metadata
 
-    def get_preview_streamer(self):
-        """ """
-        return self.preview_streamer
-
-
-class PreviewStreamingOutput(io.BufferedIOBase):
-    """ """
-
-    def __init__(self):
-        """ """
-        self.condition = threading.Condition()
-        self.streaming_event = None
-        self.frame = None
-        self.is_running = False
-
-    def start_stream(self):
-        """ """
-        self.frame = None
-        self.is_running = True
-        self.streaming_start_event()
-        # try:
-        #     self.condition.notify_all()  # TODO Needed?
-        # except Exception as e:
-        #     print("Exception: PreviewStreamingOutput start_stream: ", e)
-
-    def stop_stream(self):
-        """ """
-        self.frame = None
-        self.is_running = False
-        try:
-            self.condition.release()
-        except Exception as e:
-            print("Exception: PreviewStreamingOutput stop_stream: ", e)
-
-    def write(self, buf):
-        """ """
-        with self.condition:
-            if self.is_running == False:
-                return
-            self.frame = buf
-            # print("BUFFER: ", len(self.frame))
-            try:
-                self.condition.notify_all()
-            except Exception as e:
-                print("Exception: PreviewStreamingOutput write: ", e)
-
     def streaming_start_event(self):
         """Release event."""
         # Event: Create a new and release the old.
@@ -454,3 +425,32 @@ class PreviewStreamingOutput(io.BufferedIOBase):
         if self.streaming_event == None:
             self.streaming_event = asyncio.Event()
         return self.streaming_event
+
+
+class PreviewStreamingOutput(io.BufferedIOBase):
+    """ """
+
+    def __init__(self):
+        """ """
+        self.preview_queue = None
+
+    def set_preview_queue(self, preview_queue):
+        """ """
+        self.preview_queue = preview_queue
+
+    def write(self, buf):
+        """ """
+        try:
+            if self.preview_queue != None:
+                if not self.preview_queue.full():
+                    self.preview_queue.put_nowait(buf)
+                else:
+                    print("Queue full, remove items.")
+                    try:
+                        while True:
+                            self.preview_queue.get_nowait()
+                            self.preview_queue.task_done()
+                    except asyncio.QueueEmpty:
+                        pass
+        except Exception as e:
+            print("Exception: PreviewStreamingOutput write: ", e)

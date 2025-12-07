@@ -20,20 +20,40 @@ preview_router = fastapi.APIRouter()
 
 async def preview_streamer_mjpeg(rpi_camera="cam0"):
     """ """
-    output = None
+    #
+    # NOTE: This version supports only one mjpeg consumer for each camera.
+    #
+
+    preview_queue = None
     try:
-        output = wirc_core.wirc_manager.get_preview_streamer(rpi_camera)
-        if output == None:
-            logger.debug("Wrong camera selected for streaming.")
-            return
-        while output.is_running:
-            with output.condition:
-                output.condition.wait()
-                if output.frame != None:
+        # Select preview queue.
+        if rpi_camera == "cam1":
+            preview_queue = wirc_core.rpi_cam1.preview_queue
+        else:
+            preview_queue = wirc_core.rpi_cam0.preview_queue
+        #
+        if preview_queue:
+            while True:
+                try:
+                    # Wait for next frame.
+                    preview_frame = await asyncio.wait_for(
+                        preview_queue.get(),
+                        timeout=1,
+                    )
+                    # Search for last frame.
+                    try:
+                        while True:
+                            preview_frame = preview_queue.get_nowait()
+                    except asyncio.QueueEmpty:
+                        pass
+                    # Use found frame.
                     yield (
                         b"--frame\r\n"
-                        b"Content-Type: image/jpeg\r\n\r\n" + output.frame + b"\r\n"
+                        b"Content-Type: image/jpeg\r\n\r\n" + preview_frame + b"\r\n"
                     )
+                    preview_queue.task_done()
+                except asyncio.TimeoutError:
+                    pass
                 # Asyncio sleep needed to catch removed clients.
                 await asyncio.sleep(0)
     except asyncio.CancelledError:
@@ -74,12 +94,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         # Get event notification objects.
         status_event = wirc_core.wirc_client_status.get_status_event()
         logging_event = wirc_core.wirc_client_info.get_logging_event()
-        cam0_streaming_start_event = (
-            wirc_core.rpi_cam0.preview_streamer.get_streaming_start_event()
-        )
-        cam1_streaming_start_event = (
-            wirc_core.rpi_cam1.preview_streamer.get_streaming_start_event()
-        )
+        cam0_streaming_start_event = wirc_core.rpi_cam0.get_streaming_start_event()
+        cam1_streaming_start_event = wirc_core.rpi_cam1.get_streaming_start_event()
         # Update client.
         ws_json = {}
         ws_json["status"] = {
@@ -153,13 +169,13 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
 
             if cam0_streaming_start_event.is_set():
                 cam0_streaming_start_event = (
-                    wirc_core.rpi_cam0.preview_streamer.get_streaming_start_event()
+                    wirc_core.rpi_cam0.get_streaming_start_event()
                 )
                 ws_json["cam0_streaming_started"] = True
 
             if cam1_streaming_start_event.is_set():
                 cam1_streaming_start_event = (
-                    wirc_core.rpi_cam1.preview_streamer.get_streaming_start_event()
+                    wirc_core.rpi_cam1.get_streaming_start_event()
                 )
                 ws_json["cam1_streaming_started"] = True
 
