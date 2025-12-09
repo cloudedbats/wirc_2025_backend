@@ -231,10 +231,6 @@ class ThermalCamera:
         except Exception as e:
             self.logger.debug("Exception in stop_video: " + str(e))
 
-    async def capture_image(self, dir_path, file_name):
-        """ """
-        pass  # Not used.
-
     def streaming_start_event(self):
         """Release event."""
         # Event: Create a new and release the old.

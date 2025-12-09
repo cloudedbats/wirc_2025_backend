@@ -60,19 +60,6 @@ async def stop_video(rpi_camera: str = "cam0"):
 
 
 @cameras_router.post(
-    "/cameras/capture-image", tags=["Cameras"], description="Capture and save image."
-)
-async def capture_image(rpi_camera: str = "cam0"):
-    """ """
-    try:
-        logger.debug("API called: capture_image.")
-        await wirc_core.wirc_manager.capture_image(rpi_camera)
-    except Exception as e:
-        message = "API - capture_image. Exception: " + str(e)
-        logger.debug(message)
-
-
-@cameras_router.post(
     "/cameras/saturation", tags=["Cameras"], description="Set saturation."
 )
 async def set_saturation(saturation: float, rpi_camera: str = "cam0"):

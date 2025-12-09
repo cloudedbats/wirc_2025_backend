@@ -39,7 +39,6 @@ class RaspberyPiCamera:
         self.camera_controls = None
         #
         self.camera_status = "Cleared"
-        self.image_capture_active = False
         self.video_mp4_path = None
 
     def get_global_camera_info(self):
@@ -373,43 +372,6 @@ class RaspberyPiCamera:
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in stop_video: " + str(e))
-
-    async def capture_image(self, dir_path, file_name):
-        """ """
-        file_path_name = pathlib.Path(dir_path, file_name)
-        # if self.camera_status in ["Stopped", "Video started"]:
-        #     self.logger.warning("Capture jpeg: Terminated since video is captured now.")
-        #     return
-        try:
-            if self.image_capture_active:
-                return
-            try:
-                # Stop preview (sometimes it stops working otherwise, reason unclear).
-                await self.stop_preview_encoder()
-
-                self.image_capture_active = True
-                (buffer,), metadata = self.picam2.capture_buffers(["main"])
-                img = self.picam2.helpers.make_image(
-                    buffer, self.picam2.camera_configuration()["main"]
-                )
-                self.picam2.helpers.save(img, metadata, str(file_path_name))
-
-                # # Alternative syntax.
-                # self.image_capture_active = True
-                # with self.picam2.captured_request() as request:
-                #     request.save("main", str(image_path))
-                #     metadata = request.get_metadata()
-            finally:
-                self.image_capture_active = False
-                # Start preview, if stopped.
-                await self.start_preview_encoder()
-
-            self.logger.info("Jpeg stored: " + str(file_path_name))
-
-        except Exception as e:
-            self.logger.debug("Exception in capture_image: " + str(e))
-
-        return metadata
 
     def streaming_start_event(self):
         """Release event."""

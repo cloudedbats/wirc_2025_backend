@@ -50,12 +50,9 @@ class WircFiles(object):
     async def get_files(self, dir_path, media_type=None):
         """ """
         video_files = {}
-        image_files = {}
         if media_type in ["video", None]:
             video_files = await self.get_video_files(dir_path)
-        if media_type in ["image", None]:
-            image_files = await self.get_image_files(dir_path)
-        return video_files | image_files
+        return video_files
 
     async def get_video_files(self, dir_path):
         """ """
@@ -63,17 +60,6 @@ class WircFiles(object):
         if dir_path:
             dir_path = pathlib.Path(dir_path)
             for file_path in sorted(dir_path.glob("*.mp4")):
-                file_name = file_path.name
-                file_path = str(file_path.resolve())
-                result[file_name] = file_path
-        return result
-
-    async def get_image_files(self, dir_path):
-        """ """
-        result = {}
-        if dir_path:
-            dir_path = pathlib.Path(dir_path)
-            for file_path in sorted(dir_path.glob("*.jpg")):
                 file_name = file_path.name
                 file_path = str(file_path.resolve())
                 result[file_name] = file_path

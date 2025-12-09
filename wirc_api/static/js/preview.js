@@ -34,10 +34,6 @@ function previewToggleSettings() {
   }
 }
 
-function captureImageClicked() {
-  captureImage()
-}
-
 function videoSingleClicked() {
   videoSingle()
 }

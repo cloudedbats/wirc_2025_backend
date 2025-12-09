@@ -27,8 +27,6 @@ cam0:
     single_length_s: 5
     continuous_length_s: 10
     file_prefix: wircA
-  image:
-    file_prefix: wircA
   storage:
     rec_dir: /home/wurb/wirc_recordings
     remove_old_rec: true
@@ -58,8 +56,6 @@ cam1:
     pre_buffer_frames: 60
     single_length_s: 5
     continuous_length_s: 10
-    file_prefix: wircB
-  image:
     file_prefix: wircB
   storage:
     rec_dir: /home/wurb/wirc_recordings

@@ -40,23 +40,6 @@ async function setAnalogueGain(analogueGain) {
   }
 }
 
-async function captureImage() {
-  try {
-    let urlString = '/cameras/capture-image/' + '?rpi_camera=' + selectedRPiCamera
-    let params = {}
-    await fetch(urlString, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(params)
-    })
-  } catch (err) {
-    alert('ERROR captureImage: ' + err)
-    console.log(err)
-  }
-}
-
 async function videoSingle() {
   try {
     let urlString = '/cameras/record-video/' + '?rpi_camera=' + selectedRPiCamera
