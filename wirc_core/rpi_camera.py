@@ -40,7 +40,6 @@ class RaspberyPiCamera:
         #
         self.camera_status = "Cleared"
         self.image_capture_active = False
-        self.video_h264_path = None
         self.video_mp4_path = None
 
     def get_global_camera_info(self):
@@ -303,12 +302,11 @@ class RaspberyPiCamera:
         except Exception as e:
             self.logger.debug("Exception in stop_preview_encoder: " + str(e))
 
-    async def start_video(self, lenght_s, dir_path, file_name_h264, file_name_mp4):
+    async def start_video(self, lenght_s, dir_path, file_name_mp4):
         """ """
         if self.camera_status in ["Stopped", "Video started"]:
             return
 
-        self.video_h264_path = pathlib.Path(dir_path, file_name_h264)
         self.video_mp4_path = pathlib.Path(dir_path, file_name_mp4)
         if self.picam2 == None:
             return
@@ -338,40 +336,40 @@ class RaspberyPiCamera:
 
     async def stop_video(self):
         """ """
-        if self.video_h264_path == None or self.video_mp4_path == None:
+        if self.video_mp4_path == None:
             return
         try:
             try:
                 # self.video_output.stop()
                 self.video_output.close_output()
-                self.logger.info("Video stored: " + str(self.video_h264_path))
+                self.logger.info("Video stored: " + str(self.video_mp4_path))
             finally:
                 self.camera_status = "Video stopped"
             await asyncio.sleep(0)
 
-            # From H264 to MP4 using ffmpeg.
-            if self.video_h264_path.exists():
-                command = [
-                    "ffmpeg",
-                    "-loglevel",
-                    "warning",
-                    "-hide_banner",
-                    "-stats",
-                    "-y",  # Overwrite.
-                    "-i",
-                    str(self.video_h264_path),  # From H264.
-                    "-c",
-                    "copy",
-                    str(self.video_mp4_path),  # To MP4.
-                ]
-                self.video_h264_path = None
-                self.video_mp4_path = None
-                # subprocess.run(command, check=True)
-                subprocess.Popen(
-                    command,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                )
+            # # From H264 to MP4 using ffmpeg.
+            # if self.video_h264_path.exists():
+            #     command = [
+            #         "ffmpeg",
+            #         "-loglevel",
+            #         "warning",
+            #         "-hide_banner",
+            #         "-stats",
+            #         "-y",  # Overwrite.
+            #         "-i",
+            #         str(self.video_h264_path),  # From H264.
+            #         "-c",
+            #         "copy",
+            #         str(self.video_mp4_path),  # To MP4.
+            #     ]
+            #     self.video_h264_path = None
+            #     self.video_mp4_path = None
+            #     # subprocess.run(command, check=True)
+            #     subprocess.Popen(
+            #         command,
+            #         stdout=subprocess.DEVNULL,
+            #         stderr=subprocess.DEVNULL,
+            #     )
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in stop_video: " + str(e))

@@ -162,14 +162,9 @@ class WircManager(object):
         if not video_dir.exists():
             video_dir.mkdir(parents=True)
         video_file = video_prefix + "_" + date_and_time
-        video_file_h264 = video_file + ".h264"
         video_file_mp4 = video_file + ".mp4"
-        # video_h264_path = pathlib.Path(video_dir, video_file_h264)
-        # video_mp4_path = pathlib.Path(video_dir, video_file_mp4)
         # Start video recording.
-        metadata = await rpicam.start_video(
-            video_length_s, video_dir, video_file_h264, video_file_mp4
-        )
+        metadata = await rpicam.start_video(video_length_s, video_dir, video_file_mp4)
         wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
     async def start_video(self, rpi_camera="cam0"):
@@ -201,15 +196,15 @@ class WircManager(object):
                 if not video_dir.exists():
                     video_dir.mkdir(parents=True)
                 video_file = video_prefix + "_" + date_and_time
-                video_file_h264 = video_file + ".h264"
                 video_file_mp4 = video_file + ".mp4"
-                # video_h264_path = pathlib.Path(video_dir, video_file_h264)
-                # video_mp4_path = pathlib.Path(video_dir, video_file_mp4)
                 # Start video recording.
                 metadata = await rpicam.start_video(
-                    video_length_s, video_dir, video_file_h264, video_file_mp4
+                    video_length_s, video_dir, video_file_mp4
                 )
                 wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
+
+                if rpi_camera == "cam1":
+                    break
 
         except Exception as e:
             self.logger.debug("Exception in start_video : " + str(e))
