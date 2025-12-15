@@ -18,19 +18,22 @@ logger = logging.getLogger(wirc_core.logger_name)
 preview_router = fastapi.APIRouter()
 
 
-async def preview_streamer_mjpeg(rpi_camera="cam0"):
+async def preview_streamer_mjpeg(rpi_camera="rpi_cam0"):
     """ """
     #
     # NOTE: This version supports only one mjpeg consumer for each camera.
     #
-
     preview_queue = None
     try:
         # Select preview queue.
-        if rpi_camera == "cam1":
-            preview_queue = wirc_core.rpi_cam1.preview_queue
-        else:
+        if rpi_camera == "rpi_cam0":
             preview_queue = wirc_core.rpi_cam0.preview_queue
+        elif rpi_camera == "rpi_cam1":
+            preview_queue = wirc_core.rpi_cam1.preview_queue
+        elif rpi_camera == "usb_thermal":
+            preview_queue = wirc_core.usb_thermal.preview_queue
+        else:
+            preview_queue = None
         #
         if preview_queue:
             while True:
@@ -68,7 +71,7 @@ async def preview_streamer_mjpeg(rpi_camera="cam0"):
     description="Preview streamed as Motion JPEG.",
 )
 # async def stream_mjpeg(request: fastapi.Request):
-async def preview_stream_mjpeg(rpi_camera: str = "cam0"):
+async def preview_stream_mjpeg(rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         logger.debug("API called: preview_stream_mjpeg.")
@@ -96,6 +99,7 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         logging_event = wirc_core.wirc_client_info.get_logging_event()
         cam0_streaming_start_event = wirc_core.rpi_cam0.get_streaming_start_event()
         cam1_streaming_start_event = wirc_core.rpi_cam1.get_streaming_start_event()
+        thermal_streaming_start_event = wirc_core.usb_thermal.get_streaming_start_event()
         # Update client.
         ws_json = {}
         ws_json["status"] = {
@@ -111,6 +115,7 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()
         ws_json["cam0_streaming_started"] = True
         ws_json["cam1_streaming_started"] = True
+        ws_json["thermal_streaming_started"] = True
         # Send update to client.
         await websocket.send_json(ws_json)
         # Loop.
@@ -125,12 +130,16 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             task_5 = asyncio.create_task(
                 cam1_streaming_start_event.wait(), name="ws-cam1-stream-event"
             )
+            task_6 = asyncio.create_task(
+                thermal_streaming_start_event.wait(), name="ws-thermal-stream-event"
+            )
             events = [
                 task_1,
                 task_2,
                 task_3,
                 task_4,
                 task_5,
+                task_6,
             ]
             done, pending = await asyncio.wait(
                 events, return_when=asyncio.FIRST_COMPLETED
@@ -178,6 +187,12 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
                     wirc_core.rpi_cam1.get_streaming_start_event()
                 )
                 ws_json["cam1_streaming_started"] = True
+
+            if thermal_streaming_start_event.is_set():
+                termal_streaming_start_event = (
+                    wirc_core.usb_thermal.get_streaming_start_event()
+                )
+                ws_json["thermal_streaming_started"] = True
 
             # Send to client.
             await websocket.send_json(ws_json)

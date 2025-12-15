@@ -5,10 +5,9 @@ wirc_app:
   host: "0.0.0.0"
   log_level: info
 
-cam0:
-  name: Camera-A (cam0)
-  camera_mode: video
-  active: true
+rpi_cam0:
+  name: Camera-A (rpi_cam0)
+  startup_mode: preview
   monochrome: false
   orientation:
     hflip: 0
@@ -23,10 +22,10 @@ cam0:
     horizontal_size_px: max
     vertical_size_px: auto
     framerate_fps: 30
-    pre_buffer_frames: 60
-    single_length_s: 5
-    continuous_length_s: 10
-    file_prefix: wircA
+    pre_buffer_frames: 30
+    single_length_s: 10
+    continuous_length_s: 60
+    file_prefix: Cam-A
   storage:
     rec_dir: /home/wurb/wirc_recordings
     remove_old_rec: true
@@ -34,11 +33,9 @@ cam0:
   # picamera2_controls:
   #   AeEnable: false
 
-
-cam1:
-  name: Camera-B (cam1)
-  camera_mode: video
-  active: true
+rpi_cam1:
+  name: Camera-B (rpi_cam1)
+  startup_mode: preview
   monochrome: false
   orientation:
     hflip: 0
@@ -53,16 +50,32 @@ cam1:
     horizontal_size_px: max
     vertical_size_px: auto
     framerate_fps: 30
-    pre_buffer_frames: 60
-    single_length_s: 5
-    continuous_length_s: 10
-    file_prefix: wircB
+    pre_buffer_frames: 30
+    single_length_s: 10
+    continuous_length_s: 60
+    file_prefix: Cam-B
   storage:
     rec_dir: /home/wurb/wirc_recordings
     remove_old_rec: true
     free_space_limit_mb: 500
   # picamera2_controls:
   #   AeEnable: false
+
+usb_thermal:
+  name: Thermal (usb_thermal)
+  startup_mode: preview
+  orientation:
+    rotation_deg: 0
+  video:
+    framerate_fps: 25
+    pre_buffer_frames: 25
+    single_length_s: 10
+    continuous_length_s: 60
+    file_prefix: Thermal
+  storage:
+    rec_dir: /home/wurb/wirc_recordings
+    remove_old_rec: true
+    free_space_limit_mb: 500
 
 client_info:
   max_log_rows: 50

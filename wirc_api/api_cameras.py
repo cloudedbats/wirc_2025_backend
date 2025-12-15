@@ -19,7 +19,7 @@ cameras_router = fastapi.APIRouter()
 @cameras_router.post(
     "/cameras/record-video", tags=["Cameras"], description="Record video."
 )
-async def record_video(rpi_camera: str = "cam0"):
+async def record_video(rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         logger.debug("API called: record_video.")
@@ -34,7 +34,7 @@ async def record_video(rpi_camera: str = "cam0"):
     tags=["Cameras"],
     description="Start continuous video recording.",
 )
-async def start_video(rpi_camera: str = "cam0"):
+async def start_video(rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         logger.debug("API called: start_video.")
@@ -49,7 +49,7 @@ async def start_video(rpi_camera: str = "cam0"):
     tags=["Cameras"],
     description="Stop continuous video recording.",
 )
-async def stop_video(rpi_camera: str = "cam0"):
+async def stop_video(rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         logger.debug("API called: stop_video.")
@@ -62,7 +62,7 @@ async def stop_video(rpi_camera: str = "cam0"):
 @cameras_router.post(
     "/cameras/saturation", tags=["Cameras"], description="Set saturation."
 )
-async def set_saturation(saturation: float, rpi_camera: str = "cam0"):
+async def set_saturation(saturation: float, rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         saturation = float(saturation)
@@ -76,7 +76,7 @@ async def set_saturation(saturation: float, rpi_camera: str = "cam0"):
 @cameras_router.post(
     "/cameras/exposure-time", tags=["Cameras"], description="Set exposure time."
 )
-async def set_exposure_time(time_us: int, rpi_camera: str = "cam0"):
+async def set_exposure_time(time_us: int, rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         exposure_time_us = int(time_us)
@@ -90,7 +90,7 @@ async def set_exposure_time(time_us: int, rpi_camera: str = "cam0"):
 @cameras_router.post(
     "/cameras/analogue-gain", tags=["Cameras"], description="Set analogue gain."
 )
-async def set_analogue_gain(analogue_gain: int, rpi_camera: str = "cam0"):
+async def set_analogue_gain(analogue_gain: int, rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         analogue_gain = int(analogue_gain)
@@ -106,7 +106,7 @@ async def set_analogue_gain(analogue_gain: int, rpi_camera: str = "cam0"):
     tags=["Cameras"],
     description="Commands to stop, start and restart.",
 )
-async def camera_commands(command: str, rpi_camera: str = "cam0"):
+async def camera_commands(command: str, rpi_camera: str = "rpi_cam0"):
     """ """
     try:
         logger.debug("API called: camera_command: " + command)

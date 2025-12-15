@@ -16,12 +16,13 @@ from datetime import datetime
 class ThermalCamera:
     """ """
 
-    def __init__(self, logger_name="DefaultLogger"):
+    def __init__(self, config={}, logger_name="DefaultLogger", config_id="thermal"):
         """ """
+        self.config = config
         self.logger = logging.getLogger(logger_name)
-        self.camera_status = ""
-        self.camera_config_done = False
+        #
         self.clear()
+        self.configure(config_id)
         # For preview streaming.
         self.preview_queue = asyncio.Queue(maxsize=10)
         self.streaming_event = None
@@ -36,34 +37,34 @@ class ThermalCamera:
         self.thermal_video_active = False
         self.thermal_preview_task = None
 
+    def configure(
+        self,
+        config_id="thermal",
+
+        # rpi_camera_id="rpi_cam1",
+        # cam_monochrome=False,
+        # saturation="auto",
+        # exposure_time_us="auto",
+        # analogue_gain="auto",
+        # hflip=0,
+        # vflip=0,
+        # preview_size_divisor=2.0,
+        # video_horizontal_size_px="max",
+        # video_vertical_size_px="auto",
+        # video_framerate_fps=30,
+        # video_pre_buffer_frames=60,
+    ):
+        """ """
+        # self.rpi_camera_id = rpi_camera_id
+        # self.hflip = hflip
+        # self.vflip = vflip
+        # self.video_framerate_fps = video_framerate_fps
+        # #
+        self.camera_status = "Configured"
+
     def get_camera_status(self):
         """ """
         return self.camera_status
-
-    def camera_config(
-        self,
-        rpi_camera_id="cam1",
-        cam_monochrome=False,
-        saturation="auto",
-        exposure_time_us="auto",
-        analogue_gain="auto",
-        hflip=0,
-        vflip=0,
-        preview_size_divisor=2.0,
-        video_horizontal_size_px="max",
-        video_vertical_size_px="auto",
-        video_framerate_fps=30,
-        video_pre_buffer_frames=60,
-    ):
-        """ """
-        self.camera_config_done = True
-        #
-        self.rpi_camera_id = rpi_camera_id
-        self.hflip = hflip
-        self.vflip = vflip
-        self.video_framerate_fps = video_framerate_fps
-        #
-        self.camera_status = "Configured"
 
     async def start_camera(self):
         """ """
@@ -159,6 +160,7 @@ class ThermalCamera:
                         )
                 rc, image_array = capture.read()
                 if not rc:
+                    await asyncio.sleep(0.04)
                     continue
 
                 # For saved video.

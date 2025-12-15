@@ -16,12 +16,13 @@ import libcamera
 class RaspberyPiCamera:
     """ """
 
-    def __init__(self, logger_name="DefaultLogger"):
+    def __init__(self, config={}, logger_name="DefaultLogger", config_id="rpi_cam0"):
         """ """
+        self.config = config
         self.logger = logging.getLogger(logger_name)
-        self.camera_status = ""
-        self.camera_config_done = False
+        #
         self.clear()
+        self.configure(config_id)
         # For preview streaming.
         self.preview_queue = asyncio.Queue(maxsize=10)
         self.preview_streamer = PreviewStreamingOutput()
@@ -31,6 +32,7 @@ class RaspberyPiCamera:
 
     def clear(self):
         """ """
+        self.camera_status = ""
         self.picam2 = None
         self.video_configuration = None
         self.sensor_modes = None
@@ -41,6 +43,30 @@ class RaspberyPiCamera:
         self.camera_status = "Cleared"
         self.video_mp4_path = None
 
+    def configure(self, config_id="rpi_cam0"):
+        """ """
+        conf = self.config
+        cam = config_id
+        #
+        self.rpi_camera_id = config_id
+        self.cam_monochrome = (conf.get(cam + ".monochrome", False),)
+        self.saturation = (conf.get(cam + ".settings.saturation", "auto"),)
+        self.exposure_time_us = (conf.get(cam + ".settings.exposure_time_us", "auto"),)
+        self.analogue_gain = (conf.get(cam + ".settings.analogue_gain", "auto"),)
+        self.hflip = (conf.get(cam + ".orientation.hflip", 0),)
+        self.vflip = (conf.get(cam + ".orientation.vflip", 0),)
+        self.preview_size_divisor = (conf.get(cam + ".preview.size_divisor", 0),)
+        self.video_horizontal_size_px = (
+            conf.get(cam + ".video.horizontal_size_px", "max"),
+        )
+        self.video_vertical_size_px = (
+            conf.get(cam + ".video.vertical_size_px", "max"),
+        )
+        self.video_framerate_fps = (conf.get(cam + ".video.framerate_fps", 30),)
+        self.video_pre_buffer_frames = (conf.get(cam + ".video.pre_buffer_frames", 60),)
+        #
+        self.camera_status = "Configured"
+
     def get_global_camera_info(self):
         """ """
         global_camera_info = Picamera2.global_camera_info()
@@ -49,39 +75,6 @@ class RaspberyPiCamera:
     def get_camera_status(self):
         """ """
         return self.camera_status
-
-    def camera_config(
-        self,
-        rpi_camera_id="cam0",
-        cam_monochrome=False,
-        saturation="auto",
-        exposure_time_us="auto",
-        analogue_gain="auto",
-        hflip=0,
-        vflip=0,
-        preview_size_divisor=2.0,
-        video_horizontal_size_px="max",
-        video_vertical_size_px="auto",
-        video_framerate_fps=30,
-        video_pre_buffer_frames=60,
-    ):
-        """ """
-        self.camera_config_done = True
-        #
-        self.rpi_camera_id = rpi_camera_id
-        self.cam_monochrome = cam_monochrome
-        self.saturation = saturation
-        self.exposure_time_us = exposure_time_us
-        self.analogue_gain = analogue_gain
-        self.hflip = hflip
-        self.vflip = vflip
-        self.preview_size_divisor = preview_size_divisor
-        self.video_horizontal_size_px = video_horizontal_size_px
-        self.video_vertical_size_px = video_vertical_size_px
-        self.video_framerate_fps = video_framerate_fps
-        self.video_pre_buffer_frames = video_pre_buffer_frames
-        #
-        self.camera_status = "Configured"
 
     async def start_camera(self):
         """ """
@@ -123,9 +116,6 @@ class RaspberyPiCamera:
     async def camera_setup(self):
         """ """
         try:
-            # Used default config if not already done.
-            if self.camera_config_done == False:
-                self.camera_config()
             # Close if already running.
             if self.picam2 != None:
                 try:
@@ -134,7 +124,7 @@ class RaspberyPiCamera:
                     pass
             # Create a new camera object, cam0 or cam1.
             rpi_camera_index = 0
-            if self.rpi_camera_id == "cam1":
+            if self.rpi_camera_id == "rpi_cam1":
                 rpi_camera_index = 1
             try:
                 self.picam2 = Picamera2(camera_num=rpi_camera_index)

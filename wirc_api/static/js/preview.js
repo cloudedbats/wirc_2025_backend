@@ -1,4 +1,4 @@
-var selectedRPiCamera = "cam0";
+var selectedRPiCamera = "rpi_cam0";
 var selectedRPiCameraName = "Camera-A (cam0)";
 
 // // Used for the main tabs in the settings tile.

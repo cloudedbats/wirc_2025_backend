@@ -42,21 +42,21 @@ class WircClientStatus:
         if self.status_event:
             self.status_event.set()
 
-    def set_exposure_time_us(self, exposure_time_us, rpi_camera="cam0"):
+    def set_exposure_time_us(self, exposure_time_us, rpi_camera="rpi_cam0"):
         """ """
-        if rpi_camera == "cam0":
+        if rpi_camera == "rpi_cam0":
             self.cam0_exposure_time_us = exposure_time_us
             self.trigger_status_event()
-        if rpi_camera == "cam1":
+        if rpi_camera == "rpi_cam1":
             self.cam1_exposure_time_us = exposure_time_us
             self.trigger_status_event()
 
-    def set_analogue_gain(self, analogue_gain, rpi_camera="cam0"):
+    def set_analogue_gain(self, analogue_gain, rpi_camera="rpi_cam0"):
         """ """
-        if rpi_camera == "cam0":
+        if rpi_camera == "rpi_cam0":
             self.cam0_analogue_gain = analogue_gain
             self.trigger_status_event()
-        if rpi_camera == "cam1":
+        if rpi_camera == "rpi_cam1":
             self.cam1_analogue_gain = analogue_gain
             self.trigger_status_event()
 
