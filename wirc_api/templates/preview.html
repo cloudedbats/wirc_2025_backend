@@ -1,190 +1,215 @@
-<div class="tile is-ancestor is-vertical m-0">
-    <div class="tile is-parent">
-        <article class="tile is-child box pt-1 pb-3">
-            <div class="content">
+<article class="message m-0 is-fullwidth my-1">
+    <div class="message-header is-bordered">
+        <span id="previewTitleId">Camera-A</span>
+        <!-- <div class="is-grouped"> -->
+        <div class="select is-rounded">
+            <select id="cameraModeId" onchange="cameraModeOnChange()">
+                <option value="camera_off">Camera OFF</option>
+                <option value="camera_on">Camera ON</option>
+                <option value="record">Record</option>
+                <option value="rec_on_trigger">Rec. on trigger</option>
+            </select>
+        </div>
+        <div id="buttonTriggerId" hidden>
+            <button id="aaa" onclick="aaa()" class="button is-rounded m-1 mx-2">Trigger</button>
+        </div>
+        <!-- </div> -->
+        <button id="buttonSettingsId" onclick="toggleSettings()" class="button is-rounded is-size-7">Settings</button>
+    </div>
+</article>
 
-                <div class="field">
-                    <div class="container is-fluid">
-                        <div class="is-pulled-right">
-                            <button class="button is-rounded is-small has-text-weight-bold"
-                                onclick="previewToggleSettings()">
-                                <span id="previewSettingsTextId">Show settings</span>
-                            </button>
+<article class="has-background-grey-dark m-0">
+    <div id="settingsBasicId" class=" my-1 p-4" hidden>
+        <button onclick="hideSettings()" class="delete is-pulled-right">
+        </button>
+        <div class="is-fluid mb--3">
+            <div class="buttons is-centered">
+                <p class="ml-2 is-size-7">Exposure</p>
+                <div class="select is-rounded is-size-7">
+                    <select id="exposureTimeId" onchange="exposureTimeOnChange()">
+                        <option value="auto">Auto</option>
+                        <option value="33333">1/30 sec</option>
+                        <option value="25000">1/40 sec</option>
+                        <option value="20000">1/50 sec</option>
+                        <option value="16667">1/60 sec</option>
+                        <option value="12500">1/80 sec</option>
+                        <option value="10000">1/100 sec</option>
+                        <option value="8000">1/125 sec</option>
+                        <option value="6250">1/160 sec</option>
+                        <option value="5000">1/200 sec</option>
+                        <option value="4000">1/250 sec</option>
+                        <option value="3125">1/320 sec</option>
+                        <option value="2500">1/400 sec</option>
+                        <option value="2000">1/500 sec</option>
+                        <option value="1562">1/640 sec</option>
+                        <option value="1250">1/800 sec</option>
+                        <option value="1000">1/1000 sec</option>
+                        <option value="800">1/1250 sec</option>
+                        <option value="625">1/1600 sec</option>
+                        <option value="500">1/2000 sec</option>
+                        <option value="400">1/2500 sec</option>
+                        <option value="312">1/3200 sec</option>
+                        <option value="250">1/4000 sec</option>
+                        <option value="200">1/5000 sec</option>
+                        <option value="156">1/6400 sec</option>
+                        <option value="125">1/8000 sec</option>
+                        <option value="100">1/10000 sec</option>
+                        <option value="80">1/12500 sec</option>
+                        <option value="62">1/16000 sec</option>
+                        <option value="50">1/20000 sec</option>
+                        <option value="40">1/25000 sec</option>
+                        <option value="31">1/32000 sec</option>
+                    </select>
+                </div>
+                <p class="is-size-7 ml--2 mr--0">Gain</p>
+                <div class="select is-rounded is-size-7 ml--0">
+                    <select id="analogueGainId" onchange="analogueGainOnChange()">
+                        <option value="auto">Auto</option>
+                        <option value="1">1.0</option>
+                        <option value="2">2.0</option>
+                        <option value="3">3.0</option>
+                        <option value="4">4.0</option>
+                        <option value="5">5.0</option>
+                        <option value="6">6.0</option>
+                        <option value="7">7.0</option>
+                        <option value="8">8.0</option>
+                        <option value="9">9.0</option>
+                        <option value="10">10.0</option>
+                        <option value="11">11.0</option>
+                        <option value="12">12.0</option>
+                        <option value="13">13.0</option>
+                        <option value="14">14.0</option>
+                        <option value="15">15.0</option>
+                    </select>
+                </div>
+                <button id="buttonSettingsMoreId" onclick="toggleSettingsMore()"
+                    class="button is-rounded is-size-7">More settings</button>
+            </div>
+        </div>
+    </div>
+</article>
+
+<article class="has-background-grey-dark m-0">
+    <div id="settingsMoreId" class="my-1 p-4" hidden>
+        <button onclick="hideSettingsMore()" class="delete is-pulled-right"></button>
+        <div class="fixed-grid has-2-cols">
+            <div class="grid is--pulled-left mr-2">
+                <div class="cell">
+                    <p class="is-pulled-right is-size-7 mt-1">Folder name for recordings</p>
+                </div>
+                <div class="cell">
+                    <div class="control">
+                        <input class="input is-size-7" type="text" placeholder="Input">
+                    </div>
+                </div>
+                <div class="cell">
+                    <p class="is-pulled-right is-size-7 mt-1">Add date to folder name</p>
+                </div>
+                <div class="cell">
+                    <div class="control">
+                        <input class="input is-size-7" type="text" placeholder="Input">
+                    </div>
+                </div>
+                <div class="cell">
+                    <p class="is-pulled-right is-size-7 mt-1">Max video length (sec)</p>
+                </div>
+                <div class="cell">
+                    <div class="control">
+                        <input class="input is-size-7" type="text" placeholder="Input">
+                    </div>
+                </div>
+                <div class="cell">
+                    <p class="is-pulled-right is-size-7 mt-1">Image rotation (degrees)</p>
+                </div>
+                <div class="cell">
+                    <div class="control">
+                        <input class="input is-size-7" type="text" placeholder="Input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="is-size-7">
+            Note that settings only apply to the current session.
+            Please modify the
+            <a href="">user configuration</a>
+            for permanent changes.
+        </p>
+    </div>
+</article>
+
+<article class="has-background-grey-dark is--fullwidth m-0">
+    <div id="previewId" class="my-1 px-4">
+        <!-- <article class="message is-fullwidth is--fullheight m-0 mb-2"> -->
+        <!-- <div class="has-background-grey-dark p-4"> -->
+        <!-- <div class="select is-rounded is-pulled-right is-size-7">
+            <select id="aaa" onchange="alert('TODO')">
+                <option value="preview_on">Preview ON</option>
+                <option value="preview_off">Preview OFF</option>
+                <option value="preview_10_fps">Slow - 10 fps</option>
+                <option value="preview_5_fps">Slow - 5 fps</option>
+                <option value="preview_2_fps">Slow - 2 fps</option>
+                <option value="preview_1_fps">Slow - 1 fps</option>
+            </select>
+        </div> -->
+
+        <div class="fixed-grid has-1-cols">
+            <div class="grid mt-2">
+                <div class="cell">
+                    <div class="field is-grouped is-grouped-centered">
+                        <div class="select is-rounded is--pulled-right is-size-7">
+                            <select id="aaa" onchange="alert('TODO')">
+                                <option value="preview_on">Preview ON</option>
+                                <option value="preview_off">Preview OFF</option>
+                                <option value="preview_10_fps">Slow - 10 fps</option>
+                                <option value="preview_5_fps">Slow - 5 fps</option>
+                                <option value="preview_2_fps">Slow - 2 fps</option>
+                                <option value="preview_1_fps">Slow - 1 fps</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-
-                <p class="title is-5">
-                    <span id="previewTitleId">Camera-A (cam0)</span> - preview
-                </p>
-
-                <section id="previewBodyId" class="section has-background-grey-lighter p-1">
-                    <div class="field is-grouped is-grouped-centered p-1">
-
+                <div class="cell">
+                    <div class="field is-grouped is-grouped-centered">
                         <img id="mjpegStreamId" src="" />
-
                     </div>
-
-                    <div class="field is-grouped is-grouped-centered pt-0">
-                        <button style="margin:1px;" class="button is-small is-rounded is-info has-text-weight-bold"
-                            onclick=" videoSingleClicked()">
-                            Single
-                        </button>
-                        <button style="margin:1px;" class="button is-small is-rounded is-info has-text-weight-bold"
-                            onclick="startVideoClicked()">
-                            Start video
-                        </button>
-                        <button style="margin:1px;" class="button is-small is-rounded is-info has-text-weight-bold"
-                            onclick="stopVideoClicked()">
-                            Stop video
-                        </button>
-                    </div>
-
-                    <div class="field is-grouped is-grouped-centered pt-2">
-                        <label class="pr-1 pt-1 is-size-7">Exposure:</label>
-                        <div class="select is-rounded is-info is-size-7">
-                            <div class="control">
-                                <div class="select is-size-7">
-                                    <select id="exposureTimeId" onchange="exposureTimeOnChange()">
-                                        <option value="auto">Auto</option>
-                                        <option value="33333">1/30 sec</option>
-                                        <option value="25000">1/40 sec</option>
-                                        <option value="20000">1/50 sec</option>
-                                        <option value="16667">1/60 sec</option>
-                                        <option value="12500">1/80 sec</option>
-                                        <option value="10000">1/100 sec</option>
-                                        <option value="8000">1/125 sec</option>
-                                        <option value="6250">1/160 sec</option>
-                                        <option value="5000">1/200 sec</option>
-                                        <option value="4000">1/250 sec</option>
-                                        <option value="3125">1/320 sec</option>
-                                        <option value="2500">1/400 sec</option>
-                                        <option value="2000">1/500 sec</option>
-                                        <option value="1562">1/640 sec</option>
-                                        <option value="1250">1/800 sec</option>
-                                        <option value="1000">1/1000 sec</option>
-                                        <option value="800">1/1250 sec</option>
-                                        <option value="625">1/1600 sec</option>
-                                        <option value="500">1/2000 sec</option>
-                                        <option value="400">1/2500 sec</option>
-                                        <option value="312">1/3200 sec</option>
-                                        <option value="250">1/4000 sec</option>
-                                        <option value="200">1/5000 sec</option>
-                                        <option value="156">1/6400 sec</option>
-                                        <option value="125">1/8000 sec</option>
-                                        <option value="100">1/10000 sec</option>
-                                        <option value="80">1/12500 sec</option>
-                                        <option value="62">1/16000 sec</option>
-                                        <option value="50">1/20000 sec</option>
-                                        <option value="40">1/25000 sec</option>
-                                        <option value="31">1/32000 sec</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <label class="pl-2 pr-1 pt-1 is-size-7">Gain:</label>
-                        <div class="select is-rounded is-info is-size-7">
-                            <div class="control">
-                                <div class="select is-size-7">
-                                    <select id="analogueGainId" onchange="analogueGainOnChange()">
-                                        <option value="auto">Auto</option>
-                                        <option value="1">1.0</option>
-                                        <option value="2">2.0</option>
-                                        <option value="3">3.0</option>
-                                        <option value="4">4.0</option>
-                                        <option value="5">5.0</option>
-                                        <option value="6">6.0</option>
-                                        <option value="7">7.0</option>
-                                        <option value="8">8.0</option>
-                                        <option value="9">9.0</option>
-                                        <option value="10">10.0</option>
-                                        <option value="11">11.0</option>
-                                        <option value="12">12.0</option>
-                                        <option value="13">13.0</option>
-                                        <option value="14">14.0</option>
-                                        <option value="15">15.0</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="table-container m-0" style="height: 10em; overflow: auto;">
-                        <table id="previewLogTableId"
-                            class="table is-fullwidth is-bordered is-striped has-background-white-ter is-size-7">
-                            <tr>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <div class="field is-grouped is-grouped-centered pt-1">
-                        <button style="margin:5px;" class="button is-small is-rounded is-info has-text-weight-bold"
-                            onclick="showStatusClicked()">
-                            Show status
-                        </button>
-                        <button style="margin:5px;" class="button is-small is-rounded is-info has-text-weight-bold"
-                            onclick="setDetectorTimeClicked()">
-                            Set time
-                        </button>
-                    </div>
-
-                </section>
-
-                <section id="previewSettingsId" class="section p-2 has-background-grey-light is-hidden">
-                    <div class="field">
-                        <div class="container is-fluid">
-                            <div class="is-pulled-right">
-                                <button class="delete is-large m-2" onclick="previewToggleSettings()"></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="title is-4">Settings</label>
-                    </div>
-
-                    <!-- <div class="tabs is-fullwidth is-medium">
-                        <ul>
-                            <li id="tabSettingsBasicId" class="is-active pb-2" onclick="hideShowSettingsTabs('basic');">
-                                <a>
-                                    <span><strong>Basic</strong></span>
-                                </a>
-                            </li>
-                            <li id="tabSettingsMoreId" class="pb-2" onclick="hideShowSettingsTabs('more');">
-                                <a>
-                                    <span><strong>More</strong></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div> -->
-
-                    <div class="field is-grouped is-grouped-centered pt-2 pb-5">
-                        <label class="pr-3">Select camera</label>
-                        <div class="select is-rounded is-info is-size-7">
-                            <div class="control">
-                                <div class="select is-size-7">
-                                    <select id="rpiCameraSelectId" onchange="rpiCameraSelectOnChange()">
-                                        <option value="rpi_cam0">Camera-A (cam0)</option>
-                                        <option value="rpi_cam1">Camera-B (cam1)</option>
-                                        <option value="usb_thermal">Camera-B (thermal)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                </div>
+                <p class="cell is-size-7 mb-1">
+                    Info: Size 384x256, Fps 25, Model: USB Camera,
+                    Exposure: 1/400 s, Gain: 5.0, ...
+                </p>
             </div>
-        </article>
+        </div>
+        <!-- </div> -->
     </div>
+</article>
 
-</div>
+<article class="has-background-grey-dark is--fullwidth m-0">
+    <div id="previewId" class="my-1 p-2">
+
+        <div class="table-container m-0" style="height: 10em; overflow: auto;">
+            <table id="previewLogTableId"
+                class="table is-fullwidth is--bordered is--striped has--background-white-ter is-size-7">
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+        </div>
+        <div class="is-fluid">
+            <div class="buttons is-centered mt-1">
+                <button id="buttonSettingsId" onclick="showStatusClicked()" class="button is-rounded is-size-7">Show
+                    status</button>
+                <button id="buttonSettingsId" onclick="setDetectorTimeClicked()" class="button is-rounded is-size-7">Set
+                    time</button>
+            </div>
+        </div>
+    </div>
+</article>

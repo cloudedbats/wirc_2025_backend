@@ -40,7 +40,6 @@ class ThermalCamera:
     def configure(
         self,
         config_id="thermal",
-
         # rpi_camera_id="rpi_cam1",
         # cam_monochrome=False,
         # saturation="auto",
@@ -182,7 +181,7 @@ class ThermalCamera:
                     if not self.preview_queue.full():
                         self.preview_queue.put_nowait(bytearray)
                     else:
-                        self.logger.debug("Thermal queue full, remove items.")
+                        # self.logger.debug("Thermal queue full, remove items.")
                         try:
                             while True:
                                 self.preview_queue.get_nowait()

@@ -40,22 +40,22 @@ async function setAnalogueGain(analogueGain) {
   }
 }
 
-async function videoSingle() {
-  try {
-    let urlString = '/cameras/record-video/' + '?rpi_camera=' + selectedRPiCamera
-    let params = {}
-    await fetch(urlString, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(params)
-    })
-  } catch (err) {
-    alert('ERROR videoSingle: ' + err)
-    console.log(err)
-  }
-}
+// async function videoSingle() {
+//   try {
+//     let urlString = '/cameras/record-video/' + '?rpi_camera=' + selectedRPiCamera
+//     let params = {}
+//     await fetch(urlString, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify(params)
+//     })
+//   } catch (err) {
+//     alert('ERROR videoSingle: ' + err)
+//     console.log(err)
+//   }
+// }
 
 async function startVideo() {
   try {
@@ -135,12 +135,12 @@ function startWebsocket(wsUrl) {
     }
 
     if ('cam0_streaming_started' in dataJson === true) {
-      if (selectedRPiCamera == 'cam0') {
+      if (selectedRPiCamera == 'camera-a') {
         refreshPreviewStream()
       }
     }
     if ('cam1_streaming_started' in dataJson === true) {
-      if (selectedRPiCamera == 'cam1') {
+      if (selectedRPiCamera == 'camera-b') {
         refreshPreviewStream()
       }
     }

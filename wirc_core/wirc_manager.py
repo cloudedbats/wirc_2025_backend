@@ -30,16 +30,16 @@ class WircManager(object):
         """ """
         config = self.config
 
-    def _select_picamera(self, rpi_camera="rpi_cam0"):
+    def _select_picamera(self, rpi_camera="camera-a"):
         """ """
         rpicam = wirc_core.rpi_cam0
-        if rpi_camera == "rpi_cam1":
-            rpicam = wirc_core.rpi_cam1
-        elif rpi_camera == "usb_thermal":
+        if rpi_camera == "camera-a":
+            rpicam = wirc_core.rpi_cam0
+        elif rpi_camera == "camera-b":
             rpicam = wirc_core.usb_thermal
         return rpicam
 
-    def get_preview_streamer(self, rpi_camera="rpi_cam0"):
+    def get_preview_streamer(self, rpi_camera="camera-a"):
         """ """
         rpicam = self._select_picamera(rpi_camera)
         return rpicam.get_preview_streamer()
@@ -47,7 +47,7 @@ class WircManager(object):
     async def record_video(self, rpi_camera="cam"):
         """ """
         # rpicam = self._select_picamera(rpi_camera)
-        # rec_dir = self.cam0_rec_dir 
+        # rec_dir = self.cam0_rec_dir
         # if rpi_camera == "rpi_cam0":
         #     video_prefix = self.cam0_video_prefix
         #     video_length_s = self.cam0_single_length_s
@@ -73,7 +73,7 @@ class WircManager(object):
         # metadata = await rpicam.start_video(video_length_s, video_dir, video_file_mp4)
         # wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
-    async def start_video(self, rpi_camera="rpi_cam0"):
+    async def start_video(self, rpi_camera="camera-a"):
         """ """
         rpicam = self._select_picamera(rpi_camera)
         rec_dir = self.cam0_rec_dir if rpi_camera == "rpi_cam0" else self.cam1_rec_dir
@@ -189,13 +189,13 @@ class WircManager(object):
         wirc_core.wirc_client_info.write_log("info", rpi_cam0_info)
         wirc_core.wirc_client_info.write_log("info", rpi_cam1_info)
         wirc_core.wirc_client_info.write_log("info", usb_thermal_info)
- 
+
     async def startup(self):
         """ """
         # config = self.config
         try:
             self.log_camera_info()
-           # Inform client apps.
+            # Inform client apps.
             # exp = config.get("rpi_cam0" + ".settings.exposure_time_us", "auto")
             # wirc_core.wirc_client_status.set_exposure_time_us(
             #     exp, rpi_camera="rpi_cam0"

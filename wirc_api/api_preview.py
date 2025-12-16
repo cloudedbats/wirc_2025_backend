@@ -18,7 +18,7 @@ logger = logging.getLogger(wirc_core.logger_name)
 preview_router = fastapi.APIRouter()
 
 
-async def preview_streamer_mjpeg(rpi_camera="rpi_cam0"):
+async def preview_streamer_mjpeg(rpi_camera="camera-a"):
     """ """
     #
     # NOTE: This version supports only one mjpeg consumer for each camera.
@@ -26,11 +26,11 @@ async def preview_streamer_mjpeg(rpi_camera="rpi_cam0"):
     preview_queue = None
     try:
         # Select preview queue.
-        if rpi_camera == "rpi_cam0":
+        if rpi_camera == "camera-a":
             preview_queue = wirc_core.rpi_cam0.preview_queue
-        elif rpi_camera == "rpi_cam1":
-            preview_queue = wirc_core.rpi_cam1.preview_queue
-        elif rpi_camera == "usb_thermal":
+        # elif rpi_camera == "camera-a":
+        #     preview_queue = wirc_core.rpi_cam1.preview_queue
+        elif rpi_camera == "camera-b":
             preview_queue = wirc_core.usb_thermal.preview_queue
         else:
             preview_queue = None
@@ -71,7 +71,7 @@ async def preview_streamer_mjpeg(rpi_camera="rpi_cam0"):
     description="Preview streamed as Motion JPEG.",
 )
 # async def stream_mjpeg(request: fastapi.Request):
-async def preview_stream_mjpeg(rpi_camera: str = "rpi_cam0"):
+async def preview_stream_mjpeg(rpi_camera: str = "camera-a"):
     """ """
     try:
         logger.debug("API called: preview_stream_mjpeg.")
@@ -99,7 +99,9 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         logging_event = wirc_core.wirc_client_info.get_logging_event()
         cam0_streaming_start_event = wirc_core.rpi_cam0.get_streaming_start_event()
         cam1_streaming_start_event = wirc_core.rpi_cam1.get_streaming_start_event()
-        thermal_streaming_start_event = wirc_core.usb_thermal.get_streaming_start_event()
+        thermal_streaming_start_event = (
+            wirc_core.usb_thermal.get_streaming_start_event()
+        )
         # Update client.
         ws_json = {}
         ws_json["status"] = {

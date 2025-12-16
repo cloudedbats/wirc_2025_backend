@@ -1,36 +1,64 @@
-var selectedRPiCamera = "rpi_cam0";
-var selectedRPiCameraName = "Camera-A (cam0)";
+var selectedRPiCamera = "camera-a";
+var selectedRPiCameraName = "Camera-A";
 
-// // Used for the main tabs in the settings tile.
-// function hideShowSettingsTabs(tabName) {
-//     byId("tabSettingsBasicId").classList.remove("is-active");
-//     byId("tabSettingsMoreId").classList.remove("is-active");
-//     byId("tabSettingsSchedulerId").classList.remove("is-active");
-//     hideDivision(byId("divSettingsBasicId"))
-//     hideDivision(byId("divSettingsMoreId"))
-//     hideDivision(byId("divSettingsSchedulerId"))
+function setCameraId(cameraId, cameraName) {
+  selectedRPiCamera = cameraId;
+  selectedRPiCameraName = cameraName;
+}
 
-//     if (tabName == "basic") {
-//         byId("tabSettingsBasicId").classList.add("is-active");
-//         showDivision(byId("divSettingsBasicId"))
-//     } else if (tabName == "more") {
-//         byId("tabSettingsMoreId").classList.add("is-active");
-//         showDivision(byId("divSettingsMoreId"))
-//     } else if (tabName == "scheduler") {
-//         byId("tabSettingsSchedulerId").classList.add("is-active");
-//         showDivision(byId("divSettingsSchedulerId"))
-//     };
-// };
-
-function previewToggleSettings() {
-  if (byId('previewSettingsId').classList.contains('is-hidden')) {
-    byId('previewBodyId').classList.add('is-hidden')
-    byId('previewSettingsId').classList.remove('is-hidden')
-    byId('previewSettingsTextId').textContent = 'Hide settings'
+function toggleSettings() {
+  if (byId('settingsBasicId').hidden) {
+    byId('settingsMoreId').hidden = true;
+    byId('settingsBasicId').hidden = false;
+    byId("buttonSettingsId").classList.add('is-inverted');
   } else {
-    byId('previewSettingsId').classList.add('is-hidden')
-    byId('previewBodyId').classList.remove('is-hidden')
-    byId('previewSettingsTextId').textContent = 'Show settings'
+    hideSettings()
+  }
+}
+
+function toggleSettingsMore() {
+  if (byId('settingsMoreId').hidden) {
+    byId('settingsMoreId').hidden = false;
+    byId("buttonSettingsMoreId").classList.add('is-inverted');
+  } else {
+    hideSettingsMore()
+  }
+}
+
+function hideSettings() {
+  byId('settingsMoreId').hidden = true;
+  byId('settingsBasicId').hidden = true;
+  byId("buttonSettingsId").classList.remove('is-inverted');
+  byId("buttonSettingsMoreId").classList.remove('is-inverted');
+}
+
+function hideSettingsMore() {
+  byId('settingsMoreId').hidden = true;
+  byId("buttonSettingsMoreId").classList.remove('is-inverted');
+}
+
+// function aaa() {
+
+// }
+
+// function aaa() {
+
+// }
+
+function cameraModeOnChange() {
+  let selectedValue =
+    byId('cameraModeId').options[byId('cameraModeId').selectedIndex].value;
+  if (selectedValue == 'record') {
+    startVideoClicked()
+  } else {
+    stopVideoClicked()
+  }
+  if (selectedValue == 'rec_on_trigger') {
+    byId('buttonTriggerId').hidden = false;
+    // startVideoClicked()
+  } else {
+    byId('buttonTriggerId').hidden = true;
+    // stopVideoClicked()
   }
 }
 
@@ -68,17 +96,6 @@ function analogueGainOnChange() {
   setAnalogueGain(selectedValue)
 }
 
-function rpiCameraSelectOnChange() {
-  let selectedValue =
-    byId('rpiCameraSelectId').options[byId('rpiCameraSelectId').selectedIndex].value
-  let selectedName =
-    byId('rpiCameraSelectId').options[byId('rpiCameraSelectId').selectedIndex].text
-  // Save to global.
-  selectedRPiCamera = selectedValue
-  selectedRPiCameraName = selectedName
-  refreshPreviewStream()
-}
-
 function refreshPreviewStream() {
   let image = byId('mjpegStreamId');
   image.src = 'preview/stream.mjpeg' + '?rpi_camera=' + selectedRPiCamera;
@@ -93,10 +110,10 @@ function updateStatus(status) {
 
 function updateExposureTime(cam0ExposureTime, cam1ExposureTime) {
   let exposureTime = ""
-  if (selectedRPiCamera == 'cam0') {
+  if (selectedRPiCamera == 'camera-a') {
     exposureTime = cam0ExposureTime
   }
-  else if (selectedRPiCamera == 'cam1') {
+  else if (selectedRPiCamera == 'camera-b') {
     exposureTime = cam1ExposureTime
   }
   if (exposureTime == 0) {
@@ -108,10 +125,10 @@ function updateExposureTime(cam0ExposureTime, cam1ExposureTime) {
 
 function updateAnalogueGain(cam0AnalogueGain, cam1AnalogueGain) {
   let analogueGain = ""
-  if (selectedRPiCamera == 'cam0') {
+  if (selectedRPiCamera == 'camera-a') {
     analogueGain = cam0AnalogueGain
   }
-  else if (selectedRPiCamera == 'cam1') {
+  else if (selectedRPiCamera == 'camera-b') {
     analogueGain = cam1AnalogueGain
   }
   if (analogueGain == 0) {
