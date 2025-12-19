@@ -84,7 +84,7 @@ async def preview_stream_mjpeg(rpi_camera: str = "camera-a"):
         logger.debug(message)
 
 
-@preview_router.websocket("/preview/websocket")
+@preview_router.websocket("/wirc/websocket")
 async def websocket_endpoint(websocket: fastapi.WebSocket):
     try:
         # Logging debug.

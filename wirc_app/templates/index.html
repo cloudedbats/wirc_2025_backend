@@ -7,26 +7,21 @@
     <title>WIRC-2026</title>
 
     <!-- Bulma stylesheets: https://bulma.io/ -->
-    <!-- <link rel="stylesheet" href="{{ url_for('static', path='css/bulma.min.css') }}"> -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-
-    <!-- <script src="{{ url_for('static', path='js/main.js') }}"></script> -->
-    <!-- <script src="{{ url_for('static', path='js/preview.js') }}"></script> -->
-    <!-- <script src="{{ url_for('static', path='js/preview_client.js') }}"></script> -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/bulma.min.css') }}">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css"> -->
+    <!-- JavaScript -->
     <script src="{{ url_for('static', path='js/main.js/?v=101') }}"></script>
+    <script src="{{ url_for('static', path='js/camera.js/?v=101') }}"></script>
+    <script src="{{ url_for('static', path='js/camera_client.js/?v=101') }}"></script>
     <script src="{{ url_for('static', path='js/preview.js/?v=101') }}"></script>
-    <script src="{{ url_for('static', path='js/preview_client.js/?v=101') }}"></script>
+    <script src="{{ url_for('static', path='js/system.js/?v=101') }}"></script>
+    <script src="{{ url_for('static', path='js/system_client.js/?v=101') }}"></script>
 </head>
 
 <body onLoad="fetchModules()">
     <section class="hero is-fullheight is-fullwidth">
         <div class="hero-head has-background-black">
             <nav class="navbar" role="navigation" aria-label="main navigation">
-                <button id="buttonConfigId" onclick="toggleConfig()"
-                    class="button is-pulled-right is-rounded is-size-7 m-4" disabled>
-                    Config
-                </button>
                 <div class="navbar-brand">
                     <div class="navbar-item">
                         <img src="{{ url_for('static', path='images/cloudedbats_logo.png') }}">
@@ -54,31 +49,22 @@
             </div>
         </div>
 
-
         <div class="hero-body has-background-grey m-0 p-0">
             <div class="container is-fluid p-2">
-                <div id="heroBodyPreviewId" class="is-centered">
-                    <p class="title m-5">Loading...</p>
+                <div id="heroBodyCameraId">
+                    <p class="subtitle m-5">Loading...</p>
                 </div>
-                <div id="heroBodyAboutId" class="is-centered">
-                    <!-- <p class="title m-5">NOT LOADED...</p> -->
+                <div id="heroBodyAboutId">
+                    <!-- <p class="subtitle m-5">Loading...</p> -->
                 </div>
             </div>
         </div>
 
-        <div class="hero-foot has-background-grey-dark">
-            <nav class="tabs">
-                <ul class="is-pulled-left">
+        <div class="hero-foot has-background-black">
+            <nav class="tabs is-fullwidth">
+                <ul>
                     <li>
-                        <p class="has-text-white">Detector time:</p>
-                    </li>
-                    <li>
-                        <p class="has-text-white pl-1"><span id="detectorTimeId"></span></p>
-                    </li>
-                </ul>
-                <ul class="is-pulled-right">
-                    <li>
-                        <p class="is-clickable has-text-white" onclick="activateModuleAbout()">About</>
+                        <p class="is-clickable is-pulled-right m-2 mr-4" onclick="activateModuleAbout()">About</>
                     </li>
                 </ul>
             </nav>

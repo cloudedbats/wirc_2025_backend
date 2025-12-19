@@ -16,6 +16,13 @@ logger = logging.getLogger(wirc_core.logger_name)
 cameras_router = fastapi.APIRouter()
 
 
+
+
+
+
+
+# ##########################################
+
 # @cameras_router.post(
 #     "/cameras/record-video", tags=["Cameras"], description="Record video."
 # )

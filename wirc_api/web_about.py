@@ -11,7 +11,7 @@ import fastapi.templating
 import wirc_core
 
 logger = logging.getLogger(wirc_core.logger_name)
-templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_api/templates")
+templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_app/templates")
 templates = fastapi.templating.Jinja2Templates(directory=templates_path)
 web_about_router = fastapi.APIRouter()
 
@@ -32,8 +32,4 @@ async def load_about_page(request: fastapi.Request):
         )
     except Exception as e:
         message = "API - load_about_page. Exception: " + str(e)
-        logger.debug(message)
-
-    except Exception as e:
-        message = "AAAAA - BBBBB. Exception: " + str(e)
         logger.debug(message)

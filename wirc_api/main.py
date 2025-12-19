@@ -26,8 +26,8 @@ app = fastapi.FastAPI(
 )
 
 # Relative paths.
-static_path = pathlib.Path(wirc_core.workdir_path, "wirc_api/static")
-templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_api/templates")
+static_path = pathlib.Path(wirc_core.workdir_path, "wirc_app/static")
+templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_app/templates")
 
 app.mount(
     "/static",
@@ -56,7 +56,7 @@ app.include_router(wirc_api.directories_router)
 app.include_router(wirc_api.files_router)
 
 # Include modules.
-app.include_router(wirc_api.web_preview_router)
+app.include_router(wirc_api.web_camera_router)
 app.include_router(wirc_api.web_about_router)
 
 
@@ -80,6 +80,6 @@ async def load_main_application_page(request: fastapi.Request):
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     favicon_path = pathlib.Path(
-        wirc_core.workdir_path, "wirc_api/static/images/favicon.ico"
+        wirc_core.workdir_path, "wirc_app/static/images/favicon.ico"
     )
     return fastapi.responses.FileResponse(favicon_path)

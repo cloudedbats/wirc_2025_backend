@@ -9,7 +9,7 @@ from wirc_api.api_cameras import cameras_router
 from wirc_api.api_directories import directories_router
 from wirc_api.api_files import files_router
 
-from wirc_api.web_preview import web_preview_router
+from wirc_api.web_camera import web_camera_router
 from wirc_api.web_about import web_about_router
 
 from wirc_api.main import app
