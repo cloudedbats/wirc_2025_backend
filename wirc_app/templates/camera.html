@@ -3,14 +3,14 @@
         <span id="cameraTitleId">Camera-A</span>
         <div class="select is-rounded is-size-7">
             <select id="cameraModeId" onchange="cameraModeOnChange()">
-                <option value="camera_off">Camera OFF</option>
-                <option value="camera_on">Camera ON</option>
-                <option value="record">Record</option>
-                <option value="rec_on_trigger">Rec. on trigger</option>
+                <option value="camera-off">Camera OFF</option>
+                <option value="camera-on">Camera ON</option>
+                <option value="record-on">Record</option>
+                <option value="record-on-trigger">Record on trigger</option>
             </select>
         </div>
         <div id="buttonTriggerId" hidden>
-            <button onclick="recordTrigger()" class="button is-rounded m-1 mx-2">Trigger</button>
+            <button onclick="activateRecordTrigger()" class="button is-rounded is-size-7">Trigger</button>
         </div>
         <button id="buttonSettingsId" onclick="toggleSettings()" class="button is-rounded is-size-7">Settings</button>
     </div>
@@ -141,12 +141,12 @@
                     <div class="field is-grouped is-grouped-centered">
                         <div class="select is-rounded is-size-7">
                             <select id="previewModeId" onchange="previewModeOnChange()">
-                                <option value="preview_on">Preview ON</option>
-                                <option value="preview_off">Preview OFF</option>
-                                <option value="preview_10_fps">Slow - 10 fps</option>
-                                <option value="preview_5_fps">Slow - 5 fps</option>
-                                <option value="preview_2_fps">Slow - 2 fps</option>
-                                <option value="preview_1_fps">Slow - 1 fps</option>
+                                <option value="preview-on">Preview ON</option>
+                                <option value="preview-off">Preview OFF</option>
+                                <option value="preview-10-fps">Slow - 10 fps</option>
+                                <option value="preview-5-fps">Slow - 5 fps</option>
+                                <option value="preview-2-fps">Slow - 2 fps</option>
+                                <option value="preview-1-fps">Slow - 1 fps</option>
                             </select>
                         </div>
                     </div>
@@ -191,13 +191,13 @@
         </div>
         <div class="container is-fluid">
             <div class="buttons is-centered mt-0">
-                <button id="buttonSettingsId" onclick="showStatusClicked()" class="button is-rounded is-size-7">
+                <button onclick="showDetectorStatusClicked()" class="button is-rounded is-size-7">
                     Show status
                 </button>
-                <button id="buttonSettingsId" onclick="setDetectorTimeClicked()" class="button is-rounded is-size-7">
+                <button onclick="setDetectorTimeClicked()" class="button is-rounded is-size-7">
                     Set time
                 </button>
-                <button id="buttonConfigId" onclick="userConfigurtionClicked()" class="button is-rounded is-size-7"
+                <button onclick="userConfigurtionClicked()" class="button is-rounded is-size-7"
                     disabled>
                     User configuration
                 </button>

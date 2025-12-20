@@ -22,40 +22,54 @@ function activateModuleAbout() {
 
 function fetchModuleCamera() {
   hideModules()
-  fetch('/pages/camera', { method: 'GET' })
-    .then(function (response) {
-      if (response.ok) {
-        return response.text()
-      } else {
-        return Promise.reject(response)
-      }
+  try {
+    fetch('/pages/camera', {
+      method: 'GET',
     })
-    .then(function (html) {
-      byId('heroBodyCameraId').innerHTML = html
-      activateModuleCamera()
-    })
-    .catch(function (err) {
-      console.warn('Error in fetchModuleCamera: ', err)
-    })
-  // selectCamera(selectedRPiCamera, selectedRPiCameraName)
+      .then(function (response) {
+        if (response.ok) {
+          return response.text()
+        } else {
+          return Promise.reject(response)
+        }
+      })
+      .then(function (html) {
+        byId('heroBodyCameraId').innerHTML = html
+        activateModuleCamera()
+      })
+      .catch(function (err) {
+        console.warn('Error in fetchModuleCamera: ', err)
+      })
+    // selectCamera(selectedCameraId, selectedCameraName)
+  } catch (err) {
+    alert('ERROR fetchModuleAbout: ' + err)
+    console.log(err)
+  }
 }
 
 function fetchModuleAbout() {
   hideModules()
-  fetch('/pages/about', { method: 'GET' })
-    .then(function (response) {
-      if (response.ok) {
-        return response.text()
-      } else {
-        return Promise.reject(response)
-      }
+  try {
+    fetch('/pages/about', {
+      method: 'GET',
     })
-    .then(function (html) {
-      byId('heroBodyAboutId').innerHTML = html
-    })
-    .catch(function (err) {
-      console.warn('Error in fetchModuleAbout: ', err)
-    })
+      .then(function (response) {
+        if (response.ok) {
+          return response.text()
+        } else {
+          return Promise.reject(response)
+        }
+      })
+      .then(function (html) {
+        byId('heroBodyAboutId').innerHTML = html
+      })
+      .catch(function (err) {
+        console.warn('Error in fetchModuleAbout: ', err)
+      })
+  } catch (err) {
+    alert('ERROR fetchModuleAbout: ' + err)
+    console.log(err)
+  }
 }
 
 // Startup. Called from body onLoad.
@@ -97,12 +111,12 @@ function startWebsocket(wsUrl) {
     }
 
     if ('cam0_streaming_started' in dataJson === true) {
-      if (selectedRPiCamera == 'camera-a') {
+      if (selectedCameraId == 'camera-a') {
         refreshPreviewStream()
       }
     }
     if ('cam1_streaming_started' in dataJson === true) {
-      if (selectedRPiCamera == 'camera-b') {
+      if (selectedCameraId == 'camera-b') {
         refreshPreviewStream()
       }
     }
@@ -138,4 +152,3 @@ function updateDisconnectedInfo() {
   }
   updateStatus(statusWhenDisconnected)
 }
-

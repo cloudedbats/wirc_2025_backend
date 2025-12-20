@@ -1,9 +1,9 @@
-var selectedRPiCamera = "camera-a";
-var selectedRPiCameraName = "Camera-A";
+var selectedCameraId = "camera-a";
+var selectedCameraName = "Camera-A";
 
 function setCameraId(cameraId, cameraName) {
-  selectedRPiCamera = cameraId;
-  selectedRPiCameraName = cameraName;
+  selectedCameraId = cameraId;
+  selectedCameraName = cameraName;
 }
 
 function selectCamera(cameraId, cameraName) {
@@ -33,55 +33,51 @@ function selectCamera(cameraId, cameraName) {
 }
 
 function cameraModeOnChange() {
-  let selectedValue =
+  let selectedMode =
     byId('cameraModeId').options[byId('cameraModeId').selectedIndex].value;
-  if (selectedValue == 'camera_off') {
+  if (selectedMode == 'camera-off') {
     byId('buttonTriggerId').hidden = true;
-    cameraRecordOff()
-    cameraOff()
+    setCameraMode(selectedCameraId, selectedMode)
   }
-  else if (selectedValue == 'camera_on') {
+  else if (selectedMode == 'camera-on') {
     byId('buttonTriggerId').hidden = true;
-    cameraRecordOff()
-    cameraOn()
+    setCameraMode(selectedCameraId, selectedMode)
   }
-  else if (selectedValue == 'record') {
+  else if (selectedMode == 'record-on') {
     byId('buttonTriggerId').hidden = true;
-    cameraOn()
-    cameraRecordOn()
+    setCameraMode(selectedCameraId, selectedMode)
   }
-  else if (selectedValue == 'rec_on_trigger') {
-    cameraRecordOff()
-    cameraOn()
+  else if (selectedMode == 'record-on-trigger') {
     byId('buttonTriggerId').hidden = false;
+    setCameraMode(selectedCameraId, selectedMode)
   } else {
-    alert("Invalid value for cameraModeOnChange: " + selectedValue + ".")
+    alert("Invalid value for cameraModeOnChange: " + selectedMode + ".")
   }
 }
 
 function recordTriggerClicked() {
-  recordTrigger()
+  activateRecordTrigger(selectedCameraId)
 }
 
 function exposureTimeOnChange() {
   let selectedValue =
     byId('exposureTimeId').options[byId('exposureTimeId').selectedIndex].value
-  setExposureTime(selectedValue)
+  setExposureTime(selectedCameraId, selectedValue)
 }
 
 function analogueGainOnChange() {
   let selectedValue =
     byId('analogueGainId').options[byId('analogueGainId').selectedIndex].value
-  setAnalogueGain(selectedValue)
+  setAnalogueGain(selectedCameraId, selectedValue)
 }
 
 // Functions used to updates fields based on response contents.
 function updateExposureTime(cam0ExposureTime, cam1ExposureTime) {
   let exposureTime = ""
-  if (selectedRPiCamera == 'camera-a') {
+  if (selectedCameraId == 'camera-a') {
     exposureTime = cam0ExposureTime
   }
-  else if (selectedRPiCamera == 'camera-b') {
+  else if (selectedCameraId == 'camera-b') {
     exposureTime = cam1ExposureTime
   }
   if (exposureTime == 0) {
@@ -93,10 +89,10 @@ function updateExposureTime(cam0ExposureTime, cam1ExposureTime) {
 
 function updateAnalogueGain(cam0AnalogueGain, cam1AnalogueGain) {
   let analogueGain = ""
-  if (selectedRPiCamera == 'camera-a') {
+  if (selectedCameraId == 'camera-a') {
     analogueGain = cam0AnalogueGain
   }
-  else if (selectedRPiCamera == 'camera-b') {
+  else if (selectedCameraId == 'camera-b') {
     analogueGain = cam1AnalogueGain
   }
   if (analogueGain == 0) {

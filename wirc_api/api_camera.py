@@ -13,7 +13,7 @@ import wirc_core
 
 logger = logging.getLogger(wirc_core.logger_name)
 
-cameras_router = fastapi.APIRouter()
+camera_router = fastapi.APIRouter()
 
 
 
@@ -23,7 +23,7 @@ cameras_router = fastapi.APIRouter()
 
 # ##########################################
 
-# @cameras_router.post(
+# @camera_router.post(
 #     "/cameras/record-video", tags=["Cameras"], description="Record video."
 # )
 # async def record_video(rpi_camera: str = "camera-a"):
@@ -36,7 +36,7 @@ cameras_router = fastapi.APIRouter()
 #         logger.debug(message)
 
 
-@cameras_router.post(
+@camera_router.post(
     "/cameras/start-video",
     tags=["Cameras"],
     description="Start continuous video recording.",
@@ -51,7 +51,7 @@ async def start_video(rpi_camera: str = "camera-a"):
         logger.debug(message)
 
 
-@cameras_router.post(
+@camera_router.post(
     "/cameras/stop-video",
     tags=["Cameras"],
     description="Stop continuous video recording.",
@@ -66,7 +66,7 @@ async def stop_video(rpi_camera: str = "camera-a"):
         logger.debug(message)
 
 
-@cameras_router.post(
+@camera_router.post(
     "/cameras/saturation", tags=["Cameras"], description="Set saturation."
 )
 async def set_saturation(saturation: float, rpi_camera: str = "camera-a"):
@@ -80,7 +80,7 @@ async def set_saturation(saturation: float, rpi_camera: str = "camera-a"):
         logger.debug(message)
 
 
-@cameras_router.post(
+@camera_router.post(
     "/cameras/exposure-time", tags=["Cameras"], description="Set exposure time."
 )
 async def set_exposure_time(time_us: int, rpi_camera: str = "camera-a"):
@@ -94,7 +94,7 @@ async def set_exposure_time(time_us: int, rpi_camera: str = "camera-a"):
         logger.debug(message)
 
 
-@cameras_router.post(
+@camera_router.post(
     "/cameras/analogue-gain", tags=["Cameras"], description="Set analogue gain."
 )
 async def set_analogue_gain(analogue_gain: int, rpi_camera: str = "camera-a"):
@@ -108,7 +108,7 @@ async def set_analogue_gain(analogue_gain: int, rpi_camera: str = "camera-a"):
         logger.debug(message)
 
 
-@cameras_router.post(
+@camera_router.post(
     "/cameras/commands",
     tags=["Cameras"],
     description="Commands to stop, start and restart.",

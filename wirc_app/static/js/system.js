@@ -29,8 +29,8 @@ function hideSettingsMore() {
   byId("buttonSettingsMoreId").classList.remove('is-inverted');
 }
 
-function showStatusClicked() {
-  alert('Not implemented...')
+function showDetectorStatusClicked() {
+  showDetectorStatus()
 }
 
 function setDetectorTimeClicked() {
@@ -38,7 +38,7 @@ function setDetectorTimeClicked() {
 }
 
 function userConfigurtionClicked() {
-  alert('Not implemented...')
+  alert("Not implemented.")
 }
 
 // Functions used to updates fields based on response contents.

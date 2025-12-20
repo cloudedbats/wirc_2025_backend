@@ -49,7 +49,7 @@ config.load_config(
     config_file=config_file,
     config_default_file=config_default_file,
 )
-# Cameras.
+# Camera.
 rpi_cam0 = RaspberyPiCamera(config, logger_name=logger_name, config_id="rpi_cam0")
 rpi_cam1 = RaspberyPiCamera(config, logger_name=logger_name, config_id="rpi_cam1")
 usb_thermal = ThermalCamera(config, logger_name=logger_name, config_id="usb_thermal")
