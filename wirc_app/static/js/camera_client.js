@@ -1,9 +1,9 @@
-async function setCameraMode(cameraId, command) {
+async function setCameraMode(cameraId, cameraMode) {
   try {
     let urlString = '/camera/camera-mode/'
     let params = {
-        selectedCamera: cameraId,
-        command: command,
+      camera_id: cameraId,
+      camera_mode: cameraMode,
     };
     await fetch(urlString, {
       method: 'POST',
@@ -22,8 +22,8 @@ async function activateRecordTrigger(cameraId) {
   try {
     let urlString = '/camera/record-trigger/'
     let params = {
-      selectedCamera: cameraId,
-    }
+      cameraId: cameraId,
+    };
     await fetch(urlString, {
       method: 'POST',
       headers: {
@@ -43,8 +43,11 @@ async function setExposureTime(cameraId, exposureTimeMicroSec) {
   }
   try {
     let urlString =
-      'camera/exposure-time?time_us=' + parseInt(exposureTimeMicroSec) + '&rpi_camera=' + cameraId
-    let params = {}
+      '/camera/exposure-time'
+    let params = {
+      cameraId: cameraId,
+      exposureTimeMicroSec: parseInt(exposureTimeMicroSec),
+    };
     await fetch(urlString, {
       method: 'POST',
       headers: {
@@ -64,8 +67,11 @@ async function setAnalogueGain(cameraId, analogueGain) {
   }
   try {
     let urlString =
-      'camera/analogue-gain?analogue_gain=' + parseInt(analogueGain) + '&rpi_camera=' + cameraId
-    let params = {}
+      '/camera/analogue-gain'
+    let params = {
+      cameraId: cameraId,
+      analogueGain: parseInt(analogueGain),
+    };
     await fetch(urlString, {
       method: 'POST',
       headers: {

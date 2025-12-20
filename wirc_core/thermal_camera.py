@@ -30,12 +30,12 @@ class ThermalCamera:
 
     def clear(self):
         """ """
-        self.camera_status = "Cleared"
+        self.camera_status = "camera-init"
         self.video_dir_path = None
         # self.video_mp4_path = None
-        self.thermal_preview_active = False
+        self.thermal_camera_active = False
         self.thermal_video_active = False
-        self.thermal_preview_task = None
+        self.thermal_camera_task = None
 
     def configure(
         self,
@@ -58,8 +58,8 @@ class ThermalCamera:
         # self.hflip = hflip
         # self.vflip = vflip
         # self.video_framerate_fps = video_framerate_fps
-        # #
-        self.camera_status = "Configured"
+        #
+        self.camera_status = "camera-init"
 
     def get_camera_status(self):
         """ """
@@ -68,28 +68,33 @@ class ThermalCamera:
     async def start_camera(self):
         """ """
         try:
-            self.thermal_preview_task = asyncio.create_task(
+            if self.thermal_camera_active == True:
+                print("DEBUG: Camera already running.")
+                return
+
+            self.thermal_camera_active = True
+            self.thermal_camera_task = asyncio.create_task(
                 self._thermal_camera_loop(), name="Thermal camera loop"
             )
-            self.camera_status = "Started"
+            self.camera_status = "camera-on"
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in start_camera (thermal): " + str(e))
-            self.camera_status = "Start failed"
+            self.camera_status = "camera-start-failed"
 
     async def stop_camera(self):
         """ """
         try:
-            self.thermal_preview_active = False
+            self.thermal_camera_active = False
             await asyncio.sleep(0)
-            if self.thermal_preview_task:
-                await self.thermal_preview_task.cancel()
-                self.thermal_preview_task = None
-                await asyncio.sleep(0)
-            self.camera_status = "Stopped"
+            if self.thermal_camera_task:
+                self.thermal_camera_task.cancel()
+            await asyncio.sleep(0)
+            self.thermal_camera_task = None
+            self.camera_status = "camera-off"
         except Exception as e:
             self.logger.debug("Exception in stop_camera (thermal): " + str(e))
-            self.camera_status = "Stop failed"
+            self.camera_status = "camera-off"
 
     async def set_camera_controls(
         self,
@@ -100,12 +105,13 @@ class ThermalCamera:
         """ """
         #
         # NOT USED...
+        # Rotation ?
         #
 
     async def _thermal_camera_loop(self):
         """ """
         try:
-            self.thermal_preview_active = True
+            self.thermal_camera_active = True
 
             capture = cv2.VideoCapture(0)
 
@@ -119,7 +125,7 @@ class ThermalCamera:
             counter = 0
             file_number = 1
             video_writer = None
-            while self.thermal_preview_active:
+            while self.thermal_camera_active:
                 counter += 1
                 if self.thermal_video_active:
                     # Use one minute for tests.
@@ -148,7 +154,7 @@ class ThermalCamera:
                         date_and_time = now.strftime("%Y%m%dT%H%M%S")
                         file_mp4_name = "thermal_" + date_and_time + ".mp4"
                         video_writer = VideoFileWriter(
-                            dir_path=self.video_dir_path,
+                            dir_path=str(self.video_dir_path),
                             file_mp4_name=file_mp4_name,
                             frame_height=frame_height,
                             frame_width=frame_width,
@@ -203,18 +209,19 @@ class ThermalCamera:
 
         finally:
             # Release.
-            self.thermal_preview_active = False
+            self.thermal_camera_active = False
             capture.release()
             self.logger.debug("Thermal_camera_loop ended.")
 
     async def start_video(self, lenght_s, dir_path, file_name_mp4):
         """ """
-        # if self.camera_status in ["Stopped", "Video started"]:
-        #     return
-        self.video_dir_path = pathlib.Path(dir_path)
         try:
+            # if self.camera_status in ["Stopped", "Video started"]:
+            #     return
+            self.video_dir_path = pathlib.Path(dir_path)
 
             self.thermal_video_active = True
+            self.camera_status = "record-on"
 
             await asyncio.sleep(0)
         except Exception as e:
@@ -227,6 +234,7 @@ class ThermalCamera:
         try:
 
             self.thermal_video_active = False
+            self.camera_status = "camera-on"
 
             await asyncio.sleep(0)
         except Exception as e:

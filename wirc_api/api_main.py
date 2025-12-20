@@ -21,7 +21,7 @@ logger = logging.getLogger(wirc_core.logger_name)
 
 app = fastapi.FastAPI(
     title="CloudedBats WIRC-2025",
-    description="CloudedBats WIRC-2025, the DIY infrared camera for bat monitoring.",
+    description="CloudedBats WIRC-2025, the DIY infrared/thermal camera system for bat monitoring.",
     version=wirc_core.__version__,
 )
 
@@ -50,14 +50,15 @@ async def shutdown_event():
 
 
 # Include modules.
-app.include_router(wirc_api.preview_router)
 app.include_router(wirc_api.camera_router)
+app.include_router(wirc_api.preview_router)
 app.include_router(wirc_api.directories_router)
 app.include_router(wirc_api.files_router)
+app.include_router(wirc_api.system_router)
 
 # Include modules.
-app.include_router(wirc_api.web_camera_router)
-app.include_router(wirc_api.web_about_router)
+app.include_router(wirc_api.html_camera_router)
+app.include_router(wirc_api.html_about_router)
 
 
 @app.get("/", tags=["HTML pages"], description="Main application page (HTML).")

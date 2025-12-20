@@ -13,10 +13,10 @@ import wirc_core
 logger = logging.getLogger(wirc_core.logger_name)
 templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_app/templates")
 templates = fastapi.templating.Jinja2Templates(directory=templates_path)
-web_about_router = fastapi.APIRouter()
+html_about_router = fastapi.APIRouter()
 
 
-@web_about_router.get(
+@html_about_router.get(
     "/pages/about", tags=["HTML pages"], description="About page loaded as HTML."
 )
 async def load_about_page(request: fastapi.Request):

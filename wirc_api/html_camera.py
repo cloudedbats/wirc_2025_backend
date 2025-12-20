@@ -21,10 +21,10 @@ import wirc_core
 logger = logging.getLogger(wirc_core.logger_name)
 templates_path = pathlib.Path(wirc_core.workdir_path, "wirc_app/templates")
 templates = fastapi.templating.Jinja2Templates(directory=templates_path)
-web_camera_router = fastapi.APIRouter()
+html_camera_router = fastapi.APIRouter()
 
 
-@web_camera_router.get(
+@html_camera_router.get(
     "/pages/camera", tags=["HTML pages"], description="Camera page loaded as HTML."
 )
 async def load_camera_page(request: fastapi.Request):

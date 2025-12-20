@@ -87,7 +87,7 @@ function fetchAllModules() {
 function loadWebsocket() {
   var ws_url = window.location.protocol === 'https:' ? 'wss://' : 'ws://'
   ws_url += window.location.host // Note: Host includes port.
-  ws_url += '/wirc/websocket'
+  ws_url += '/system/websocket'
   startWebsocket(ws_url)
 }
 

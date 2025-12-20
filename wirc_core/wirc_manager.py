@@ -44,6 +44,32 @@ class WircManager(object):
         rpicam = self._select_picamera(rpi_camera)
         return rpicam.get_preview_streamer()
 
+    async def camera_mode(self, camera_id, camera_mode):
+        """ """
+        rpicam = self._select_picamera(camera_id)
+        if camera_mode == "camera-off":
+            await rpicam.stop_video()
+            await asyncio.sleep(0)
+            await rpicam.stop_camera()
+            await asyncio.sleep(0)
+            wirc_core.wirc_client_info.write_log("info", "Camera OFF.")
+        if camera_mode == "camera-on":
+            await rpicam.stop_video()
+            await asyncio.sleep(0)
+            await rpicam.start_camera()
+            await asyncio.sleep(0)
+            wirc_core.wirc_client_info.write_log("info", "Camera ON.")
+        if camera_mode == "record-on":
+            await rpicam.start_camera()
+            await asyncio.sleep(0)
+            await rpicam.start_video("", "/home/wurb/wirc_recordings", "")
+            await asyncio.sleep(0)
+            wirc_core.wirc_client_info.write_log("info", "Recording ON.")
+        if camera_mode == "record-on-trigger":
+            pass
+        else:
+            pass
+
     async def record_video(self, rpi_camera="cam"):
         """ """
         # rpicam = self._select_picamera(rpi_camera)
