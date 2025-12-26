@@ -123,11 +123,11 @@ class RaspberyPiCamera:
                 except:
                     pass
             # Create a new camera object, cam0 or cam1.
-            rpi_camera_index = 0
-            if self.rpi_camera_id == "rpi_cam1":
-                rpi_camera_index = 1
+            camera_id_index = 0
+            if self.camera_id == "rpi_cam1":
+                camera_id_index = 1
             try:
-                self.picam2 = Picamera2(camera_num=rpi_camera_index)
+                self.picam2 = Picamera2(camera_num=camera_id_index)
             except Exception as e:
                 self.logger.debug("Exception in setup_camera: " + str(e))
                 self.picam2 = None
@@ -139,16 +139,16 @@ class RaspberyPiCamera:
             self.camera_properties = self.picam2.camera_properties
             self.camera_controls = self.picam2.camera_controls
             # ...to debug log.
-            message = "Sensor modes (" + self.rpi_camera_id + "): "
+            message = "Sensor modes (" + self.camera_id + "): "
             message += str(self.sensor_modes)
             self.logger.debug(message)
-            message = "Sensor resolution (" + self.rpi_camera_id + "): "
+            message = "Sensor resolution (" + self.camera_id + "): "
             message += str(self.sensor_resolution)
             self.logger.debug(message)
-            message = "Camera properties (" + self.rpi_camera_id + "): "
+            message = "Camera properties (" + self.camera_id + "): "
             message += str(self.camera_properties)
             self.logger.debug(message)
-            message = "Camera controls (" + self.rpi_camera_id + "): "
+            message = "Camera controls (" + self.camera_id + "): "
             message += str(self.camera_controls)
             self.logger.debug(message)
             # Keep the aspect ratio from the sensor.

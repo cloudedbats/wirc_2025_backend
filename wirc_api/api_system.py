@@ -69,8 +69,14 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         logging_event = wirc_core.wirc_client_info.get_logging_event()
         cam0_streaming_start_event = wirc_core.rpi_cam0.get_streaming_start_event()
         cam1_streaming_start_event = wirc_core.rpi_cam1.get_streaming_start_event()
-        thermal_streaming_start_event = (
-            wirc_core.usb_thermal.get_streaming_start_event()
+        thermal0_streaming_start_event = (
+            wirc_core.usb_thermal0.get_streaming_start_event()
+        )
+        thermal1_streaming_start_event = (
+            wirc_core.usb_thermal1.get_streaming_start_event()
+        )
+        thermal2_streaming_start_event = (
+            wirc_core.usb_thermal2.get_streaming_start_event()
         )
         # Update client.
         ws_json = {}
@@ -103,7 +109,13 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
                 cam1_streaming_start_event.wait(), name="ws-cam1-stream-event"
             )
             task_6 = asyncio.create_task(
-                thermal_streaming_start_event.wait(), name="ws-thermal-stream-event"
+                thermal0_streaming_start_event.wait(), name="ws-thermal-stream-event"
+            )
+            task_7 = asyncio.create_task(
+                thermal1_streaming_start_event.wait(), name="ws-thermal-stream-event"
+            )
+            task_8 = asyncio.create_task(
+                thermal2_streaming_start_event.wait(), name="ws-thermal-stream-event"
             )
             events = [
                 task_1,
@@ -112,6 +124,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
                 task_4,
                 task_5,
                 task_6,
+                task_7,
+                task_8,
             ]
             done, pending = await asyncio.wait(
                 events, return_when=asyncio.FIRST_COMPLETED
@@ -160,11 +174,21 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
                 )
                 ws_json["cam1_streaming_started"] = True
 
-            if thermal_streaming_start_event.is_set():
-                termal_streaming_start_event = (
-                    wirc_core.usb_thermal.get_streaming_start_event()
+            if thermal0_streaming_start_event.is_set():
+                termal0_streaming_start_event = (
+                    wirc_core.usb_thermal0.get_streaming_start_event()
                 )
-                ws_json["thermal_streaming_started"] = True
+                ws_json["thermal0_streaming_started"] = True
+            if thermal1_streaming_start_event.is_set():
+                termal1_streaming_start_event = (
+                    wirc_core.usb_thermal1.get_streaming_start_event()
+                )
+                ws_json["thermal1_streaming_started"] = True
+            if thermal2_streaming_start_event.is_set():
+                termal2_streaming_start_event = (
+                    wirc_core.usb_thermal2.get_streaming_start_event()
+                )
+                ws_json["thermal2_streaming_started"] = True
 
             # Send to client.
             await websocket.send_json(ws_json)

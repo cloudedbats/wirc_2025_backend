@@ -30,19 +30,30 @@ class WircManager(object):
         """ """
         config = self.config
 
-    def _select_picamera(self, rpi_camera="camera-a"):
+    def _select_picamera(self, camera_id="camera-a"):
         """ """
         rpicam = wirc_core.rpi_cam0
-        if rpi_camera == "camera-a":
+        if camera_id == "camera-a":
             rpicam = wirc_core.rpi_cam0
-        elif rpi_camera == "camera-b":
-            rpicam = wirc_core.usb_thermal
+        elif camera_id == "camera-b":
+            rpicam = wirc_core.rpi_cam1
+        elif camera_id == "camera-c":
+            rpicam = wirc_core.usb_thermal0
+        elif camera_id == "camera-d":
+            rpicam = wirc_core.usb_thermal1
+        elif camera_id == "camera-e":
+            rpicam = wirc_core.usb_thermal2
         return rpicam
 
-    def get_preview_streamer(self, rpi_camera="camera-a"):
+    def get_preview_streamer(self, camera_id="camera-a"):
         """ """
-        rpicam = self._select_picamera(rpi_camera)
+        rpicam = self._select_picamera(camera_id)
         return rpicam.get_preview_streamer()
+
+    def get_preview_queue(self, camera_id="camera-a"):
+        """ """
+        rpicam = self._select_picamera(camera_id)
+        return rpicam.preview_queue
 
     async def camera_mode(self, camera_id, camera_mode):
         """ """
@@ -70,19 +81,19 @@ class WircManager(object):
         else:
             pass
 
-    async def record_video(self, rpi_camera="cam"):
+    async def record_video(self, camera_id="cam"):
         """ """
-        # rpicam = self._select_picamera(rpi_camera)
+        # rpicam = self._select_picamera(camera_id)
         # rec_dir = self.cam0_rec_dir
-        # if rpi_camera == "rpi_cam0":
+        # if camera_id == "rpi_cam0":
         #     video_prefix = self.cam0_video_prefix
         #     video_length_s = self.cam0_single_length_s
         #     wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
-        # if rpi_camera == "rpi_cam1":
+        # if camera_id == "rpi_cam1":
         #     video_prefix = self.cam1_video_prefix
         #     video_length_s = self.cam1_single_length_s
         #     wirc_core.wirc_client_info.write_log("info", "Single video (cam1).")
-        # if rpi_camera == "rpi_cam0":
+        # if camera_id == "rpi_cam0":
         #     video_prefix = self.cam0_video_prefix
         #     video_length_s = self.cam0_single_length_s
         #     wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
@@ -99,11 +110,11 @@ class WircManager(object):
         # metadata = await rpicam.start_video(video_length_s, video_dir, video_file_mp4)
         # wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
-    async def start_video(self, rpi_camera="camera-a"):
+    async def start_video(self, camera_id="camera-a"):
         """ """
-        rpicam = self._select_picamera(rpi_camera)
-        rec_dir = self.cam0_rec_dir if rpi_camera == "rpi_cam0" else self.cam1_rec_dir
-        if rpi_camera == "rpi_cam0":
+        rpicam = self._select_picamera(camera_id)
+        rec_dir = self.cam0_rec_dir if camera_id == "rpi_cam0" else self.cam1_rec_dir
+        if camera_id == "rpi_cam0":
             video_prefix = self.cam0_video_prefix
             video_length_s = self.cam0_cont_length_s
             self.cam0_continuous_video_running = True
@@ -115,10 +126,10 @@ class WircManager(object):
             wirc_core.wirc_client_info.write_log("info", "Video started...")
             # Loop for videos.
             while True:
-                if rpi_camera == "rpi_cam0":
+                if camera_id == "rpi_cam0":
                     if self.cam0_continuous_video_running == False:
                         return
-                if rpi_camera == "rpi_cam1":
+                if camera_id == "rpi_cam1":
                     if self.cam1_continuous_video_running == False:
                         return
                 now = datetime.datetime.now()
@@ -135,55 +146,55 @@ class WircManager(object):
                 )
                 wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
-                if rpi_camera == "rpi_cam1":
+                if camera_id == "rpi_cam1":
                     break
 
         except Exception as e:
             self.logger.debug("Exception in start_video : " + str(e))
 
-    async def stop_video(self, rpi_camera="rpi_cam0"):
+    async def stop_video(self, camera_id="rpi_cam0"):
         """ """
-        if rpi_camera == "rpi_cam0":
+        if camera_id == "rpi_cam0":
             self.cam0_continuous_video_running = False
         else:
             self.cam1_continuous_video_running = False
-        rpicam = self._select_picamera(rpi_camera)
+        rpicam = self._select_picamera(camera_id)
         wirc_core.wirc_client_info.write_log("info", "Video stopped.")
         await rpicam.stop_video()
 
-    async def set_saturation(self, saturation, rpi_camera="rpi_cam0"):
+    async def set_saturation(self, saturation, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(rpi_camera)
+        rpicam = self._select_picamera(camera_id)
         await rpicam.set_camera_controls(saturation=saturation)
 
-    async def set_exposure_time(self, exposure_time_us, rpi_camera="rpi_cam0"):
+    async def set_exposure_time(self, exposure_time_us, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(rpi_camera)
+        rpicam = self._select_picamera(camera_id)
         await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
         wirc_core.wirc_client_status.set_exposure_time_us(
-            exposure_time_us, rpi_camera=rpi_camera
+            exposure_time_us, camera_id=camera_id
         )
 
-    async def set_analogue_gain(self, analogue_gain, rpi_camera="rpi_cam0"):
+    async def set_analogue_gain(self, analogue_gain, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(rpi_camera)
+        rpicam = self._select_picamera(camera_id)
         await rpicam.set_camera_controls(analogue_gain=analogue_gain)
         wirc_core.wirc_client_status.set_analogue_gain(
-            analogue_gain, rpi_camera=rpi_camera
+            analogue_gain, camera_id=camera_id
         )
 
-    async def start_camera(self, rpi_camera="rpi_cam0"):
+    async def start_camera(self, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(rpi_camera)
+        rpicam = self._select_picamera(camera_id)
         await rpicam.start_camera()
-        message = "Camera " + rpi_camera + " started."
+        message = "Camera " + camera_id + " started."
         wirc_core.wirc_client_info.write_log("info", message)
 
-    async def stop_camera(self, rpi_camera="rpi_cam0"):
+    async def stop_camera(self, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(rpi_camera)
+        rpicam = self._select_picamera(camera_id)
         await rpicam.stop_camera()
-        message = "Camera " + rpi_camera + " stopped."
+        message = "Camera " + camera_id + " stopped."
         wirc_core.wirc_client_info.write_log("info", message)
 
     def log_camera_info(self):
@@ -224,20 +235,22 @@ class WircManager(object):
             # Inform client apps.
             # exp = config.get("rpi_cam0" + ".settings.exposure_time_us", "auto")
             # wirc_core.wirc_client_status.set_exposure_time_us(
-            #     exp, rpi_camera="rpi_cam0"
+            #     exp, camera_id="rpi_cam0"
             # )
             # exp = config.get("rpi_cam1" + ".settings.exposure_time_us", "auto")
             # wirc_core.wirc_client_status.set_exposure_time_us(
-            #     exp, rpi_camera="rpi_cam1"
+            #     exp, camera_id="rpi_cam1"
             # )
             # gain = config.get("rpi_cam0" + ".settings.analogue_gain", "auto")
-            # wirc_core.wirc_client_status.set_analogue_gain(gain, rpi_camera="rpi_cam0")
+            # wirc_core.wirc_client_status.set_analogue_gain(gain, camera_id="rpi_cam0")
             # gain = config.get("rpi_cam1" + ".settings.analogue_gain", "auto")
-            # wirc_core.wirc_client_status.set_analogue_gain(gain, rpi_camera="rpi_cam1")
+            # wirc_core.wirc_client_status.set_analogue_gain(gain, camera_id="rpi_cam1")
 
             await wirc_core.rpi_cam0.start_camera()
-            # await wirc_core.rpi_cam1.start_camera()
-            await wirc_core.usb_thermal.start_camera()
+            await wirc_core.rpi_cam1.start_camera()
+            await wirc_core.usb_therma0.start_camera()
+            await wirc_core.usb_thermal1.start_camera()
+            await wirc_core.usb_thermal2.start_camera()
         except Exception as e:
             self.logger.debug("Exception in WircManager - startup: " + str(e))
 
@@ -245,7 +258,9 @@ class WircManager(object):
         """ """
         try:
             await wirc_core.rpi_cam0.stop_camera()
-            # await wirc_core.rpi_cam1.stop_camera()
-            await wirc_core.usb_thermal.stop_camera()
+            await wirc_core.rpi_cam1.stop_camera()
+            await wirc_core.usb_thermal0.stop_camera()
+            await wirc_core.usb_thermal1.stop_camera()
+            await wirc_core.usb_thermal2.stop_camera()
         except Exception as e:
             self.logger.debug("Exception in WircManager - shutdown: " + str(e))

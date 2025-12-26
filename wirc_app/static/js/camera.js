@@ -12,6 +12,7 @@ function selectCamera(cameraId, cameraName) {
   byId("selectCamBId").classList.remove('is-inverted');
   byId("selectCamCId").classList.remove('is-inverted');
   byId("selectCamDId").classList.remove('is-inverted');
+  byId("selectCamEId").classList.remove('is-inverted');
   if (cameraId == 'camera-a') {
     byId("selectCamAId").classList.add('is-inverted');
   }
@@ -22,12 +23,15 @@ function selectCamera(cameraId, cameraName) {
     byId("selectCamCId").classList.add('is-inverted');
   }
   if (cameraId == 'camera-d') {
-    byId("selectCamDId").disabled = true;
+    byId("selectCamDId").classList.add('is-inverted');
+  }
+  if (cameraId == 'camera-e') {
+    byId("selectCamEId").classList.add('is-inverted');
   }
 
   // TODO: For test.
-  byId("selectCamCId").disabled = true;
-  byId("selectCamDId").disabled = true;
+  // byId("selectCamCId").disabled = true;
+  // byId("selectCamDId").disabled = true;
 
   refreshPreviewStream()
 }

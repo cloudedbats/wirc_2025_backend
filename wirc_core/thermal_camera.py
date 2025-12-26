@@ -16,7 +16,9 @@ from datetime import datetime
 class ThermalCamera:
     """ """
 
-    def __init__(self, config={}, logger_name="DefaultLogger", config_id="thermal"):
+    def __init__(
+        self, config={}, logger_name="DefaultLogger", config_id="usb_thermal0"
+    ):
         """ """
         self.config = config
         self.logger = logging.getLogger(logger_name)
@@ -39,8 +41,8 @@ class ThermalCamera:
 
     def configure(
         self,
-        config_id="thermal",
-        # rpi_camera_id="rpi_cam1",
+        config_id,
+        # camera_id="rpi_cam1",
         # cam_monochrome=False,
         # saturation="auto",
         # exposure_time_us="auto",
@@ -54,11 +56,19 @@ class ThermalCamera:
         # video_pre_buffer_frames=60,
     ):
         """ """
-        # self.rpi_camera_id = rpi_camera_id
+        # self.camera_id = camera_id
         # self.hflip = hflip
         # self.vflip = vflip
         # self.video_framerate_fps = video_framerate_fps
         #
+        self.cv2_device_index = 0
+        if config_id == "usb_thermal0":
+            self.cv2_device_index = 0
+        elif config_id == "usb_thermal1":
+            self.cv2_device_index = 1
+        elif config_id == "usb_thermal2":
+            self.cv2_device_index = 2
+
         self.camera_status = "camera-init"
 
     def get_camera_status(self):
@@ -113,10 +123,11 @@ class ThermalCamera:
         try:
             self.thermal_camera_active = True
 
-            capture = cv2.VideoCapture(0)
+            capture = cv2.VideoCapture(self.cv2_device_index)
 
             if not capture.isOpened():
                 print("Error: Could not access the webcam.")
+                self.thermal_camera_active = False
                 return
 
             frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))

@@ -18,7 +18,7 @@ logger = logging.getLogger(wirc_core.logger_name)
 preview_router = fastapi.APIRouter()
 
 
-async def preview_streamer_mjpeg(rpi_camera="camera-a"):
+async def preview_streamer_mjpeg(camera_id, request):
     """ """
     #
     # NOTE: This version supports only one mjpeg consumer for each camera.
@@ -26,17 +26,23 @@ async def preview_streamer_mjpeg(rpi_camera="camera-a"):
     preview_queue = None
     try:
         # Select preview queue.
-        if rpi_camera == "camera-a":
-            preview_queue = wirc_core.rpi_cam0.preview_queue
-        # elif rpi_camera == "camera-a":
-        #     preview_queue = wirc_core.rpi_cam1.preview_queue
-        elif rpi_camera == "camera-b":
-            preview_queue = wirc_core.usb_thermal.preview_queue
-        else:
-            preview_queue = None
+        preview_queue = wirc_core.wirc_manager.get_preview_queue(camera_id)
+
+        # if camera_id == "camera-a":
+        #     preview_queue = wirc_core.rpi_cam0.preview_queue
+        # # elif camera_id == "camera-a":
+        # #     preview_queue = wirc_core.rpi_cam1.preview_queue
+        # elif camera_id == "camera-b":
+        #     preview_queue = wirc_core.usb_thermal.preview_queue
+        # else:
+        #     preview_queue = None
         #
         if preview_queue:
             while True:
+                # Stop sending if client disconnected.
+                if await request.is_disconnected():
+                    break
+
                 try:
                     # Wait for next frame.
                     preview_frame = await asyncio.wait_for(
@@ -55,10 +61,11 @@ async def preview_streamer_mjpeg(rpi_camera="camera-a"):
                         b"Content-Type: image/jpeg\r\n\r\n" + preview_frame + b"\r\n"
                     )
                     preview_queue.task_done()
+                    # Asyncio sleep needed to catch removed clients.
+                    await asyncio.sleep(0)
                 except asyncio.TimeoutError:
-                    pass
-                # Asyncio sleep needed to catch removed clients.
-                await asyncio.sleep(0)
+                    # Asyncio sleep needed to catch removed clients.
+                    await asyncio.sleep(0)
     except asyncio.CancelledError:
         logger.debug("Streaming client removed.")
     except Exception as e:
@@ -71,12 +78,12 @@ async def preview_streamer_mjpeg(rpi_camera="camera-a"):
     description="Preview streamed as Motion JPEG.",
 )
 # async def stream_mjpeg(request: fastapi.Request):
-async def preview_stream_mjpeg(rpi_camera: str = "camera-a"):
+async def preview_stream_mjpeg(camera_id: str, request: fastapi.Request):
     """ """
     try:
         logger.debug("API called: preview_stream_mjpeg.")
         return StreamingResponse(
-            preview_streamer_mjpeg(rpi_camera=rpi_camera),
+            preview_streamer_mjpeg(camera_id, request),
             media_type="multipart/x-mixed-replace;boundary=frame",
         )
     except Exception as e:

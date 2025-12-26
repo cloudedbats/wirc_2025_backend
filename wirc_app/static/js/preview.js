@@ -31,11 +31,16 @@ function previewModeOnChange() {
   }
 }
 
-function refreshPreviewStream() {
+async function refreshPreviewStream() {
   let image = byId('mjpegStreamId');
-  image.src = 'preview/stream.mjpeg' + '?rpi_camera=' + selectedCameraId;
-  image.src += '&fps=' + previewFps;
-  image.src += '&dummy=' + Math.random(); // To avoid cache.
+  image.removeAttribute('src');
+  // await new Promise(r => setTimeout(r, 100));
+
+  let src_text = 'preview/stream.mjpeg' + '?camera_id=' + selectedCameraId;
+  src_text += '&fps=' + previewFps;
+  src_text += '&dummy=' + Math.random(); // To avoid cache.
+  image.src = src_text;
+
   byId('cameraTitleId').textContent = selectedCameraName;
 }
 
