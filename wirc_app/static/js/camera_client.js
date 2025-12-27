@@ -1,6 +1,6 @@
 async function setCameraMode(cameraId, cameraMode) {
   try {
-    let urlString = '/camera/camera-mode/'
+    let urlString = '/camera/camera-mode/';
     let params = {
       camera_id: cameraId,
       camera_mode: cameraMode,
@@ -13,14 +13,14 @@ async function setCameraMode(cameraId, cameraMode) {
       body: JSON.stringify(params)
     })
   } catch (err) {
-    alert('ERROR setCameraMode: ' + err)
-    console.log(err)
+    alert('ERROR setCameraMode: ' + err);
+    console.log(err);
   }
 }
 
 async function activateRecordTrigger(cameraId) {
   try {
-    let urlString = '/camera/record-trigger/'
+    let urlString = '/camera/record-trigger/';
     let params = {
       cameraId: cameraId,
     };
@@ -32,8 +32,8 @@ async function activateRecordTrigger(cameraId) {
       body: JSON.stringify(params)
     })
   } catch (err) {
-    alert('ERROR activateRecordTrigger: ' + err)
-    console.log(err)
+    alert('ERROR activateRecordTrigger: ' + err);
+    console.log(err);
   }
 }
 
@@ -43,7 +43,7 @@ async function setExposureTime(cameraId, exposureTimeMicroSec) {
   }
   try {
     let urlString =
-      '/camera/exposure-time'
+      '/camera/exposure-time';
     let params = {
       cameraId: cameraId,
       exposureTimeMicroSec: parseInt(exposureTimeMicroSec),
@@ -63,7 +63,7 @@ async function setExposureTime(cameraId, exposureTimeMicroSec) {
 
 async function setAnalogueGain(cameraId, analogueGain) {
   if (analogueGain == 'auto') {
-    analogueGain = 0
+    analogueGain = 0;
   }
   try {
     let urlString =
@@ -80,7 +80,7 @@ async function setAnalogueGain(cameraId, analogueGain) {
       body: JSON.stringify(params)
     })
   } catch (err) {
-    alert('ERROR setAnalogueGain: ' + err)
-    console.log(err)
+    alert('ERROR setAnalogueGain: ' + err);
+    console.log(err);
   }
 }

@@ -1,46 +1,54 @@
-var previewFps = 1;
+// Preview mode is stored on client only.
+var selectedPreviewMode = {
+  'camera-a': 'preview-on',
+  'camera-b': 'preview-on',
+  'camera-c': 'preview-on',
+  'camera-d': 'preview-on',
+  'camera-e': 'preview-on',
+}
 
 function previewModeOnChange() {
+  let previewModeId = byId('previewModeId');
   let selectedMode =
-    byId('previewModeId').options[byId('previewModeId').selectedIndex].value;
-  if (selectedMode == 'preview_on') {
-    previewFps = 30 // Run on max speed.
-    refreshPreviewStream()
-  }
-  else if (selectedMode == 'preview_off') {
-    previewFps = 0
-    refreshPreviewStream()
-  }
-  else if (selectedMode == 'preview_10_fps') {
-    previewFps = 10
-    refreshPreviewStream()
-  }
-  else if (selectedMode == 'preview_5_fps') {
-    previewFps = 5
-    refreshPreviewStream()
-  }
-  else if (selectedMode == 'preview_2_fps') {
-    previewFps = 2
-    refreshPreviewStream()
-  }
-  else if (selectedMode == 'preview_1_fps') {
-    previewFps = 1
-    refreshPreviewStream()
-  } else {
-    alert("Invalid value for previewModeOnChange: " + selectedMode + ".")
-  }
+    previewModeId.options[previewModeId.selectedIndex].value;
+  selectedPreviewMode[selectedCameraId] = selectedMode;
+
+  refreshPreviewStream();
+}
+
+function previewModeUpdate() {
+  let selectedMode = selectedPreviewMode[selectedCameraId];
+  byId('previewModeId').value = selectedMode;
+
+  refreshPreviewStream();
 }
 
 async function refreshPreviewStream() {
   let image = byId('mjpegStreamId');
   image.removeAttribute('src');
-  // await new Promise(r => setTimeout(r, 100));
 
-  let src_text = 'preview/stream.mjpeg' + '?camera_id=' + selectedCameraId;
-  src_text += '&fps=' + previewFps;
-  src_text += '&dummy=' + Math.random(); // To avoid cache.
-  image.src = src_text;
-
-  byId('cameraTitleId').textContent = selectedCameraName;
+  let selectedMode = selectedPreviewMode[selectedCameraId];
+  let fps = 0; // 0 = OFF.
+  if (selectedMode == 'preview-on') {
+    fps = 30; // Run on max speed.
+  }
+  else if (selectedMode == 'preview-10-fps') {
+    fps = 10;
+  }
+  else if (selectedMode == 'preview-5-fps') {
+    fps = 5;
+  }
+  else if (selectedMode == 'preview-2-fps') {
+    fps = 2;
+  }
+  else if (selectedMode == 'preview-1-fps') {
+    fps = 1;
+  }
+  if (fps != 0) {
+    let src_text = 'preview/stream.mjpeg' + '?camera_id=' + selectedCameraId;
+    src_text += '&fps=' + fps;
+    src_text += '&dummy=' + Math.random(); // To avoid cache.
+    image.src = src_text;
+  }
 }
 

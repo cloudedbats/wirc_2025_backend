@@ -28,7 +28,6 @@ class RaspberyPiCamera:
         self.preview_streamer = PreviewStreamingOutput()
         self.preview_streamer.set_preview_queue(self.preview_queue)
         self.streaming_event = None
-        self.streaming_start_event()
 
     def clear(self):
         """ """
@@ -362,19 +361,6 @@ class RaspberyPiCamera:
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in stop_video: " + str(e))
-
-    def streaming_start_event(self):
-        """Release event."""
-        # Event: Create a new and release the old.
-        old_event = self.get_streaming_start_event()
-        self.streaming_event = asyncio.Event()
-        old_event.set()
-
-    def get_streaming_start_event(self):
-        """Used by consumers."""
-        if self.streaming_event == None:
-            self.streaming_event = asyncio.Event()
-        return self.streaming_event
 
 
 class PreviewStreamingOutput(io.BufferedIOBase):

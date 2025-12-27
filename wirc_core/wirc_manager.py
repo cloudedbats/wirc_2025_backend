@@ -30,7 +30,7 @@ class WircManager(object):
         """ """
         config = self.config
 
-    def _select_picamera(self, camera_id="camera-a"):
+    def _select_camera(self, camera_id="camera-a"):
         """ """
         rpicam = wirc_core.rpi_cam0
         if camera_id == "camera-a":
@@ -45,131 +45,115 @@ class WircManager(object):
             rpicam = wirc_core.usb_thermal2
         return rpicam
 
-    def get_preview_streamer(self, camera_id="camera-a"):
-        """ """
-        rpicam = self._select_picamera(camera_id)
-        return rpicam.get_preview_streamer()
+    # def get_preview_streamer(self, camera_id="camera-a"):
+    #     """ """
+    #     rpicam = self._select_camera(camera_id)
+    #     return rpicam.get_preview_streamer()
 
     def get_preview_queue(self, camera_id="camera-a"):
         """ """
-        rpicam = self._select_picamera(camera_id)
+        rpicam = self._select_camera(camera_id)
         return rpicam.preview_queue
 
     async def camera_mode(self, camera_id, camera_mode):
         """ """
-        rpicam = self._select_picamera(camera_id)
-        if camera_mode == "camera-off":
-            await rpicam.stop_video()
-            await asyncio.sleep(0)
-            await rpicam.stop_camera()
-            await asyncio.sleep(0)
-            wirc_core.wirc_client_info.write_log("info", "Camera OFF.")
-        if camera_mode == "camera-on":
-            await rpicam.stop_video()
-            await asyncio.sleep(0)
-            await rpicam.start_camera()
-            await asyncio.sleep(0)
-            wirc_core.wirc_client_info.write_log("info", "Camera ON.")
-        if camera_mode == "record-on":
-            await rpicam.start_camera()
-            await asyncio.sleep(0)
-            await rpicam.start_video("", "/home/wurb/wirc_recordings", "")
-            await asyncio.sleep(0)
-            wirc_core.wirc_client_info.write_log("info", "Recording ON.")
-        if camera_mode == "record-on-trigger":
-            pass
-        else:
-            pass
+        rpicam = self._select_camera(camera_id)
+        await rpicam.set_camera_mode(camera_mode)
 
-    async def record_video(self, camera_id="cam"):
+    async def camera_trigger(self, camera_id):
         """ """
-        # rpicam = self._select_picamera(camera_id)
-        # rec_dir = self.cam0_rec_dir
-        # if camera_id == "rpi_cam0":
-        #     video_prefix = self.cam0_video_prefix
-        #     video_length_s = self.cam0_single_length_s
-        #     wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
-        # if camera_id == "rpi_cam1":
-        #     video_prefix = self.cam1_video_prefix
-        #     video_length_s = self.cam1_single_length_s
-        #     wirc_core.wirc_client_info.write_log("info", "Single video (cam1).")
-        # if camera_id == "rpi_cam0":
-        #     video_prefix = self.cam0_video_prefix
-        #     video_length_s = self.cam0_single_length_s
-        #     wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
+        rpicam = self._select_camera(camera_id)
+        await rpicam.camera_trigger()
 
-        # now = datetime.datetime.now()
-        # date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
-        # date_and_time = now.strftime("%Y%m%dT%H%M%S")
-        # video_dir = pathlib.Path(rec_dir, date_dir_name)
-        # if not video_dir.exists():
-        #     video_dir.mkdir(parents=True)
-        # video_file = video_prefix + "_" + date_and_time
-        # video_file_mp4 = video_file + ".mp4"
-        # # Start video recording.
-        # metadata = await rpicam.start_video(video_length_s, video_dir, video_file_mp4)
-        # wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
+    # async def record_video(self, camera_id="cam"):
+    #     """ """
+    #     rpicam = self._select_camera(camera_id)
+    #     rec_dir = self.cam0_rec_dir
+    #     if camera_id == "rpi_cam0":
+    #         video_prefix = self.cam0_video_prefix
+    #         video_length_s = self.cam0_single_length_s
+    #         wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
+    #     if camera_id == "rpi_cam1":
+    #         video_prefix = self.cam1_video_prefix
+    #         video_length_s = self.cam1_single_length_s
+    #         wirc_core.wirc_client_info.write_log("info", "Single video (cam1).")
+    #     if camera_id == "rpi_cam0":
+    #         video_prefix = self.cam0_video_prefix
+    #         video_length_s = self.cam0_single_length_s
+    #         wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
 
-    async def start_video(self, camera_id="camera-a"):
-        """ """
-        rpicam = self._select_picamera(camera_id)
-        rec_dir = self.cam0_rec_dir if camera_id == "rpi_cam0" else self.cam1_rec_dir
-        if camera_id == "rpi_cam0":
-            video_prefix = self.cam0_video_prefix
-            video_length_s = self.cam0_cont_length_s
-            self.cam0_continuous_video_running = True
-        else:
-            video_prefix = self.cam1_video_prefix
-            video_length_s = self.cam1_cont_length_s
-            self.cam1_continuous_video_running = True
-        try:
-            wirc_core.wirc_client_info.write_log("info", "Video started...")
-            # Loop for videos.
-            while True:
-                if camera_id == "rpi_cam0":
-                    if self.cam0_continuous_video_running == False:
-                        return
-                if camera_id == "rpi_cam1":
-                    if self.cam1_continuous_video_running == False:
-                        return
-                now = datetime.datetime.now()
-                date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
-                date_and_time = now.strftime("%Y%m%dT%H%M%S")
-                video_dir = pathlib.Path(rec_dir, date_dir_name)
-                if not video_dir.exists():
-                    video_dir.mkdir(parents=True)
-                video_file = video_prefix + "_" + date_and_time
-                video_file_mp4 = video_file + ".mp4"
-                # Start video recording.
-                metadata = await rpicam.start_video(
-                    video_length_s, video_dir, video_file_mp4
-                )
-                wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
+    #     now = datetime.datetime.now()
+    #     date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
+    #     date_and_time = now.strftime("%Y%m%dT%H%M%S")
+    #     video_dir = pathlib.Path(rec_dir, date_dir_name)
+    #     if not video_dir.exists():
+    #         video_dir.mkdir(parents=True)
+    #     video_file = video_prefix + "_" + date_and_time
+    #     video_file_mp4 = video_file + ".mp4"
+    #     # Start video recording.
+    #     metadata = await rpicam.start_video(video_length_s, video_dir, video_file_mp4)
+    #     wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
-                if camera_id == "rpi_cam1":
-                    break
+    # async def start_video(self, camera_id="camera-a"):
+    #     """ """
+    #     rpicam = self._select_camera(camera_id)
+    #     rec_dir = self.cam0_rec_dir if camera_id == "rpi_cam0" else self.cam1_rec_dir
+    #     if camera_id == "rpi_cam0":
+    #         video_prefix = self.cam0_video_prefix
+    #         video_length_s = self.cam0_cont_length_s
+    #         self.cam0_continuous_video_running = True
+    #     else:
+    #         video_prefix = self.cam1_video_prefix
+    #         video_length_s = self.cam1_cont_length_s
+    #         self.cam1_continuous_video_running = True
+    #     try:
+    #         wirc_core.wirc_client_info.write_log("info", "Video started...")
+    #         # Loop for videos.
+    #         while True:
+    #             if camera_id == "rpi_cam0":
+    #                 if self.cam0_continuous_video_running == False:
+    #                     return
+    #             if camera_id == "rpi_cam1":
+    #                 if self.cam1_continuous_video_running == False:
+    #                     return
+    #             now = datetime.datetime.now()
+    #             date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
+    #             date_and_time = now.strftime("%Y%m%dT%H%M%S")
+    #             video_dir = pathlib.Path(rec_dir, date_dir_name)
+    #             if not video_dir.exists():
+    #                 video_dir.mkdir(parents=True)
+    #             video_file = video_prefix + "_" + date_and_time
+    #             video_file_mp4 = video_file + ".mp4"
+    #             # Start video recording.
+    #             metadata = await rpicam.start_video(
+    #                 video_length_s, video_dir, video_file_mp4
+    #             )
+    #             wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
 
-        except Exception as e:
-            self.logger.debug("Exception in start_video : " + str(e))
+    #             if camera_id == "rpi_cam1":
+    #                 break
 
-    async def stop_video(self, camera_id="rpi_cam0"):
-        """ """
-        if camera_id == "rpi_cam0":
-            self.cam0_continuous_video_running = False
-        else:
-            self.cam1_continuous_video_running = False
-        rpicam = self._select_picamera(camera_id)
-        wirc_core.wirc_client_info.write_log("info", "Video stopped.")
-        await rpicam.stop_video()
+    #     except Exception as e:
+    #         self.logger.debug("Exception in start_video : " + str(e))
+
+    # async def stop_video(self, camera_id="rpi_cam0"):
+    #     """ """
+    #     if camera_id == "rpi_cam0":
+    #         self.cam0_continuous_video_running = False
+    #     else:
+    #         self.cam1_continuous_video_running = False
+    #     rpicam = self._select_camera(camera_id)
+    #     wirc_core.wirc_client_info.write_log("info", "Video stopped.")
+    #     await rpicam.stop_video()
 
     async def set_saturation(self, saturation, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(camera_id)
+        rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(saturation=saturation)
 
     async def set_exposure_time(self, exposure_time_us, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(camera_id)
+        rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
         wirc_core.wirc_client_status.set_exposure_time_us(
             exposure_time_us, camera_id=camera_id
@@ -177,7 +161,7 @@ class WircManager(object):
 
     async def set_analogue_gain(self, analogue_gain, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(camera_id)
+        rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(analogue_gain=analogue_gain)
         wirc_core.wirc_client_status.set_analogue_gain(
             analogue_gain, camera_id=camera_id
@@ -185,14 +169,14 @@ class WircManager(object):
 
     async def start_camera(self, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(camera_id)
+        rpicam = self._select_camera(camera_id)
         await rpicam.start_camera()
         message = "Camera " + camera_id + " started."
         wirc_core.wirc_client_info.write_log("info", message)
 
     async def stop_camera(self, camera_id="rpi_cam0"):
         """ """
-        rpicam = self._select_picamera(camera_id)
+        rpicam = self._select_camera(camera_id)
         await rpicam.stop_camera()
         message = "Camera " + camera_id + " stopped."
         wirc_core.wirc_client_info.write_log("info", message)

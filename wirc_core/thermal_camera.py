@@ -28,13 +28,11 @@ class ThermalCamera:
         # For preview streaming.
         self.preview_queue = asyncio.Queue(maxsize=10)
         self.streaming_event = None
-        self.streaming_start_event()
 
     def clear(self):
         """ """
-        self.camera_status = "camera-init"
+        self.camera_mode = "camera-off"
         self.video_dir_path = None
-        # self.video_mp4_path = None
         self.thermal_camera_active = False
         self.thermal_video_active = False
         self.thermal_camera_task = None
@@ -69,11 +67,43 @@ class ThermalCamera:
         elif config_id == "usb_thermal2":
             self.cv2_device_index = 2
 
-        self.camera_status = "camera-init"
-
     def get_camera_status(self):
         """ """
-        return self.camera_status
+        camera_status = {}
+        camera_status["camera_mode"] = self.camera_mode
+        return camera_status
+
+    async def set_camera_mode(self, camera_mode):
+        """ """
+        if camera_mode == "camera-off":
+            if self.thermal_video_active == True:
+                await self.stop_video()
+                await asyncio.sleep(0)
+            if self.thermal_camera_active == True:
+                await self.stop_camera()
+                await asyncio.sleep(0)
+            self.camera_mode = camera_mode
+        if camera_mode == "camera-on":
+            if self.thermal_video_active == True:
+                await self.stop_video()
+                await asyncio.sleep(0)
+            if self.thermal_camera_active == False:
+                await self.start_camera()
+                await asyncio.sleep(0)
+            self.camera_mode = camera_mode
+        if camera_mode == "record-on":
+            if self.thermal_camera_active == False:
+                await self.start_camera()
+                await asyncio.sleep(0)
+            if self.thermal_video_active == False:
+                await self.start_video("", "/home/wurb/wirc_recordings", "")
+                await asyncio.sleep(0)
+            self.camera_mode = camera_mode
+        else:
+            self.camera_mode = "camera_failed"
+
+    async def camera_trigger(self):
+        """ """
 
     async def start_camera(self):
         """ """
@@ -86,11 +116,9 @@ class ThermalCamera:
             self.thermal_camera_task = asyncio.create_task(
                 self._thermal_camera_loop(), name="Thermal camera loop"
             )
-            self.camera_status = "camera-on"
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in start_camera (thermal): " + str(e))
-            self.camera_status = "camera-start-failed"
 
     async def stop_camera(self):
         """ """
@@ -101,10 +129,8 @@ class ThermalCamera:
                 self.thermal_camera_task.cancel()
             await asyncio.sleep(0)
             self.thermal_camera_task = None
-            self.camera_status = "camera-off"
         except Exception as e:
             self.logger.debug("Exception in stop_camera (thermal): " + str(e))
-            self.camera_status = "camera-off"
 
     async def set_camera_controls(
         self,
@@ -227,12 +253,9 @@ class ThermalCamera:
     async def start_video(self, lenght_s, dir_path, file_name_mp4):
         """ """
         try:
-            # if self.camera_status in ["Stopped", "Video started"]:
-            #     return
             self.video_dir_path = pathlib.Path(dir_path)
 
             self.thermal_video_active = True
-            self.camera_status = "record-on"
 
             await asyncio.sleep(0)
         except Exception as e:
@@ -245,24 +268,10 @@ class ThermalCamera:
         try:
 
             self.thermal_video_active = False
-            self.camera_status = "camera-on"
 
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in stop_video: " + str(e))
-
-    def streaming_start_event(self):
-        """Release event."""
-        # Event: Create a new and release the old.
-        old_event = self.get_streaming_start_event()
-        self.streaming_event = asyncio.Event()
-        old_event.set()
-
-    def get_streaming_start_event(self):
-        """Used by consumers."""
-        if self.streaming_event == None:
-            self.streaming_event = asyncio.Event()
-        return self.streaming_event
 
 
 class VideoFileWriter(object):

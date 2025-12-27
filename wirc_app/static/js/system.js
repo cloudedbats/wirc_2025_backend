@@ -2,35 +2,35 @@ function toggleSettings() {
   if (byId('settingsBasicId').hidden) {
     byId('settingsMoreId').hidden = true;
     byId('settingsBasicId').hidden = false;
-    byId("buttonSettingsId").classList.add('is-inverted');
+    byId('buttonSettingsId').classList.add('is-inverted');
   } else {
-    hideSettings()
+    hideSettings();
   }
 }
 
 function toggleSettingsMore() {
   if (byId('settingsMoreId').hidden) {
     byId('settingsMoreId').hidden = false;
-    byId("buttonSettingsMoreId").classList.add('is-inverted');
+    byId('buttonSettingsMoreId').classList.add('is-inverted');
   } else {
-    hideSettingsMore()
+    hideSettingsMore();
   }
 }
 
 function hideSettings() {
   byId('settingsMoreId').hidden = true;
   byId('settingsBasicId').hidden = true;
-  byId("buttonSettingsId").classList.remove('is-inverted');
-  byId("buttonSettingsMoreId").classList.remove('is-inverted');
+  byId('buttonSettingsId').classList.remove('is-inverted');
+  byId('buttonSettingsMoreId').classList.remove('is-inverted');
 }
 
 function hideSettingsMore() {
   byId('settingsMoreId').hidden = true;
-  byId("buttonSettingsMoreId").classList.remove('is-inverted');
+  byId('buttonSettingsMoreId').classList.remove('is-inverted');
 }
 
 function showDetectorStatusClicked() {
-  showDetectorStatus()
+  showDetectorStatus();
 }
 
 function setDetectorTimeClicked() {
@@ -38,20 +38,20 @@ function setDetectorTimeClicked() {
 }
 
 function userConfigurtionClicked() {
-  alert("Not implemented.")
+  alert('Not implemented.');
 }
 
 // Functions used to updates fields based on response contents.
 function updateStatus(status) {
-  byId('detectorTimeId').innerHTML = status.detectorTime
+  byId('detectorTimeId').innerHTML = status.detectorTime;
 }
 
 function updateLogTable(logRows) {
-  htmlTableRows = ''
+  htmlTableRows = '';
   for (rowIndex in logRows) {
-    htmlTableRows += '<tr><td>'
-    htmlTableRows += logRows[rowIndex]
-    htmlTableRows += '</tr></td>'
+    htmlTableRows += '<tr><td>';
+    htmlTableRows += logRows[rowIndex];
+    htmlTableRows += '</tr></td>';
   }
-  byId('systemLogTableId').innerHTML = htmlTableRows
+  byId('systemLogTableId').innerHTML = htmlTableRows;
 }

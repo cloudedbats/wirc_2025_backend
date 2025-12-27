@@ -28,15 +28,6 @@ async def preview_streamer_mjpeg(camera_id, request):
         # Select preview queue.
         preview_queue = wirc_core.wirc_manager.get_preview_queue(camera_id)
 
-        # if camera_id == "camera-a":
-        #     preview_queue = wirc_core.rpi_cam0.preview_queue
-        # # elif camera_id == "camera-a":
-        # #     preview_queue = wirc_core.rpi_cam1.preview_queue
-        # elif camera_id == "camera-b":
-        #     preview_queue = wirc_core.usb_thermal.preview_queue
-        # else:
-        #     preview_queue = None
-        #
         if preview_queue:
             while True:
                 # Stop sending if client disconnected.
