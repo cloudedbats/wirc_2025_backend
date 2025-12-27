@@ -83,7 +83,7 @@ class ThermalCamera:
                 await self.stop_camera()
                 await asyncio.sleep(0)
             self.camera_mode = camera_mode
-        if camera_mode == "camera-on":
+        elif camera_mode == "camera-on":
             if self.thermal_video_active == True:
                 await self.stop_video()
                 await asyncio.sleep(0)
@@ -91,7 +91,7 @@ class ThermalCamera:
                 await self.start_camera()
                 await asyncio.sleep(0)
             self.camera_mode = camera_mode
-        if camera_mode == "record-on":
+        elif camera_mode == "record-on":
             if self.thermal_camera_active == False:
                 await self.start_camera()
                 await asyncio.sleep(0)
@@ -100,7 +100,7 @@ class ThermalCamera:
                 await asyncio.sleep(0)
             self.camera_mode = camera_mode
         else:
-            self.camera_mode = "camera_failed"
+            self.camera_mode = "camera-failed"
 
     async def camera_trigger(self):
         """ """

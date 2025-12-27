@@ -102,13 +102,16 @@ function startWebsocket(wsUrl) {
     if ('logRows' in dataJson === true) {
       updateLogTable(dataJson.logRows);
     }
+    if ('cameraStatusAll' in dataJson === true) {
+      cameraStatusAllUpdate(dataJson.cameraStatusAll);
+    }
 
-    if ('cam0_exposure_time_us' in dataJson === true) {
-      updateExposureTime(dataJson.cam0_exposure_time_us, dataJson.cam1_exposure_time_us);
-    }
-    if ('cam0_analogue_gain' in dataJson === true) {
-      updateAnalogueGain(dataJson.cam0_analogue_gain, dataJson.cam1_analogue_gain);
-    }
+    // if ('cam0_exposure_time_us' in dataJson === true) {
+    //   updateExposureTime(dataJson.cam0_exposure_time_us, dataJson.cam1_exposure_time_us);
+    // }
+    // if ('cam0_analogue_gain' in dataJson === true) {
+    //   updateAnalogueGain(dataJson.cam0_analogue_gain, dataJson.cam1_analogue_gain);
+    // }
 
     // if ('cam0_streaming_started' in dataJson === true) {
     //   if (selectedCameraId == 'camera-a') {

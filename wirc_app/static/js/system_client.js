@@ -1,7 +1,6 @@
 async function setDetectorTime() {
   try {
     let posixTimeMs = new Date().getTime();
-    // let urlString = '/system/setTime/?posixtime=' + posixTimeMs;
     let urlString = '/system/set-time/?posixtime=' + posixTimeMs;
     await fetch(urlString);
   } catch (err) {

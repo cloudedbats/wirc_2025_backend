@@ -64,37 +64,34 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         #
         await websocket.accept()
         #
-        # Get event notification objects.
-        status_event = wirc_core.wirc_client_status.get_status_event()
-        logging_event = wirc_core.wirc_client_info.get_logging_event()
         # Update client.
         ws_json = {}
         ws_json["status"] = {
             "detectorTime": time.strftime("%Y-%m-%d %H:%M:%S"),
         }
-        status_dict = wirc_core.wirc_client_status.get_status_dict()
-        ws_json["cam0_exposure_time_us"] = status_dict.get("cam0_exposure_time_us", "")
-        ws_json["cam1_exposure_time_us"] = (
-            status_dict.get("cam1_exposure_time_us", ""),
-        )
-        ws_json["cam0_analogue_gain"] = status_dict.get("cam0_analogue_gain", "")
-        ws_json["cam1_analogue_gain"] = (status_dict.get("cam1_analogue_gain", ""),)
-        ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()
-        ws_json["cam0_streaming_started"] = True
-        ws_json["cam1_streaming_started"] = True
-        ws_json["thermal_streaming_started"] = True
         # Send update to client.
         await websocket.send_json(ws_json)
+
+        # Get event notification objects.
+        status_event = wirc_core.wirc_client_status.get_status_event()
+        logging_event = wirc_core.wirc_client_info.get_logging_event()
+        camera_status_event = wirc_core.wirc_manager.get_camera_status_event()
+        # Trigger all for first loop.
+        wirc_core.wirc_client_status.trigger_status_event()
+        wirc_core.wirc_client_info.trigger_logging_event()
+        wirc_core.wirc_manager.trigger_camera_status_event()
         # Loop.
         while True:
             # Wait for next event to happen.
             task_1 = asyncio.create_task(asyncio.sleep(1.0), name="ws-sleep-event")
             task_2 = asyncio.create_task(status_event.wait(), name="ws-status-event")
             task_3 = asyncio.create_task(logging_event.wait(), name="ws-logging-event")
+            task_4 = asyncio.create_task(camera_status_event.wait(), name="ws-camera-modes-event")
             events = [
                 task_1,
                 task_2,
                 task_3,
+                task_4,
             ]
             done, pending = await asyncio.wait(
                 events, return_when=asyncio.FIRST_COMPLETED
@@ -130,6 +127,10 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             if logging_event.is_set():
                 logging_event = wirc_core.wirc_client_info.get_logging_event()
                 ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()
+
+            if camera_status_event.is_set():
+                camera_status_event = wirc_core.wirc_manager.get_camera_status_event()
+                ws_json["cameraStatusAll"] = wirc_core.wirc_manager.get_camera_status_all()
 
             # Send to client.
             await websocket.send_json(ws_json)

@@ -128,7 +128,7 @@ class RaspberyPiCamera:
             try:
                 self.picam2 = Picamera2(camera_num=camera_id_index)
             except Exception as e:
-                self.logger.debug("Exception in setup_camera: " + str(e))
+                self.logger.debug("Exception in camera_setup: " + str(e))
                 self.picam2 = None
                 self.camera_status = "Failed"
                 return
@@ -138,16 +138,16 @@ class RaspberyPiCamera:
             self.camera_properties = self.picam2.camera_properties
             self.camera_controls = self.picam2.camera_controls
             # ...to debug log.
-            message = "Sensor modes (" + self.camera_id + "): "
+            message = "Sensor modes (" + self.camera_id_index + "): "
             message += str(self.sensor_modes)
             self.logger.debug(message)
-            message = "Sensor resolution (" + self.camera_id + "): "
+            message = "Sensor resolution (" + self.camera_id_index + "): "
             message += str(self.sensor_resolution)
             self.logger.debug(message)
-            message = "Camera properties (" + self.camera_id + "): "
+            message = "Camera properties (" + self.camera_id_index + "): "
             message += str(self.camera_properties)
             self.logger.debug(message)
-            message = "Camera controls (" + self.camera_id + "): "
+            message = "Camera controls (" + self.camera_id_index + "): "
             message += str(self.camera_controls)
             self.logger.debug(message)
             # Keep the aspect ratio from the sensor.
@@ -172,7 +172,7 @@ class RaspberyPiCamera:
             )
             await asyncio.sleep(0)
         except Exception as e:
-            self.logger.debug("Exception in setup_camera: " + str(e))
+            self.logger.debug("Exception in camera_setup: " + str(e))
 
     async def config_camera_controls(self):
         """ """

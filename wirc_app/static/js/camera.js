@@ -1,5 +1,12 @@
 var selectedCameraId = 'camera-a';
 var selectedCameraName = 'Camera-A';
+var cameraStatusAll = {
+  'camera-a': { 'camera_mode': 'camera-off' },
+  'camera-b': { 'camera_mode': 'camera-off' },
+  'camera-c': { 'camera_mode': 'camera-off' },
+  'camera-d': { 'camera_mode': 'camera-off' },
+  'camera-e': { 'camera_mode': 'camera-off' },
+}
 
 function setCameraId(cameraId, cameraName) {
   selectedCameraId = cameraId;
@@ -8,6 +15,7 @@ function setCameraId(cameraId, cameraName) {
 
 function selectCamera(cameraId, cameraName) {
   setCameraId(cameraId, cameraName)
+
   byId('selectCamAId').classList.remove('is-inverted');
   byId('selectCamBId').classList.remove('is-inverted');
   byId('selectCamCId').classList.remove('is-inverted');
@@ -35,6 +43,7 @@ function selectCamera(cameraId, cameraName) {
 
   byId('cameraTitleId').textContent = selectedCameraName;
 
+  cameraStatusAllUpdate()
   previewModeUpdate();
 }
 
@@ -61,15 +70,23 @@ function cameraModeOnChange() {
   }
 }
 
-function cameraModeUpdate(cameraModeJson) {
-  if (selectedCameraId in cameraModeJson === true) {
-    let mode = cameraModeJson.selectedCameraId;
-    byId('cameraModeId').value = mode;
+function cameraStatusAllUpdate(cameraStatusAllJson = '') {
+  if (cameraStatusAllJson != '') {
+    cameraStatusAll = cameraStatusAllJson;
   }
-  if (mode === 'record-on-trigger') {
-    byId('buttonTriggerId').hidden = false;
-  } else {
-    byId('buttonTriggerId').hidden = true;
+
+  if (selectedCameraId in cameraStatusAll === true) {
+    let mode = cameraStatusAll[selectedCameraId];
+    // alert(JSON.stringify(cameraStatusAll))
+    if ('camera_mode' in mode === true) {
+      byId('cameraModeId').value = mode['camera_mode'];
+
+      if (mode === 'record-on-trigger') {
+        byId('buttonTriggerId').hidden = false;
+      } else {
+        byId('buttonTriggerId').hidden = true;
+      }
+    }
   }
 }
 

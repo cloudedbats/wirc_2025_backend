@@ -25,6 +25,7 @@ class WircManager(object):
 
     def clear(self):
         """ """
+        self.camera_status_event = None
 
     def configure(self):
         """ """
@@ -59,6 +60,7 @@ class WircManager(object):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_mode(camera_mode)
+        self.trigger_camera_status_event()
 
     async def camera_trigger(self, camera_id):
         """ """
@@ -230,21 +232,48 @@ class WircManager(object):
             # gain = config.get("rpi_cam1" + ".settings.analogue_gain", "auto")
             # wirc_core.wirc_client_status.set_analogue_gain(gain, camera_id="rpi_cam1")
 
-            await wirc_core.rpi_cam0.start_camera()
-            await wirc_core.rpi_cam1.start_camera()
-            await wirc_core.usb_therma0.start_camera()
-            await wirc_core.usb_thermal1.start_camera()
-            await wirc_core.usb_thermal2.start_camera()
+            # await wirc_core.rpi_cam0.start_camera()
+            # await wirc_core.rpi_cam1.start_camera()
+            # await wirc_core.usb_thermal0.start_camera()
+            # await wirc_core.usb_thermal1.start_camera()
+            # await wirc_core.usb_thermal2.start_camera()
         except Exception as e:
             self.logger.debug("Exception in WircManager - startup: " + str(e))
 
     async def shutdown(self):
         """ """
         try:
-            await wirc_core.rpi_cam0.stop_camera()
-            await wirc_core.rpi_cam1.stop_camera()
-            await wirc_core.usb_thermal0.stop_camera()
-            await wirc_core.usb_thermal1.stop_camera()
-            await wirc_core.usb_thermal2.stop_camera()
+            pass
+            # await wirc_core.rpi_cam0.stop_camera()
+            # await wirc_core.rpi_cam1.stop_camera()
+            # await wirc_core.usb_thermal0.stop_camera()
+            # await wirc_core.usb_thermal1.stop_camera()
+            # await wirc_core.usb_thermal2.stop_camera()
         except Exception as e:
             self.logger.debug("Exception in WircManager - shutdown: " + str(e))
+
+
+
+    def trigger_camera_status_event(self):
+        """ """
+        # Event: Create a new and release the old.
+        old_event = self.get_camera_status_event()
+        self.camera_status_event = asyncio.Event()
+        old_event.set()
+
+    def get_camera_status_event(self):
+        """ """
+        if self.camera_status_event == None:
+            self.camera_status_event = asyncio.Event()
+        return self.camera_status_event
+
+    def get_camera_status_all(self):
+        """ """
+        camera_status_dict = {}
+        # camera_status_dict["camera-a"] = wirc_core.cam0.get_camera_status()
+        # camera_status_dict["camera-b"] = wirc_core.cam1.get_camera_status()
+        camera_status_dict["camera-c"] = wirc_core.usb_thermal0.get_camera_status()
+        camera_status_dict["camera-d"] = wirc_core.usb_thermal1.get_camera_status()
+        camera_status_dict["camera-e"] = wirc_core.usb_thermal2.get_camera_status()
+        return camera_status_dict
+
