@@ -38,15 +38,12 @@ async function activateRecordTrigger(cameraId) {
 }
 
 async function setExposureTime(cameraId, exposureTimeMicroSec) {
-  if (exposureTimeMicroSec == 'auto') {
-    exposureTimeMicroSec = 0;
-  }
   try {
     let urlString =
-      '/camera/exposure-time';
+      '/camera/exposure-time/';
     let params = {
-      cameraId: cameraId,
-      exposureTimeMicroSec: parseInt(exposureTimeMicroSec),
+      camera_id: cameraId,
+      exposure_time_us: exposureTimeMicroSec,
     };
     await fetch(urlString, {
       method: 'POST',
@@ -61,16 +58,13 @@ async function setExposureTime(cameraId, exposureTimeMicroSec) {
   }
 }
 
-async function setAnalogueGain(cameraId, analogueGain) {
-  if (analogueGain == 'auto') {
-    analogueGain = 0;
-  }
+async function setCameraGain(cameraId, cameraGain) {
   try {
     let urlString =
-      '/camera/analogue-gain'
+      '/camera/camera-gain/'
     let params = {
-      cameraId: cameraId,
-      analogueGain: parseInt(analogueGain),
+      camera_id: cameraId,
+      camera_gain: cameraGain,
     };
     await fetch(urlString, {
       method: 'POST',
@@ -80,7 +74,7 @@ async function setAnalogueGain(cameraId, analogueGain) {
       body: JSON.stringify(params)
     })
   } catch (err) {
-    alert('ERROR setAnalogueGain: ' + err);
+    alert('ERROR setCameraGain: ' + err);
     console.log(err);
   }
 }

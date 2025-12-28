@@ -15,7 +15,7 @@ rpi_cam0:
   settings: 
     saturation: auto
     exposure_time_us: auto
-    analogue_gain: auto
+    camera_gain: auto
   preview:
     size_divisor: 2.0
   video:
@@ -43,7 +43,7 @@ rpi_cam1:
   settings: 
     saturation: auto
     exposure_time_us: auto
-    analogue_gain: auto
+    camera_gain: auto
   preview:
     size_divisor: 2.0
   video:

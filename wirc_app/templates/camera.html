@@ -60,7 +60,7 @@
             </div>
             <p class="is-size-7">Gain</p>
             <div class="select is-rounded is-size-7">
-                <select id="analogueGainId" onchange="analogueGainOnChange()">
+                <select id="cameraGainId" onchange="cameraGainOnChange()">
                     <option value="auto">Auto</option>
                     <option value="1">1.0</option>
                     <option value="2">2.0</option>
@@ -141,8 +141,8 @@
                     <div class="field is-grouped is-grouped-centered">
                         <div class="select is-rounded is-size-7">
                             <select id="previewModeId" onchange="previewModeOnChange()">
-                                <option value="preview-on">Preview ON</option>
                                 <option value="preview-off">Preview OFF</option>
+                                <option value="preview-on">Preview ON</option>
                                 <option value="preview-10-fps">Slow - 10 fps</option>
                                 <option value="preview-5-fps">Slow - 5 fps</option>
                                 <option value="preview-2-fps">Slow - 2 fps</option>
@@ -197,8 +197,7 @@
                 <button onclick="setDetectorTimeClicked()" class="button is-rounded is-size-7">
                     Set time
                 </button>
-                <button onclick="userConfigurtionClicked()" class="button is-rounded is-size-7"
-                    disabled>
+                <button onclick="userConfigurtionClicked()" class="button is-rounded is-size-7" disabled>
                     User configuration
                 </button>
             </div>

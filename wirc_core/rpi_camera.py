@@ -8,7 +8,6 @@ import asyncio
 import pathlib
 import logging
 import io
-import subprocess
 from picamera2 import Picamera2, encoders, outputs, Metadata
 import libcamera
 
@@ -16,7 +15,12 @@ import libcamera
 class RaspberyPiCamera:
     """ """
 
-    def __init__(self, config={}, logger_name="DefaultLogger", config_id="rpi_cam0"):
+    def __init__(
+        self,
+        config={},
+        logger_name="DefaultLogger",
+        config_id="rpi_cam0",
+    ):
         """ """
         self.config = config
         self.logger = logging.getLogger(logger_name)
@@ -27,11 +31,10 @@ class RaspberyPiCamera:
         self.preview_queue = asyncio.Queue(maxsize=10)
         self.preview_streamer = PreviewStreamingOutput()
         self.preview_streamer.set_preview_queue(self.preview_queue)
-        self.streaming_event = None
 
     def clear(self):
         """ """
-        self.camera_status = ""
+        self.camera_mode = "camera-off"
         self.picam2 = None
         self.video_configuration = None
         self.sensor_modes = None
@@ -39,8 +42,10 @@ class RaspberyPiCamera:
         self.camera_properties = None
         self.camera_controls = None
         #
-        self.camera_status = "Cleared"
         self.video_mp4_path = None
+        self.camera_active = False
+        self.camera_video_active = False
+        self.camera_task = None
 
     def configure(self, config_id="rpi_cam0"):
         """ """
@@ -48,23 +53,19 @@ class RaspberyPiCamera:
         cam = config_id
         #
         self.rpi_camera_id = config_id
-        self.cam_monochrome = (conf.get(cam + ".monochrome", False),)
-        self.saturation = (conf.get(cam + ".settings.saturation", "auto"),)
-        self.exposure_time_us = (conf.get(cam + ".settings.exposure_time_us", "auto"),)
-        self.analogue_gain = (conf.get(cam + ".settings.analogue_gain", "auto"),)
-        self.hflip = (conf.get(cam + ".orientation.hflip", 0),)
-        self.vflip = (conf.get(cam + ".orientation.vflip", 0),)
-        self.preview_size_divisor = (conf.get(cam + ".preview.size_divisor", 0),)
-        self.video_horizontal_size_px = (
-            conf.get(cam + ".video.horizontal_size_px", "max"),
+        self.cam_monochrome = conf.get(cam + ".monochrome", False)
+        self.saturation = conf.get(cam + ".settings.saturation", "auto")
+        self.exposure_time_us = conf.get(cam + ".settings.exposure_time_us", "auto")
+        self.camera_gain = conf.get(cam + ".settings.camera_gain", "auto")
+        self.hflip = conf.get(cam + ".orientation.hflip", 0)
+        self.vflip = conf.get(cam + ".orientation.vflip", 0)
+        self.preview_size_divisor = conf.get(cam + ".preview.size_divisor", 0)
+        self.video_horizontal_size_px = conf.get(
+            cam + ".video.horizontal_size_px", "max"
         )
-        self.video_vertical_size_px = (
-            conf.get(cam + ".video.vertical_size_px", "max"),
-        )
-        self.video_framerate_fps = (conf.get(cam + ".video.framerate_fps", 30),)
-        self.video_pre_buffer_frames = (conf.get(cam + ".video.pre_buffer_frames", 60),)
-        #
-        self.camera_status = "Configured"
+        self.video_vertical_size_px = conf.get(cam + ".video.vertical_size_px", "max")
+        self.video_framerate_fps = conf.get(cam + ".video.framerate_fps", 30)
+        self.video_pre_buffer_frames = conf.get(cam + ".video.pre_buffer_frames", 60)
 
     def get_global_camera_info(self):
         """ """
@@ -73,11 +74,48 @@ class RaspberyPiCamera:
 
     def get_camera_status(self):
         """ """
-        return self.camera_status
+        camera_status = {}
+        camera_status["camera_mode"] = self.camera_mode
+        return camera_status
+
+    async def set_camera_mode(self, camera_mode):
+        """ """
+        if camera_mode == "camera-off":
+            if self.camera_video_active == True:
+                await self.stop_video()
+                await asyncio.sleep(0)
+            if self.camera_active == True:
+                await self.stop_camera()
+                await asyncio.sleep(0)
+            self.camera_mode = camera_mode
+        elif camera_mode == "camera-on":
+            if self.camera_video_active == True:
+                await self.stop_video()
+                await asyncio.sleep(0)
+            if self.camera_active == False:
+                await self.start_camera()
+                await asyncio.sleep(0)
+            self.camera_mode = camera_mode
+        elif camera_mode == "record-on":
+            if self.camera_active == False:
+                await self.start_camera()
+                await asyncio.sleep(0)
+            if self.camera_video_active == False:
+                await self.start_video("", "/home/wurb/wirc_recordings", "")
+                await asyncio.sleep(0)
+            self.camera_mode = camera_mode
+        else:
+            self.camera_mode = "camera-failed"
 
     async def start_camera(self):
         """ """
-        self.clear()
+        # self.clear()
+        if self.camera_active == True:
+            print("DEBUG: Camera already running.")
+            return
+
+        self.camera_active = True
+
         # Camera.
         await self.camera_setup()
         await asyncio.sleep(0)
@@ -92,11 +130,10 @@ class RaspberyPiCamera:
         # Preview.
         await self.start_preview_encoder()
         await asyncio.sleep(0)
-        #
-        self.camera_status = "Started"
 
     async def stop_camera(self):
         """ """
+        self.camera_active = False
         # Video and preview encoders.
         await self.stop_video_encoder()
         await asyncio.sleep(0)
@@ -109,8 +146,6 @@ class RaspberyPiCamera:
             await asyncio.sleep(0)
         except:
             print("FAILED: self.picam2.close()")
-        #
-        self.camera_status = "Stopped"
 
     async def camera_setup(self):
         """ """
@@ -122,15 +157,14 @@ class RaspberyPiCamera:
                 except:
                     pass
             # Create a new camera object, cam0 or cam1.
-            camera_id_index = 0
-            if self.camera_id == "rpi_cam1":
-                camera_id_index = 1
+            camera_index = 0
+            if self.rpi_camera_id == "rpi_cam1":
+                camera_index = 1
             try:
-                self.picam2 = Picamera2(camera_num=camera_id_index)
+                self.picam2 = Picamera2(camera_num=camera_index)
             except Exception as e:
                 self.logger.debug("Exception in camera_setup: " + str(e))
                 self.picam2 = None
-                self.camera_status = "Failed"
                 return
             # Generic info...
             self.sensor_modes = self.picam2.sensor_modes
@@ -138,16 +172,16 @@ class RaspberyPiCamera:
             self.camera_properties = self.picam2.camera_properties
             self.camera_controls = self.picam2.camera_controls
             # ...to debug log.
-            message = "Sensor modes (" + self.camera_id_index + "): "
+            message = "Sensor modes (" + str(camera_index) + "): "
             message += str(self.sensor_modes)
             self.logger.debug(message)
-            message = "Sensor resolution (" + self.camera_id_index + "): "
+            message = "Sensor resolution (" + str(camera_index) + "): "
             message += str(self.sensor_resolution)
             self.logger.debug(message)
-            message = "Camera properties (" + self.camera_id_index + "): "
+            message = "Camera properties (" + str(camera_index) + "): "
             message += str(self.camera_properties)
             self.logger.debug(message)
-            message = "Camera controls (" + self.camera_id_index + "): "
+            message = "Camera controls (" + str(camera_index) + "): "
             message += str(self.camera_controls)
             self.logger.debug(message)
             # Keep the aspect ratio from the sensor.
@@ -180,14 +214,14 @@ class RaspberyPiCamera:
             return
         saturation = self.saturation
         exposure_time_us = self.exposure_time_us
-        analogue_gain = self.analogue_gain
+        camera_gain = self.camera_gain
         video_framerate_fps = self.video_framerate_fps
         if self.saturation == "auto":
             saturation = 0
         if self.exposure_time_us == "auto":
             exposure_time_us = 0
-        if self.analogue_gain == "auto":
-            analogue_gain = 0
+        if self.camera_gain == "auto":
+            camera_gain = 0
         try:
             if not self.cam_monochrome:
                 try:
@@ -195,7 +229,7 @@ class RaspberyPiCamera:
                 except:
                     pass
             self.picam2.controls.ExposureTime = int(exposure_time_us)
-            self.picam2.controls.AnalogueGain = int(analogue_gain)
+            self.picam2.controls.AnalogueGain = int(camera_gain)
             self.picam2.controls.FrameRate = int(video_framerate_fps)
 
             print(
@@ -213,7 +247,7 @@ class RaspberyPiCamera:
         self,
         saturation=None,
         exposure_time_us=None,
-        analogue_gain=None,
+        camera_gain=None,
     ):
         """ """
         if self.picam2 == None:
@@ -231,10 +265,10 @@ class RaspberyPiCamera:
                 if exposure_time_us == "auto":
                     exposure_time_us = 0
                 self.picam2.controls.ExposureTime = int(exposure_time_us)
-            if analogue_gain != None:
-                if analogue_gain == "auto":
-                    analogue_gain = 0
-                self.picam2.controls.AnalogueGain = int(analogue_gain)
+            if camera_gain != None:
+                if camera_gain == "auto":
+                    camera_gain = 0
+                self.picam2.controls.AnalogueGain = int(camera_gain)
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in set_controls: " + str(e))
@@ -292,8 +326,7 @@ class RaspberyPiCamera:
 
     async def start_video(self, lenght_s, dir_path, file_name_mp4):
         """ """
-        if self.camera_status in ["Stopped", "Video started"]:
-            return
+        self.camera_video_active = True
 
         self.video_mp4_path = pathlib.Path(dir_path, file_name_mp4)
         if self.picam2 == None:
@@ -313,7 +346,6 @@ class RaspberyPiCamera:
             )
 
             self.video_output.stop()
-            self.camera_status = "Video started"
             # self.video_output.open_output(outputs.PyavOutput(str(self.video_mp4_path)))
             self.video_output.open_output(outputs.PyavOutput(out_path))
             self.video_output.start()
@@ -324,6 +356,8 @@ class RaspberyPiCamera:
 
     async def stop_video(self):
         """ """
+        self.camera_video_active = False
+
         if self.video_mp4_path == None:
             return
         try:
@@ -332,7 +366,8 @@ class RaspberyPiCamera:
                 self.video_output.close_output()
                 self.logger.info("Video stored: " + str(self.video_mp4_path))
             finally:
-                self.camera_status = "Video stopped"
+                pass
+                # self.camera_status = "Video stopped"
             await asyncio.sleep(0)
 
             # # From H264 to MP4 using ffmpeg.

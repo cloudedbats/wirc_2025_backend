@@ -102,24 +102,16 @@ function cameraSettingsUpdate() {
 
 }
 
-
-
-
-
-
-
-// #################################################
-
 function exposureTimeOnChange() {
   let selectedValue =
     byId('exposureTimeId').options[byId('exposureTimeId').selectedIndex].value
   setExposureTime(selectedCameraId, selectedValue)
 }
 
-function analogueGainOnChange() {
+function cameraGainOnChange() {
   let selectedValue =
-    byId('analogueGainId').options[byId('analogueGainId').selectedIndex].value
-  setAnalogueGain(selectedCameraId, selectedValue)
+    byId('cameraGainId').options[byId('cameraGainId').selectedIndex].value
+  setCameraGain(selectedCameraId, selectedValue)
 }
 
 // Functions used to updates fields based on response contents.
@@ -138,17 +130,17 @@ function updateExposureTime(cam0ExposureTime, cam1ExposureTime) {
   }
 }
 
-function updateAnalogueGain(cam0AnalogueGain, cam1AnalogueGain) {
-  let analogueGain = ''
+function updateCameraGain(cam0CameraGain, cam1CameraGain) {
+  let cameraGain = ''
   if (selectedCameraId == 'camera-a') {
-    analogueGain = cam0AnalogueGain
+    cameraGain = cam0CameraGain
   }
   else if (selectedCameraId == 'camera-b') {
-    analogueGain = cam1AnalogueGain
+    cameraGain = cam1CameraGain
   }
-  if (analogueGain == 0) {
-    byId('analogueGainId').value = 'auto'
+  if (cameraGain == 0) {
+    byId('cameraGainId').value = 'auto'
   } else {
-    byId('analogueGainId').value = analogueGain
+    byId('cameraGainId').value = cameraGain
   }
 }

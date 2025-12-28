@@ -57,29 +57,45 @@ async def camera_mode(params: CameraMode):
 #         logger.debug(message)
 
 
+class CameraExpTime(pydantic.BaseModel):
+    camera_id: str
+    exposure_time_us: str
+
+
 @camera_router.post(
-    "/camera/exposure-time/", tags=["Cameras"], description="Set exposure time."
+    "/camera/exposure-time/",
+    tags=["Cameras"],
+    description="Set exposure time.",
 )
-async def set_exposure_time(camera_id: str = "camera-a", time_us: int = "0"):
+async def set_exposure_time(params: CameraExpTime):
     """ """
     try:
-        exposure_time_us = int(time_us)
         logger.debug("API called: set_exposure_time.")
-        await wirc_core.wirc_manager.set_exposure_time(camera_id, exposure_time_us)
+        await wirc_core.wirc_manager.set_exposure_time(
+            params.camera_id, params.exposure_time_us
+        )
     except Exception as e:
         message = "API - set_exposure_time. Exception: " + str(e)
         logger.debug(message)
 
 
+class CameraGain(pydantic.BaseModel):
+    camera_id: str
+    camera_gain: str
+
+
 @camera_router.post(
-    "/camera/analogue-gain/", tags=["Cameras"], description="Set analogue gain."
+    "/camera/camera-gain/",
+    tags=["Cameras"],
+    description="Set camera gain.",
 )
-async def set_analogue_gain(camera_id: str = "camera-a", analogue_gain: int = "1"):
+async def set_camera_gain(params: CameraGain):
     """ """
     try:
-        analogue_gain = int(analogue_gain)
-        logger.debug("API called: set_analogue_gain.")
-        await wirc_core.wirc_manager.set_analogue_gain(camera_id, analogue_gain)
+        logger.debug("API called: set_camera_gain.")
+        await wirc_core.wirc_manager.set_camera_gain(
+            params.camera_id, params.camera_gain
+        )
     except Exception as e:
-        message = "API - set_analogue_gain. Exception: " + str(e)
+        message = "API - set_camera_gain. Exception: " + str(e)
         logger.debug(message)

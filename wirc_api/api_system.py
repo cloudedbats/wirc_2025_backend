@@ -86,7 +86,9 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             task_1 = asyncio.create_task(asyncio.sleep(1.0), name="ws-sleep-event")
             task_2 = asyncio.create_task(status_event.wait(), name="ws-status-event")
             task_3 = asyncio.create_task(logging_event.wait(), name="ws-logging-event")
-            task_4 = asyncio.create_task(camera_status_event.wait(), name="ws-camera-modes-event")
+            task_4 = asyncio.create_task(
+                camera_status_event.wait(), name="ws-camera-modes-event"
+            )
             events = [
                 task_1,
                 task_2,
@@ -117,12 +119,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
                 ws_json["cam1_exposure_time_us"] = status_dict.get(
                     "cam1_exposure_time_us", ""
                 )
-                ws_json["cam0_analogue_gain"] = status_dict.get(
-                    "cam0_analogue_gain", ""
-                )
-                ws_json["cam1_analogue_gain"] = status_dict.get(
-                    "cam1_analogue_gain", ""
-                )
+                ws_json["cam0_camera_gain"] = status_dict.get("cam0_camera_gain", "")
+                ws_json["cam1_camera_gain"] = status_dict.get("cam1_camera_gain", "")
 
             if logging_event.is_set():
                 logging_event = wirc_core.wirc_client_info.get_logging_event()
@@ -130,7 +128,9 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
 
             if camera_status_event.is_set():
                 camera_status_event = wirc_core.wirc_manager.get_camera_status_event()
-                ws_json["cameraStatusAll"] = wirc_core.wirc_manager.get_camera_status_all()
+                ws_json["cameraStatusAll"] = (
+                    wirc_core.wirc_manager.get_camera_status_all()
+                )
 
             # Send to client.
             await websocket.send_json(ws_json)

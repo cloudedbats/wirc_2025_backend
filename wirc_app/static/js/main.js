@@ -109,8 +109,8 @@ function startWebsocket(wsUrl) {
     // if ('cam0_exposure_time_us' in dataJson === true) {
     //   updateExposureTime(dataJson.cam0_exposure_time_us, dataJson.cam1_exposure_time_us);
     // }
-    // if ('cam0_analogue_gain' in dataJson === true) {
-    //   updateAnalogueGain(dataJson.cam0_analogue_gain, dataJson.cam1_analogue_gain);
+    // if ('cam0_camera_gain' in dataJson === true) {
+    //   updateCameraGain(dataJson.cam0_camera_gain, dataJson.cam1_camera_gain);
     // }
 
     // if ('cam0_streaming_started' in dataJson === true) {

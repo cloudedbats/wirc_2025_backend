@@ -17,7 +17,10 @@ class ThermalCamera:
     """ """
 
     def __init__(
-        self, config={}, logger_name="DefaultLogger", config_id="usb_thermal0"
+        self,
+        config={},
+        logger_name="DefaultLogger",
+        config_id="usb_thermal0",
     ):
         """ """
         self.config = config
@@ -27,15 +30,14 @@ class ThermalCamera:
         self.configure(config_id)
         # For preview streaming.
         self.preview_queue = asyncio.Queue(maxsize=10)
-        self.streaming_event = None
 
     def clear(self):
         """ """
         self.camera_mode = "camera-off"
         self.video_dir_path = None
-        self.thermal_camera_active = False
-        self.thermal_video_active = False
-        self.thermal_camera_task = None
+        self.camera_active = False
+        self.camera_video_active = False
+        self.camera_task = None
 
     def configure(
         self,
@@ -44,7 +46,7 @@ class ThermalCamera:
         # cam_monochrome=False,
         # saturation="auto",
         # exposure_time_us="auto",
-        # analogue_gain="auto",
+        # camera_gain="auto",
         # hflip=0,
         # vflip=0,
         # preview_size_divisor=2.0,
@@ -76,26 +78,26 @@ class ThermalCamera:
     async def set_camera_mode(self, camera_mode):
         """ """
         if camera_mode == "camera-off":
-            if self.thermal_video_active == True:
+            if self.camera_video_active == True:
                 await self.stop_video()
                 await asyncio.sleep(0)
-            if self.thermal_camera_active == True:
+            if self.camera_active == True:
                 await self.stop_camera()
                 await asyncio.sleep(0)
             self.camera_mode = camera_mode
         elif camera_mode == "camera-on":
-            if self.thermal_video_active == True:
+            if self.camera_video_active == True:
                 await self.stop_video()
                 await asyncio.sleep(0)
-            if self.thermal_camera_active == False:
+            if self.camera_active == False:
                 await self.start_camera()
                 await asyncio.sleep(0)
             self.camera_mode = camera_mode
         elif camera_mode == "record-on":
-            if self.thermal_camera_active == False:
+            if self.camera_active == False:
                 await self.start_camera()
                 await asyncio.sleep(0)
-            if self.thermal_video_active == False:
+            if self.camera_video_active == False:
                 await self.start_video("", "/home/wurb/wirc_recordings", "")
                 await asyncio.sleep(0)
             self.camera_mode = camera_mode
@@ -108,12 +110,12 @@ class ThermalCamera:
     async def start_camera(self):
         """ """
         try:
-            if self.thermal_camera_active == True:
+            if self.camera_active == True:
                 print("DEBUG: Camera already running.")
                 return
 
-            self.thermal_camera_active = True
-            self.thermal_camera_task = asyncio.create_task(
+            self.camera_active = True
+            self.camera_task = asyncio.create_task(
                 self._thermal_camera_loop(), name="Thermal camera loop"
             )
             await asyncio.sleep(0)
@@ -123,12 +125,12 @@ class ThermalCamera:
     async def stop_camera(self):
         """ """
         try:
-            self.thermal_camera_active = False
+            self.camera_active = False
             await asyncio.sleep(0)
-            if self.thermal_camera_task:
-                self.thermal_camera_task.cancel()
+            if self.camera_task:
+                self.camera_task.cancel()
             await asyncio.sleep(0)
-            self.thermal_camera_task = None
+            self.camera_task = None
         except Exception as e:
             self.logger.debug("Exception in stop_camera (thermal): " + str(e))
 
@@ -136,7 +138,7 @@ class ThermalCamera:
         self,
         saturation=None,
         exposure_time_us=None,
-        analogue_gain=None,
+        camera_gain=None,
     ):
         """ """
         #
@@ -147,13 +149,13 @@ class ThermalCamera:
     async def _thermal_camera_loop(self):
         """ """
         try:
-            self.thermal_camera_active = True
+            self.camera_active = True
 
             capture = cv2.VideoCapture(self.cv2_device_index)
 
             if not capture.isOpened():
                 print("Error: Could not access the webcam.")
-                self.thermal_camera_active = False
+                self.camera_active = False
                 return
 
             frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -162,9 +164,9 @@ class ThermalCamera:
             counter = 0
             file_number = 1
             video_writer = None
-            while self.thermal_camera_active:
+            while self.camera_active:
                 counter += 1
-                if self.thermal_video_active:
+                if self.camera_video_active:
                     # Use one minute for tests.
                     if counter > (25 * 60):
                         counter = 0
@@ -185,7 +187,7 @@ class ThermalCamera:
                             "Thermal video saved. Time: " + str(datetime.now())
                         )
 
-                if self.thermal_video_active:
+                if self.camera_video_active:
                     if video_writer == None:
                         now = datetime.now()
                         date_and_time = now.strftime("%Y%m%dT%H%M%S")
@@ -207,7 +209,7 @@ class ThermalCamera:
 
                 # For saved video.
                 try:
-                    if self.thermal_video_active:
+                    if self.camera_video_active:
                         # Write the frame to the output video file
                         video_writer.add_frame(image_array)
                 except Exception as e:
@@ -246,7 +248,7 @@ class ThermalCamera:
 
         finally:
             # Release.
-            self.thermal_camera_active = False
+            self.camera_active = False
             capture.release()
             self.logger.debug("Thermal_camera_loop ended.")
 
@@ -255,7 +257,7 @@ class ThermalCamera:
         try:
             self.video_dir_path = pathlib.Path(dir_path)
 
-            self.thermal_video_active = True
+            self.camera_video_active = True
 
             await asyncio.sleep(0)
         except Exception as e:
@@ -267,7 +269,7 @@ class ThermalCamera:
         #     return
         try:
 
-            self.thermal_video_active = False
+            self.camera_video_active = False
 
             await asyncio.sleep(0)
         except Exception as e:

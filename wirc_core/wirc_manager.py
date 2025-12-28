@@ -84,7 +84,7 @@ class WircManager(object):
     #         video_length_s = self.cam0_single_length_s
     #         wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
 
-    #     now = datetime.datetime.now()
+    #     now = datetime.datetime.now()Exception in camera_setup
     #     date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
     #     date_and_time = now.strftime("%Y%m%dT%H%M%S")
     #     video_dir = pathlib.Path(rec_dir, date_dir_name)
@@ -153,7 +153,7 @@ class WircManager(object):
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(saturation=saturation)
 
-    async def set_exposure_time(self, exposure_time_us, camera_id="rpi_cam0"):
+    async def set_exposure_time(self, camera_id, exposure_time_us):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
@@ -161,27 +161,25 @@ class WircManager(object):
             exposure_time_us, camera_id=camera_id
         )
 
-    async def set_analogue_gain(self, analogue_gain, camera_id="rpi_cam0"):
+    async def set_camera_gain(self, camera_id, camera_gain):
         """ """
         rpicam = self._select_camera(camera_id)
-        await rpicam.set_camera_controls(analogue_gain=analogue_gain)
-        wirc_core.wirc_client_status.set_analogue_gain(
-            analogue_gain, camera_id=camera_id
-        )
+        await rpicam.set_camera_controls(camera_gain=camera_gain)
+        wirc_core.wirc_client_status.set_camera_gain(camera_gain, camera_id=camera_id)
 
-    async def start_camera(self, camera_id="rpi_cam0"):
-        """ """
-        rpicam = self._select_camera(camera_id)
-        await rpicam.start_camera()
-        message = "Camera " + camera_id + " started."
-        wirc_core.wirc_client_info.write_log("info", message)
+    # async def start_camera(self, camera_id="rpi_cam0"):
+    #     """ """
+    #     rpicam = self._select_camera(camera_id)
+    #     await rpicam.start_camera()
+    #     message = "Camera " + camera_id + " started."
+    #     wirc_core.wirc_client_info.write_log("info", message)
 
-    async def stop_camera(self, camera_id="rpi_cam0"):
-        """ """
-        rpicam = self._select_camera(camera_id)
-        await rpicam.stop_camera()
-        message = "Camera " + camera_id + " stopped."
-        wirc_core.wirc_client_info.write_log("info", message)
+    # async def stop_camera(self, camera_id="rpi_cam0"):
+    #     """ """
+    #     rpicam = self._select_camera(camera_id)
+    #     await rpicam.stop_camera()
+    #     message = "Camera " + camera_id + " stopped."
+    #     wirc_core.wirc_client_info.write_log("info", message)
 
     def log_camera_info(self):
         """ """
@@ -227,10 +225,10 @@ class WircManager(object):
             # wirc_core.wirc_client_status.set_exposure_time_us(
             #     exp, camera_id="rpi_cam1"
             # )
-            # gain = config.get("rpi_cam0" + ".settings.analogue_gain", "auto")
-            # wirc_core.wirc_client_status.set_analogue_gain(gain, camera_id="rpi_cam0")
-            # gain = config.get("rpi_cam1" + ".settings.analogue_gain", "auto")
-            # wirc_core.wirc_client_status.set_analogue_gain(gain, camera_id="rpi_cam1")
+            # gain = config.get("rpi_cam0" + ".settings.camera_gain", "auto")
+            # wirc_core.wirc_client_status.set_camera_gain(gain, camera_id="rpi_cam0")
+            # gain = config.get("rpi_cam1" + ".settings.camera_gain", "auto")
+            # wirc_core.wirc_client_status.set_camera_gain(gain, camera_id="rpi_cam1")
 
             # await wirc_core.rpi_cam0.start_camera()
             # await wirc_core.rpi_cam1.start_camera()
@@ -252,8 +250,6 @@ class WircManager(object):
         except Exception as e:
             self.logger.debug("Exception in WircManager - shutdown: " + str(e))
 
-
-
     def trigger_camera_status_event(self):
         """ """
         # Event: Create a new and release the old.
@@ -270,10 +266,9 @@ class WircManager(object):
     def get_camera_status_all(self):
         """ """
         camera_status_dict = {}
-        # camera_status_dict["camera-a"] = wirc_core.cam0.get_camera_status()
-        # camera_status_dict["camera-b"] = wirc_core.cam1.get_camera_status()
+        camera_status_dict["camera-a"] = wirc_core.rpi_cam0.get_camera_status()
+        camera_status_dict["camera-b"] = wirc_core.rpi_cam1.get_camera_status()
         camera_status_dict["camera-c"] = wirc_core.usb_thermal0.get_camera_status()
         camera_status_dict["camera-d"] = wirc_core.usb_thermal1.get_camera_status()
         camera_status_dict["camera-e"] = wirc_core.usb_thermal2.get_camera_status()
         return camera_status_dict
-
