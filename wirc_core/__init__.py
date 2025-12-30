@@ -29,7 +29,7 @@ config_dir = pathlib.Path(executable_path.parent, "wirc_settings")
 config_file = "wirc_config.yaml"
 config_default_file = pathlib.Path(workdir_path, "wirc_config_default.yaml")
 
-from wirc_core.rpi_camera import RaspberyPiCamera
+from wirc_core.rpi_camera import RaspberryPiCamera
 from wirc_core.thermal_camera import ThermalCamera
 
 # from wirc_core.wirc_config import WircConfig
@@ -50,8 +50,8 @@ config.load_config(
     config_default_file=config_default_file,
 )
 # Camera.
-rpi_cam0 = RaspberyPiCamera(config, logger_name=logger_name, config_id="rpi_cam0")
-rpi_cam1 = RaspberyPiCamera(config, logger_name=logger_name, config_id="rpi_cam1")
+rpi_cam0 = RaspberryPiCamera(config, logger_name=logger_name, config_id="rpi_cam0")
+rpi_cam1 = RaspberryPiCamera(config, logger_name=logger_name, config_id="rpi_cam1")
 usb_thermal0 = ThermalCamera(config, logger_name=logger_name, config_id="usb_thermal0")
 usb_thermal1 = ThermalCamera(config, logger_name=logger_name, config_id="usb_thermal1")
 usb_thermal2 = ThermalCamera(config, logger_name=logger_name, config_id="usb_thermal2")

@@ -27,7 +27,9 @@ class ThermalCamera:
         self.logger = logging.getLogger(logger_name)
         #
         self.clear()
-        self.configure(config_id)
+        self.camera_initiated = False
+        self.config_id = config_id
+        self.configure()
         # For preview streaming.
         self.preview_queue = asyncio.Queue(maxsize=10)
 
@@ -37,24 +39,10 @@ class ThermalCamera:
         self.video_dir_path = None
         self.camera_active = False
         self.camera_video_active = False
-        self.camera_task = None
+        self.camera_task = ""
+        self.camera_info = ""
 
-    def configure(
-        self,
-        config_id,
-        # camera_id="rpi_cam1",
-        # cam_monochrome=False,
-        # saturation="auto",
-        # exposure_time_us="auto",
-        # camera_gain="auto",
-        # hflip=0,
-        # vflip=0,
-        # preview_size_divisor=2.0,
-        # video_horizontal_size_px="max",
-        # video_vertical_size_px="auto",
-        # video_framerate_fps=30,
-        # video_pre_buffer_frames=60,
-    ):
+    def configure(self):
         """ """
         # self.camera_id = camera_id
         # self.hflip = hflip
@@ -62,21 +50,29 @@ class ThermalCamera:
         # self.video_framerate_fps = video_framerate_fps
         #
         self.cv2_device_index = 0
-        if config_id == "usb_thermal0":
+        if self.config_id == "usb_thermal0":
             self.cv2_device_index = 0
-        elif config_id == "usb_thermal1":
+        elif self.config_id == "usb_thermal1":
             self.cv2_device_index = 1
-        elif config_id == "usb_thermal2":
+        elif self.config_id == "usb_thermal2":
             self.cv2_device_index = 2
+
+        self.camera_info = "Config id: " + self.config_id + "."
 
     def get_camera_status(self):
         """ """
         camera_status = {}
         camera_status["camera_mode"] = self.camera_mode
+        camera_status["exposure_time_us"] = "disabled"
+        camera_status["camera_gain"] = "disabled"
+        camera_status["video_framerate_fps"] = "disabled"
+        camera_status["camera_info"] = self.camera_info
+
         return camera_status
 
     async def set_camera_mode(self, camera_mode):
         """ """
+        self.camera_mode = camera_mode
         if camera_mode == "camera-off":
             if self.camera_video_active == True:
                 await self.stop_video()
@@ -84,7 +80,6 @@ class ThermalCamera:
             if self.camera_active == True:
                 await self.stop_camera()
                 await asyncio.sleep(0)
-            self.camera_mode = camera_mode
         elif camera_mode == "camera-on":
             if self.camera_video_active == True:
                 await self.stop_video()
@@ -92,26 +87,28 @@ class ThermalCamera:
             if self.camera_active == False:
                 await self.start_camera()
                 await asyncio.sleep(0)
-            self.camera_mode = camera_mode
         elif camera_mode == "record-on":
             if self.camera_active == False:
                 await self.start_camera()
                 await asyncio.sleep(0)
             if self.camera_video_active == False:
-                await self.start_video("", "/home/wurb/wirc_recordings", "")
+                await self.start_video("", "/home/wurb/wirc_recordings")
                 await asyncio.sleep(0)
-            self.camera_mode = camera_mode
         else:
             self.camera_mode = "camera-failed"
 
     async def camera_trigger(self):
         """ """
 
+    async def initiate_camera(self):
+        """ """
+        self.camera_initiated = True
+
     async def start_camera(self):
         """ """
         try:
             if self.camera_active == True:
-                print("DEBUG: Camera already running.")
+                print("DEBUG: Camera is already running.")
                 return
 
             self.camera_active = True
@@ -136,9 +133,9 @@ class ThermalCamera:
 
     async def set_camera_controls(
         self,
-        saturation=None,
         exposure_time_us=None,
         camera_gain=None,
+        saturation=None,
     ):
         """ """
         #
@@ -191,7 +188,8 @@ class ThermalCamera:
                     if video_writer == None:
                         now = datetime.now()
                         date_and_time = now.strftime("%Y%m%dT%H%M%S")
-                        file_mp4_name = "thermal_" + date_and_time + ".mp4"
+                        # file_mp4_name = "thermal_" + date_and_time + ".mp4"
+                        file_mp4_name = self.config_id + "_" + date_and_time + ".mp4"
                         video_writer = VideoFileWriter(
                             dir_path=str(self.video_dir_path),
                             file_mp4_name=file_mp4_name,
@@ -252,7 +250,7 @@ class ThermalCamera:
             capture.release()
             self.logger.debug("Thermal_camera_loop ended.")
 
-    async def start_video(self, lenght_s, dir_path, file_name_mp4):
+    async def start_video(self, lenght_s, dir_path):
         """ """
         try:
             self.video_dir_path = pathlib.Path(dir_path)
@@ -265,12 +263,8 @@ class ThermalCamera:
 
     async def stop_video(self):
         """ """
-        # if self.video_mp4_path == None:
-        #     return
         try:
-
             self.camera_video_active = False
-
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in stop_video: " + str(e))

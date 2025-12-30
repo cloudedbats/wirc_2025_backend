@@ -67,91 +67,12 @@ class WircManager(object):
         rpicam = self._select_camera(camera_id)
         await rpicam.camera_trigger()
 
-    # async def record_video(self, camera_id="cam"):
-    #     """ """
-    #     rpicam = self._select_camera(camera_id)
-    #     rec_dir = self.cam0_rec_dir
-    #     if camera_id == "rpi_cam0":
-    #         video_prefix = self.cam0_video_prefix
-    #         video_length_s = self.cam0_single_length_s
-    #         wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
-    #     if camera_id == "rpi_cam1":
-    #         video_prefix = self.cam1_video_prefix
-    #         video_length_s = self.cam1_single_length_s
-    #         wirc_core.wirc_client_info.write_log("info", "Single video (cam1).")
-    #     if camera_id == "rpi_cam0":
-    #         video_prefix = self.cam0_video_prefix
-    #         video_length_s = self.cam0_single_length_s
-    #         wirc_core.wirc_client_info.write_log("info", "Single video (cam0).")
-
-    #     now = datetime.datetime.now()Exception in camera_setup
-    #     date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
-    #     date_and_time = now.strftime("%Y%m%dT%H%M%S")
-    #     video_dir = pathlib.Path(rec_dir, date_dir_name)
-    #     if not video_dir.exists():
-    #         video_dir.mkdir(parents=True)
-    #     video_file = video_prefix + "_" + date_and_time
-    #     video_file_mp4 = video_file + ".mp4"
-    #     # Start video recording.
-    #     metadata = await rpicam.start_video(video_length_s, video_dir, video_file_mp4)
-    #     wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
-
-    # async def start_video(self, camera_id="camera-a"):
-    #     """ """
-    #     rpicam = self._select_camera(camera_id)
-    #     rec_dir = self.cam0_rec_dir if camera_id == "rpi_cam0" else self.cam1_rec_dir
-    #     if camera_id == "rpi_cam0":
-    #         video_prefix = self.cam0_video_prefix
-    #         video_length_s = self.cam0_cont_length_s
-    #         self.cam0_continuous_video_running = True
-    #     else:
-    #         video_prefix = self.cam1_video_prefix
-    #         video_length_s = self.cam1_cont_length_s
-    #         self.cam1_continuous_video_running = True
-    #     try:
-    #         wirc_core.wirc_client_info.write_log("info", "Video started...")
-    #         # Loop for videos.
-    #         while True:
-    #             if camera_id == "rpi_cam0":
-    #                 if self.cam0_continuous_video_running == False:
-    #                     return
-    #             if camera_id == "rpi_cam1":
-    #                 if self.cam1_continuous_video_running == False:
-    #                     return
-    #             now = datetime.datetime.now()
-    #             date_dir_name = "wirc_" + now.strftime("%Y-%m-%d")
-    #             date_and_time = now.strftime("%Y%m%dT%H%M%S")
-    #             video_dir = pathlib.Path(rec_dir, date_dir_name)
-    #             if not video_dir.exists():
-    #                 video_dir.mkdir(parents=True)
-    #             video_file = video_prefix + "_" + date_and_time
-    #             video_file_mp4 = video_file + ".mp4"
-    #             # Start video recording.
-    #             metadata = await rpicam.start_video(
-    #                 video_length_s, video_dir, video_file_mp4
-    #             )
-    #             wirc_core.wirc_client_info.write_log("info", "Video: " + video_file_mp4)
-
-    #             if camera_id == "rpi_cam1":
-    #                 break
-
-    #     except Exception as e:
-    #         self.logger.debug("Exception in start_video : " + str(e))
-
-    # async def stop_video(self, camera_id="rpi_cam0"):
-    #     """ """
-    #     if camera_id == "rpi_cam0":
-    #         self.cam0_continuous_video_running = False
-    #     else:
-    #         self.cam1_continuous_video_running = False
-    #     rpicam = self._select_camera(camera_id)
-    #     wirc_core.wirc_client_info.write_log("info", "Video stopped.")
-    #     await rpicam.stop_video()
 
     async def set_saturation(self, saturation, camera_id="rpi_cam0"):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(saturation=saturation)
+        self.trigger_camera_status_event()
 
     async def set_exposure_time(self, camera_id, exposure_time_us):
         """ """
@@ -160,26 +81,14 @@ class WircManager(object):
         wirc_core.wirc_client_status.set_exposure_time_us(
             exposure_time_us, camera_id=camera_id
         )
+        self.trigger_camera_status_event()
 
     async def set_camera_gain(self, camera_id, camera_gain):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(camera_gain=camera_gain)
         wirc_core.wirc_client_status.set_camera_gain(camera_gain, camera_id=camera_id)
-
-    # async def start_camera(self, camera_id="rpi_cam0"):
-    #     """ """
-    #     rpicam = self._select_camera(camera_id)
-    #     await rpicam.start_camera()
-    #     message = "Camera " + camera_id + " started."
-    #     wirc_core.wirc_client_info.write_log("info", message)
-
-    # async def stop_camera(self, camera_id="rpi_cam0"):
-    #     """ """
-    #     rpicam = self._select_camera(camera_id)
-    #     await rpicam.stop_camera()
-    #     message = "Camera " + camera_id + " stopped."
-    #     wirc_core.wirc_client_info.write_log("info", message)
+        self.trigger_camera_status_event()
 
     def log_camera_info(self):
         """ """
@@ -242,11 +151,11 @@ class WircManager(object):
         """ """
         try:
             pass
-            # await wirc_core.rpi_cam0.stop_camera()
-            # await wirc_core.rpi_cam1.stop_camera()
-            # await wirc_core.usb_thermal0.stop_camera()
-            # await wirc_core.usb_thermal1.stop_camera()
-            # await wirc_core.usb_thermal2.stop_camera()
+            # await wirc_core.rpi_cam0.set_camera_mode("camera-off")
+            # await wirc_core.rpi_cam1.set_camera_mode("camera-off")
+            # await wirc_core.usb_thermal0.set_camera_mode("camera-off")
+            # await wirc_core.usb_thermal1.set_camera_mode("camera-off")
+            # await wirc_core.usb_thermal2.set_camera_mode("camera-off")
         except Exception as e:
             self.logger.debug("Exception in WircManager - shutdown: " + str(e))
 
