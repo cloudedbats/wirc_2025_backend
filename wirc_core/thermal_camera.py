@@ -159,15 +159,20 @@ class ThermalCamera:
             frame_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
             counter = 0
-            file_number = 1
             video_writer = None
+
+            now = datetime.now()
+            time_next_minute = now.replace(
+                second=0, microsecond=0, minute=now.minute + 1, hour=now.hour
+            )
+
             while self.camera_active:
                 counter += 1
                 if self.camera_video_active:
                     # Use one minute for tests.
-                    if counter > (25 * 60):
+                    # if counter > (25 * 60):
+                    if datetime.now() >= time_next_minute:
                         counter = 0
-                        file_number += 1
                         # Save to file.
                         if video_writer != None:
                             video_writer.write_to_file()
@@ -187,6 +192,12 @@ class ThermalCamera:
                 if self.camera_video_active:
                     if video_writer == None:
                         now = datetime.now()
+                        time_next_minute = now.replace(
+                            second=0,
+                            microsecond=0,
+                            minute=now.minute + 1,
+                            hour=now.hour,
+                        )
                         date_and_time = now.strftime("%Y%m%dT%H%M%S")
                         # file_mp4_name = "thermal_" + date_and_time + ".mp4"
                         file_mp4_name = self.config_id + "_" + date_and_time + ".mp4"

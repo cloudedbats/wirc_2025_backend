@@ -382,7 +382,20 @@ class RaspberryPiCamera:
                         self.video_output.open_output(outputs.PyavOutput(out_path))
                         self.video_output.start()
 
-                        await asyncio.sleep(float(lenght_s))
+                        time_next_minute = now.replace(
+                            second=0,
+                            microsecond=0,
+                            minute=now.minute + 1,
+                            hour=now.hour,
+                        )
+                        # print("now: ", now)
+                        # print("time_next_minute: ", time_next_minute)
+                        time_left = time_next_minute - datetime.now()
+                        # print("time_left: ", time_left)
+                        time_left_sec = time_left.total_seconds()
+                        await asyncio.sleep(time_left_sec)
+
+                        # await asyncio.sleep(float(lenght_s))
 
                         # await self.stop_video()
                         # self.video_output.stop()
