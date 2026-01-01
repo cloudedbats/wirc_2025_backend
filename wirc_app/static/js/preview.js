@@ -1,10 +1,10 @@
 // Preview mode is stored on client only.
 var selectedPreviewMode = {
-  'camera-a': 'preview-on',
-  'camera-b': 'preview-on',
-  'camera-c': 'preview-on',
-  'camera-d': 'preview-on',
-  'camera-e': 'preview-on',
+  'camera-a': 'preview-off',
+  'camera-b': 'preview-off',
+  'camera-c': 'preview-off',
+  'camera-d': 'preview-off',
+  'camera-e': 'preview-off',
 }
 
 function previewModeOnChange() {

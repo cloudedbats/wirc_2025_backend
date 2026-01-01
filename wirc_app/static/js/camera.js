@@ -1,11 +1,21 @@
 var selectedCameraId = 'camera-a';
 var selectedCameraName = 'Camera-A';
 var cameraStatusAll = {
-  'camera-a': { 'camera_mode': 'camera-off' },
-  'camera-b': { 'camera_mode': 'camera-off' },
-  'camera-c': { 'camera_mode': 'camera-off' },
-  'camera-d': { 'camera_mode': 'camera-off' },
-  'camera-e': { 'camera_mode': 'camera-off' },
+  'camera-a': {
+    'camera_mode': 'camera-off', 'exposure_time_us': 'auto', 'camera_gain': 'auto', 'video_framerate_fps': '30', 'camera_info': ''
+  },
+  'camera-b': {
+    'camera_mode': 'camera-off', 'exposure_time_us': 'auto', 'camera_gain': 'auto', 'video_framerate_fps': '30', 'camera_info': ''
+  },
+  'camera-c': {
+    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_thermal0.'
+  },
+  'camera-d': {
+    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_thermal1.'
+  },
+  'camera-e': {
+    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_thermal2.'
+  },
 }
 
 function setCameraId(cameraId, cameraName) {
@@ -72,20 +82,43 @@ function cameraModeOnChange() {
 
 function cameraStatusAllUpdate(cameraStatusAllJson = '') {
   if (cameraStatusAllJson != '') {
+    // Use status from Wirc.
     cameraStatusAll = cameraStatusAllJson;
   }
-
   if (selectedCameraId in cameraStatusAll === true) {
-    let mode = cameraStatusAll[selectedCameraId];
-    // alert(JSON.stringify(cameraStatusAll))
-    if ('camera_mode' in mode === true) {
-      byId('cameraModeId').value = mode['camera_mode'];
-
+    let status = cameraStatusAll[selectedCameraId];
+    if ('camera_mode' in status === true) {
+      mode = status['camera_mode']
+      byId('cameraModeId').value = mode;
       if (mode === 'record-on-trigger') {
         byId('buttonTriggerId').hidden = false;
       } else {
         byId('buttonTriggerId').hidden = true;
       }
+    }
+    if ('exposure_time_us' in status === true) {
+      exposure = status['exposure_time_us']
+      if (exposure === 'disabled') {
+        byId('exposureTimeId').disabled = true;
+        byId('exposureTimeId').value = 'auto';
+      } else {
+        byId('exposureTimeId').disabled = false;
+        byId('exposureTimeId').value = exposure;
+      }
+    }
+    if ('camera_gain' in status === true) {
+      gain = status['camera_gain']
+      if (gain === 'disabled') {
+        byId('cameraGainId').disabled = true;
+        byId('cameraGainId').value = 'auto';
+      } else {
+        byId('cameraGainId').disabled = false;
+        byId('cameraGainId').value = gain;
+      }
+    }
+    if ('camera_info' in status === true) {
+      info = status['camera_info']
+      byId('cameraInfoId').textContent = info;
     }
   }
 }
@@ -112,35 +145,4 @@ function cameraGainOnChange() {
   let selectedValue =
     byId('cameraGainId').options[byId('cameraGainId').selectedIndex].value
   setCameraGain(selectedCameraId, selectedValue)
-}
-
-// Functions used to updates fields based on response contents.
-function updateExposureTime(cam0ExposureTime, cam1ExposureTime) {
-  let exposureTime = ''
-  if (selectedCameraId == 'camera-a') {
-    exposureTime = cam0ExposureTime
-  }
-  else if (selectedCameraId == 'camera-b') {
-    exposureTime = cam1ExposureTime
-  }
-  if (exposureTime == 0) {
-    byId('exposureTimeId').value = 'auto'
-  } else {
-    byId('exposureTimeId').value = exposureTime
-  }
-}
-
-function updateCameraGain(cam0CameraGain, cam1CameraGain) {
-  let cameraGain = ''
-  if (selectedCameraId == 'camera-a') {
-    cameraGain = cam0CameraGain
-  }
-  else if (selectedCameraId == 'camera-b') {
-    cameraGain = cam1CameraGain
-  }
-  if (cameraGain == 0) {
-    byId('cameraGainId').value = 'auto'
-  } else {
-    byId('cameraGainId').value = cameraGain
-  }
 }
