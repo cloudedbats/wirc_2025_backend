@@ -70,6 +70,8 @@ class RaspberryPiCamera:
         self.video_framerate_fps = conf.get(cam + ".video.framerate_fps", 30)
         self.video_pre_buffer_frames = conf.get(cam + ".video.pre_buffer_frames", 60)
 
+        self.camera_info = "Config id: " + self.config_id + "."
+
     def get_global_camera_info(self):
         """ """
         global_camera_info = Picamera2.global_camera_info()
@@ -353,6 +355,8 @@ class RaspberryPiCamera:
                 )
                 await asyncio.sleep(0)
 
+                time_next_minute = None
+
                 while True:
 
                     now = datetime.now()
@@ -382,16 +386,21 @@ class RaspberryPiCamera:
                         self.video_output.open_output(outputs.PyavOutput(out_path))
                         self.video_output.start()
 
-                        time_next_minute = now.replace(
-                            second=0,
-                            microsecond=0,
-                            minute=now.minute + 1,
-                            hour=now.hour,
-                        )
-                        # print("now: ", now)
-                        # print("time_next_minute: ", time_next_minute)
+                        if now.minute < 59:
+                            time_next_minute = now.replace(
+                                second=0,
+                                microsecond=0,
+                                minute=now.minute + 1,
+                                hour=now.hour,
+                            )
+                        else:
+                            time_next_minute = now.replace(
+                                second=0,
+                                microsecond=0,
+                                minute=0,
+                                hour=now.hour + 1,
+                            )
                         time_left = time_next_minute - datetime.now()
-                        # print("time_left: ", time_left)
                         time_left_sec = time_left.total_seconds()
                         await asyncio.sleep(time_left_sec)
 

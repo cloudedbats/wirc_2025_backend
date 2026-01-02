@@ -162,9 +162,21 @@ class ThermalCamera:
             video_writer = None
 
             now = datetime.now()
-            time_next_minute = now.replace(
-                second=0, microsecond=0, minute=now.minute + 1, hour=now.hour
-            )
+            time_next_minute = None
+            if now.minute < 59:
+                time_next_minute = now.replace(
+                    second=0,
+                    microsecond=0,
+                    minute=now.minute + 1,
+                    hour=now.hour,
+                )
+            else:
+                time_next_minute = now.replace(
+                    second=0,
+                    microsecond=0,
+                    minute=0,
+                    hour=now.hour + 1,
+                )
 
             while self.camera_active:
                 counter += 1
@@ -192,12 +204,21 @@ class ThermalCamera:
                 if self.camera_video_active:
                     if video_writer == None:
                         now = datetime.now()
-                        time_next_minute = now.replace(
-                            second=0,
-                            microsecond=0,
-                            minute=now.minute + 1,
-                            hour=now.hour,
-                        )
+                        if now.minute < 59:
+                            time_next_minute = now.replace(
+                                second=0,
+                                microsecond=0,
+                                minute=now.minute + 1,
+                                hour=now.hour,
+                            )
+                        else:
+                            time_next_minute = now.replace(
+                                second=0,
+                                microsecond=0,
+                                minute=0,
+                                hour=now.hour + 1,
+                            )
+
                         date_and_time = now.strftime("%Y%m%dT%H%M%S")
                         # file_mp4_name = "thermal_" + date_and_time + ".mp4"
                         file_mp4_name = self.config_id + "_" + date_and_time + ".mp4"
