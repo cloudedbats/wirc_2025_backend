@@ -4,7 +4,6 @@ var selectedPreviewMode = {
   'camera-b': 'preview-off',
   'camera-c': 'preview-off',
   'camera-d': 'preview-off',
-  'camera-e': 'preview-off',
 }
 
 function previewModeOnChange() {
@@ -43,6 +42,9 @@ async function refreshPreviewStream() {
   }
   else if (selectedMode == 'preview-1-fps') {
     fps = 1;
+  }
+  else if (selectedMode == 'preview-0.1-fps') {
+    fps = 0.1;
   }
   if (fps != 0) {
     let src_text = 'preview/stream.mjpeg' + '?camera_id=' + selectedCameraId;

@@ -42,8 +42,6 @@ class WircManager(object):
             rpicam = wirc_core.usb_thermal0
         elif camera_id == "camera-d":
             rpicam = wirc_core.usb_thermal1
-        elif camera_id == "camera-e":
-            rpicam = wirc_core.usb_thermal2
         return rpicam
 
     # def get_preview_streamer(self, camera_id="camera-a"):
@@ -66,7 +64,6 @@ class WircManager(object):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.camera_trigger()
-
 
     async def set_saturation(self, saturation, camera_id="rpi_cam0"):
         """ """
@@ -143,7 +140,6 @@ class WircManager(object):
             # await wirc_core.rpi_cam1.start_camera()
             # await wirc_core.usb_thermal0.start_camera()
             # await wirc_core.usb_thermal1.start_camera()
-            # await wirc_core.usb_thermal2.start_camera()
         except Exception as e:
             self.logger.debug("Exception in WircManager - startup: " + str(e))
 
@@ -155,7 +151,6 @@ class WircManager(object):
             # await wirc_core.rpi_cam1.set_camera_mode("camera-off")
             # await wirc_core.usb_thermal0.set_camera_mode("camera-off")
             # await wirc_core.usb_thermal1.set_camera_mode("camera-off")
-            # await wirc_core.usb_thermal2.set_camera_mode("camera-off")
         except Exception as e:
             self.logger.debug("Exception in WircManager - shutdown: " + str(e))
 
@@ -179,5 +174,4 @@ class WircManager(object):
         camera_status_dict["camera-b"] = wirc_core.rpi_cam1.get_camera_status()
         camera_status_dict["camera-c"] = wirc_core.usb_thermal0.get_camera_status()
         camera_status_dict["camera-d"] = wirc_core.usb_thermal1.get_camera_status()
-        camera_status_dict["camera-e"] = wirc_core.usb_thermal2.get_camera_status()
         return camera_status_dict

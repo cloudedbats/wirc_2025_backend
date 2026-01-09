@@ -2,19 +2,16 @@ var selectedCameraId = 'camera-a';
 var selectedCameraName = 'Camera-A';
 var cameraStatusAll = {
   'camera-a': {
-    'camera_mode': 'camera-off', 'exposure_time_us': 'auto', 'camera_gain': 'auto', 'video_framerate_fps': '30', 'camera_info': ''
+    'camera_mode': 'camera-off', 'exposure_time_us': 'auto', 'camera_gain': 'auto', 'video_framerate_fps': '30', 'camera_info': 'RPi cam0.'
   },
   'camera-b': {
-    'camera_mode': 'camera-off', 'exposure_time_us': 'auto', 'camera_gain': 'auto', 'video_framerate_fps': '30', 'camera_info': ''
+    'camera_mode': 'camera-off', 'exposure_time_us': 'auto', 'camera_gain': 'auto', 'video_framerate_fps': '30', 'camera_info': 'RPi cam1.'
   },
   'camera-c': {
-    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_thermal0.'
+    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_0.'
   },
   'camera-d': {
-    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_thermal1.'
-  },
-  'camera-e': {
-    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_thermal2.'
+    'camera_mode': 'camera-off', 'exposure_time_us': 'disabled', 'camera_gain': 'disabled', 'video_framerate_fps': 'disabled', 'camera_info': 'Config id: usb_1.'
   },
 }
 
@@ -30,7 +27,6 @@ function selectCamera(cameraId, cameraName) {
   byId('selectCamBId').classList.remove('is-inverted');
   byId('selectCamCId').classList.remove('is-inverted');
   byId('selectCamDId').classList.remove('is-inverted');
-  byId('selectCamEId').classList.remove('is-inverted');
   if (cameraId == 'camera-a') {
     byId('selectCamAId').classList.add('is-inverted');
   }
@@ -42,9 +38,6 @@ function selectCamera(cameraId, cameraName) {
   }
   if (cameraId == 'camera-d') {
     byId('selectCamDId').classList.add('is-inverted');
-  }
-  if (cameraId == 'camera-e') {
-    byId('selectCamEId').classList.add('is-inverted');
   }
 
   // TODO: For test.

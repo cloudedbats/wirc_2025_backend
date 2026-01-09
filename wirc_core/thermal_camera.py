@@ -53,8 +53,6 @@ class ThermalCamera:
         if self.config_id == "usb_thermal0":
             self.cv2_device_index = 0
         elif self.config_id == "usb_thermal1":
-            self.cv2_device_index = 1
-        elif self.config_id == "usb_thermal2":
             self.cv2_device_index = 2
 
         self.camera_info = "Config id: " + self.config_id + "."
@@ -253,16 +251,11 @@ class ThermalCamera:
                 jpg.save(tmpFile, "JPEG")
                 bytearray = tmpFile.getvalue()[:]  # Copy. Needed?
                 try:
+                    while self.preview_queue.qsize() > 2:
+                        self.preview_queue.get_nowait()
+                        self.preview_queue.task_done()
                     if not self.preview_queue.full():
                         self.preview_queue.put_nowait(bytearray)
-                    else:
-                        # self.logger.debug("Thermal queue full, remove items.")
-                        try:
-                            while True:
-                                self.preview_queue.get_nowait()
-                                self.preview_queue.task_done()
-                        except asyncio.QueueEmpty:
-                            pass
                 except Exception as e:
                     self.logger.debug("Exception in _thermal_camera_loop: " + str(e))
 

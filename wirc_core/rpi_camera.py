@@ -448,15 +448,10 @@ class PreviewStreamingOutput(io.BufferedIOBase):
         """ """
         try:
             if self.preview_queue != None:
+                while self.preview_queue.qsize() > 2:
+                    self.preview_queue.get_nowait()
+                    self.preview_queue.task_done()
                 if not self.preview_queue.full():
                     self.preview_queue.put_nowait(buf)
-                else:
-                    # print("Queue full, remove items.")
-                    try:
-                        while True:
-                            self.preview_queue.get_nowait()
-                            self.preview_queue.task_done()
-                    except asyncio.QueueEmpty:
-                        pass
         except Exception as e:
             print("Exception: PreviewStreamingOutput write: ", e)
