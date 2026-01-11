@@ -10,7 +10,9 @@ import logging
 import io
 from picamera2 import Picamera2, encoders, outputs, Metadata
 import libcamera
-from datetime import datetime
+from datetime import datetime, timedelta
+
+import wirc_core
 
 
 class RaspberryPiCamera:
@@ -115,7 +117,7 @@ class RaspberryPiCamera:
                 await self.start_camera()
                 await asyncio.sleep(0)
             if self.camera_video_active == False:
-                await self.start_video(10.0, "/home/wurb/wirc_recordings")
+                await self.start_video()
                 await asyncio.sleep(0)
         else:
             self.camera_mode = "camera-failed"
@@ -313,7 +315,7 @@ class RaspberryPiCamera:
         except Exception as e:
             self.logger.debug("Exception in stop_preview_encoder: " + str(e))
 
-    async def start_video(self, lenght_s, dir_path):
+    async def start_video(self):
         """ """
         try:
             if self.camera_video_active == True:
@@ -339,9 +341,6 @@ class RaspberryPiCamera:
 
     async def _camera_video_loop(self):
         """ """
-        lenght_s = 10
-        dir_path = "/home/wurb/wirc_recordings"
-
         self.camera_video_active = True
         try:
             try:
@@ -355,15 +354,18 @@ class RaspberryPiCamera:
                 )
                 await asyncio.sleep(0)
 
-                time_next_minute = None
+                next_time_minute = None
 
                 while True:
 
                     now = datetime.now()
                     date_and_time = now.strftime("%Y%m%dT%H%M%S")
-                    file_name_mp4 = "cam0_" + date_and_time + ".mp4"
+                    file_mp4_name = "cam0_" + date_and_time + ".mp4"
 
-                    video_mp4_path = pathlib.Path(dir_path, file_name_mp4)
+                    disc_path = wirc_core.wirc_files.get_target_disc_path()
+                    dir_path = wirc_core.wirc_files.get_target_dir_path(disc_path, date_option="date-post-after")
+                    video_mp4_path = pathlib.Path(dir_path, file_mp4_name)
+
                     try:
                         metadata = Metadata(self.picam2.capture_metadata())
                         exposure = metadata.ExposureTime
@@ -386,25 +388,16 @@ class RaspberryPiCamera:
                         self.video_output.open_output(outputs.PyavOutput(out_path))
                         self.video_output.start()
 
-                        if now.minute < 59:
-                            time_next_minute = now.replace(
+                        next_time = now + timedelta(seconds=60)
+                        next_time_minute = next_time.replace(
                                 second=0,
                                 microsecond=0,
-                                minute=now.minute + 1,
-                                hour=now.hour,
+                                minute=next_time.minute,
+                                hour=next_time.hour,
                             )
-                        else:
-                            time_next_minute = now.replace(
-                                second=0,
-                                microsecond=0,
-                                minute=0,
-                                hour=now.hour + 1,
-                            )
-                        time_left = time_next_minute - datetime.now()
+                        time_left = next_time_minute - datetime.now()
                         time_left_sec = time_left.total_seconds()
                         await asyncio.sleep(time_left_sec)
-
-                        # await asyncio.sleep(float(lenght_s))
 
                         # await self.stop_video()
                         # self.video_output.stop()

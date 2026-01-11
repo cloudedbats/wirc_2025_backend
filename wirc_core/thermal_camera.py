@@ -10,7 +10,9 @@ import logging
 import cv2
 import PIL
 import io
-from datetime import datetime
+from datetime import datetime, timedelta
+
+import wirc_core
 
 
 class ThermalCamera:
@@ -36,7 +38,6 @@ class ThermalCamera:
     def clear(self):
         """ """
         self.camera_mode = "camera-off"
-        self.video_dir_path = None
         self.camera_active = False
         self.camera_video_active = False
         self.camera_task = ""
@@ -90,7 +91,7 @@ class ThermalCamera:
                 await self.start_camera()
                 await asyncio.sleep(0)
             if self.camera_video_active == False:
-                await self.start_video("", "/home/wurb/wirc_recordings")
+                await self.start_video()
                 await asyncio.sleep(0)
         else:
             self.camera_mode = "camera-failed"
@@ -160,28 +161,20 @@ class ThermalCamera:
             video_writer = None
 
             now = datetime.now()
-            time_next_minute = None
-            if now.minute < 59:
-                time_next_minute = now.replace(
-                    second=0,
-                    microsecond=0,
-                    minute=now.minute + 1,
-                    hour=now.hour,
-                )
-            else:
-                time_next_minute = now.replace(
-                    second=0,
-                    microsecond=0,
-                    minute=0,
-                    hour=now.hour + 1,
-                )
+            next_time = now + timedelta(seconds=60)
+            next_time_minute = next_time.replace(
+                second=0,
+                microsecond=0,
+                minute=next_time.minute,
+                hour=next_time.hour,
+            )
 
             while self.camera_active:
                 counter += 1
                 if self.camera_video_active:
                     # Use one minute for tests.
                     # if counter > (25 * 60):
-                    if datetime.now() >= time_next_minute:
+                    if datetime.now() >= next_time_minute:
                         counter = 0
                         # Save to file.
                         if video_writer != None:
@@ -202,26 +195,17 @@ class ThermalCamera:
                 if self.camera_video_active:
                     if video_writer == None:
                         now = datetime.now()
-                        if now.minute < 59:
-                            time_next_minute = now.replace(
-                                second=0,
-                                microsecond=0,
-                                minute=now.minute + 1,
-                                hour=now.hour,
-                            )
-                        else:
-                            time_next_minute = now.replace(
-                                second=0,
-                                microsecond=0,
-                                minute=0,
-                                hour=now.hour + 1,
-                            )
+                        next_time = now + timedelta(seconds=60)
+                        next_time_minute = next_time.replace(
+                            second=0,
+                            microsecond=0,
+                            minute=next_time.minute,
+                            hour=next_time.hour,
+                        )
 
                         date_and_time = now.strftime("%Y%m%dT%H%M%S")
-                        # file_mp4_name = "thermal_" + date_and_time + ".mp4"
                         file_mp4_name = self.config_id + "_" + date_and_time + ".mp4"
                         video_writer = VideoFileWriter(
-                            dir_path=str(self.video_dir_path),
                             file_mp4_name=file_mp4_name,
                             frame_height=frame_height,
                             frame_width=frame_width,
@@ -230,6 +214,7 @@ class ThermalCamera:
                         self.logger.debug(
                             "Thermal video started. Time: " + str(datetime.now())
                         )
+
                 rc, image_array = capture.read()
                 if not rc:
                     await asyncio.sleep(0.04)
@@ -275,13 +260,10 @@ class ThermalCamera:
             capture.release()
             self.logger.debug("Thermal_camera_loop ended.")
 
-    async def start_video(self, lenght_s, dir_path):
+    async def start_video(self):
         """ """
         try:
-            self.video_dir_path = pathlib.Path(dir_path)
-
             self.camera_video_active = True
-
             await asyncio.sleep(0)
         except Exception as e:
             self.logger.debug("Exception in start_video: " + str(e))
@@ -300,14 +282,13 @@ class VideoFileWriter(object):
 
     def __init__(
         self,
-        dir_path,
         file_mp4_name,
         frame_height,
         frame_width,
         fps,
     ):
         """ """
-        self.out_path = pathlib.Path(dir_path, file_mp4_name)
+        self.file_mp4_name = file_mp4_name
         self.frame_height = frame_height
         self.frame_width = frame_width
         self.fps = fps
@@ -321,6 +302,12 @@ class VideoFileWriter(object):
 
     def write_to_file(self):
         """ """
+        disc_path = wirc_core.wirc_files.get_target_disc_path()
+        dir_path = wirc_core.wirc_files.get_target_dir_path(
+            disc_path, date_option="date-post-after"
+        )
+        self.out_path = pathlib.Path(dir_path, self.file_mp4_name)
+
         if not self.out_path.parent.exists():
             self.out_path.parent.mkdir(parents=True)
         self.write_task = asyncio.create_task(

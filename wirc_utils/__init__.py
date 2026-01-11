@@ -5,6 +5,7 @@
 from wirc_utils.logger import Logger
 from wirc_utils.configuration import Configuration
 from wirc_utils.sqlite_db import SqliteDb
+from wirc_utils.rpi_control import RaspberryPiControl
 
 # Instances of classes.
 

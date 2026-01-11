@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from typing import Optional
 import websockets.exceptions
 
+import wirc_utils
 import wirc_core
 
 logger = logging.getLogger(wirc_core.logger_name)
@@ -32,7 +33,9 @@ async def set_time(posixtime: str):
         message = "API called: set-time: " + str(posixtime)
         logger.debug(message)
         posix_time_s = int(int(posixtime) / 1000)
-        await wirc_core.wurb_rpi.set_detector_time(posix_time_s, cmd_source="by user")
+        await wirc_utils.rpi_control.set_detector_time(
+            posix_time_s, cmd_source="by user"
+        )
     except Exception as e:
         message = "API - set_time. Exception: " + str(e)
         logger.debug(message)

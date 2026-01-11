@@ -61,3 +61,6 @@ wirc_client_status = WircClientStatus(config, logger_name=logger_name)
 wirc_client_info = WircClientInfo(config, logger_name=logger_name)
 wirc_manager = WircManager(config, logger_name=logger_name)
 wirc_files = WircFiles(config, logger_name=logger_name)
+
+# Raspberry Pi.
+rpi_control = wirc_utils.RaspberryPiControl(logger_name=logger_name)
