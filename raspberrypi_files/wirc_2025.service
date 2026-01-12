@@ -1,5 +1,5 @@
 [Unit]
-Description=CloudedBats WIRC-2025 Infrared camera for bats 
+Description=CloudedBats WIRC-2026 Infrared camera for bats 
 After=network.target
 ### Before=nginx.service
 
@@ -7,8 +7,8 @@ After=network.target
 Restart=always
 TimeoutStopSec=10s
 User=wurb
-WorkingDirectory=/home/wurb/wirc_2025_backend
-ExecStart=/home/wurb/wirc_2025_backend/venv/bin/python3 /home/wurb/wirc_2025_backend/wirc_main.py
+WorkingDirectory=/home/wurb/wirc_2026
+ExecStart=/home/wurb/wirc_2026/venv/bin/python3 /home/wurb/wirc_2026/wirc_main.py
 
 [Install]
 WantedBy=multi-user.target

@@ -72,12 +72,12 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
         await websocket.send_json(ws_json)
 
         # Get event notification objects.
-        status_event = wirc_core.wirc_client_status.get_status_event()
-        logging_event = wirc_core.wirc_client_info.get_logging_event()
+        status_event = wirc_core.client_status.get_status_event()
+        logging_event = wirc_core.client_info.get_logging_event()
         camera_status_event = wirc_core.wirc_manager.get_camera_status_event()
         # Trigger all for first loop.
-        wirc_core.wirc_client_status.trigger_status_event()
-        wirc_core.wirc_client_info.trigger_logging_event()
+        wirc_core.client_status.trigger_status_event()
+        wirc_core.client_info.trigger_logging_event()
         wirc_core.wirc_manager.trigger_camera_status_event()
         # Loop.
         while True:
@@ -110,8 +110,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             }
 
             if status_event.is_set():
-                status_event = wirc_core.wirc_client_status.get_status_event()
-                status_dict = wirc_core.wirc_client_status.get_status_dict()
+                status_event = wirc_core.client_status.get_status_event()
+                status_dict = wirc_core.client_status.get_status_dict()
                 ws_json["cam0_exposure_time_us"] = status_dict.get(
                     "cam0_exposure_time_us", ""
                 )
@@ -122,8 +122,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
                 ws_json["cam1_camera_gain"] = status_dict.get("cam1_camera_gain", "")
 
             if logging_event.is_set():
-                logging_event = wirc_core.wirc_client_info.get_logging_event()
-                ws_json["logRows"] = wirc_core.wirc_client_info.get_client_messages()
+                logging_event = wirc_core.client_info.get_logging_event()
+                ws_json["logRows"] = wirc_core.client_info.get_client_messages()
 
             if camera_status_event.is_set():
                 camera_status_event = wirc_core.wirc_manager.get_camera_status_event()

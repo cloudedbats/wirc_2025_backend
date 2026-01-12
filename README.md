@@ -1,25 +1,25 @@
-# CloudedBats WIRC-2025-backend
+# CloudedBats WIRC-2026
 
 Welcome to the backend part of the WIRC system (Wireless InfraRed Camera) for bat monitoring.
 
 The WIRC system is intended as a complement to the WURB system (Wireless Ultrasonic Recorder for Bats), 
 but instead of focusing on ultrasonic sound we now are focusing on using infrared light to monitor the bats.
 
-Both WURB and WIRC runs on Raspberry Pi and they can be installed together. Both systems provide APIs, and also web applications that can be used directly without any installation on the client computer. By default WURB-2024 is running on port 8080 and WIRC-2025 uses the port 8082.
+Both WURB and WIRC runs on Raspberry Pi and they can be installed together. Both systems provide APIs, and also web applications that can be used directly without any installation on the client computer. By default WURB-2024 is running on port 8080 and WIRC-2026 uses the port 8082.
 
-A WIRC-2025 client app is under development and in the future there will be apps with more functionality that can be installed on mobile phones and desktop computers. More info will appear here:
-https://github.com/cloudedbats/wirc_2025 
+A WIRC-2026 client app is under development and in the future there will be apps with more functionality that can be installed on mobile phones and desktop computers. More info will appear here:
+https://github.com/cloudedbats/wirc_2026 
 
-With this WIRC-2025-backend system you can use the web application to check the live preview image stream, adjust exposure time and gain, take jpeg photos, and record videos. The selected exposure time is used both for photos and video and is the key setting to get sharp images on fast moving objects.
+With this WIRC-2026 system you can use the web application to check the live preview image stream, adjust exposure time and gain, take jpeg photos, and record videos. The selected exposure time is used both for photos and video and is the key setting to get sharp images on fast moving objects.
 To download and manage recorded files you have to use an SFTP client, like FileZilla or WinSCP. In the future the new client app will take care of that.
 
 "To monitor bats we have to use ultra for sound and infra for light."
 
 ## The web user interface
 
-![WIRC-2025-web](WIRC-2025-backend-web.png?raw=true  "WIRC-2025-backend - web example.")
+![WIRC-2026-web](WIRC-2026-web.png?raw=true  "WIRC-2026 - web example.")
 
-This is an example screenshot from the simple web app that is a part of the WIRC-2025-backend. 
+This is an example screenshot from the simple web app that is a part of the WIRC-2026. 
 I'm watching birds in daylight now, flying bats with IR-light is not possible in February in Sweden.
 
 The web user interface only contains the most basic functionality and settings.
@@ -80,16 +80,16 @@ Additions for camera support.
 
 Install the software in this repository.
 
-    git clone https://github.com/cloudedbats/wirc_2025_backend.git
-    cd wirc_2025_backend/
+    git clone https://github.com/cloudedbats/wirc_2026.git
+    cd wirc_2026/
     python -m venv --system-site-packages venv
     source venv/bin/activate
     pip install -r requirements.txt
 
-    sudo cp /home/wurb/wirc_2025_backend/raspberrypi_files/wirc_2025.service /etc/systemd/system/
+    sudo cp /home/wurb/wirc_2026/raspberrypi_files/wirc_2026.service /etc/systemd/system/
     sudo systemctl daemon-reload
-    sudo systemctl enable wirc_2025.service
-    sudo systemctl start wirc_2025.service
+    sudo systemctl enable wirc_2026.service
+    sudo systemctl start wirc_2026.service
 
 ## Attached cameras
 

@@ -17,8 +17,8 @@ import wirc_api
 logger = logging.getLogger(wirc_core.logger_name)
 
 app = fastapi.FastAPI(
-    title="CloudedBats WIRC-2025",
-    description="CloudedBats WIRC-2025. The DIY infrared/thermal camera system for bat monitoring.",
+    title="CloudedBats WIRC-2026",
+    description="CloudedBats WIRC-2026. The DIY infrared/thermal camera system for bat monitoring.",
     version=wirc_core.__version__,
 )
 

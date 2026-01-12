@@ -23,16 +23,12 @@ async def main():
     logger = logging.getLogger(wirc_core.logger_name)
     logger.info("")
     logger.info("")
-    logger.info("Welcome to CloudedBats WIRC-2025")
-    logger.info("Project: https://cloudedbats.github.io")
-    logger.info("================ ^ö^ =================")
+    logger.info("Welcome to CloudedBats WIRC-2026")
+    logger.info("https://github.com/cloudedbats/wirc_2026")
+    logger.info("================= ^ö^ ==================")
     logger.info("")
 
     try:
-        # WIRC settings.
-        logger.debug("WIRC - main. Startup settings.")
-        await wirc_core.wirc_settings.startup(settings_dir=wirc_core.settings_dir)
-
         # WIRC core startup.
         logger.debug("WIRC - main. Startup core.")
         await wirc_core.wirc_manager.startup()
@@ -55,7 +51,6 @@ async def main():
 
         # Shutdown actions.
         logger.debug("WIRC - main. Shutdown started.")
-        await wirc_core.wirc_settings.shutdown()
         await wirc_core.wirc_manager.shutdown()
         logger.debug("WIRC - main. Shutdown done.")
     except Exception as e:

@@ -1,4 +1,4 @@
-# Configurations for CloudedBats WIRC-2025.
+# Configurations for CloudedBats WIRC-2026.
 ---
 wirc_app:
   port: 8082

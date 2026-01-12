@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: WIRC-2025",
+            "name": "Python: WIRC-2026",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/wirc_main.py",

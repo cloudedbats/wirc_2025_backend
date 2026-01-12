@@ -28,7 +28,7 @@ class WircClientInfo(object):
 
     def configure(self):
         """ """
-        self.max_client_messages = self.config.get("client_info.max_log_rows", 10)
+        self.max_client_messages = self.config.get("client_info.max_log_rows", 50)
 
     def startup(self):
         """ """
@@ -89,4 +89,5 @@ class WircClientInfo(object):
 
     def get_client_messages(self):
         """ """
+        # Reverse order.
         return self.client_messages[::-1]

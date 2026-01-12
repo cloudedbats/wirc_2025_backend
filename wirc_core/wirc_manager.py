@@ -75,7 +75,7 @@ class WircManager(object):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
-        wirc_core.wirc_client_status.set_exposure_time_us(
+        wirc_core.client_status.set_exposure_time_us(
             exposure_time_us, camera_id=camera_id
         )
         self.trigger_camera_status_event()
@@ -84,7 +84,7 @@ class WircManager(object):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(camera_gain=camera_gain)
-        wirc_core.wirc_client_status.set_camera_gain(camera_gain, camera_id=camera_id)
+        wirc_core.client_status.set_camera_gain(camera_gain, camera_id=camera_id)
         self.trigger_camera_status_event()
 
     def log_camera_info(self):
@@ -113,9 +113,9 @@ class WircManager(object):
         rpi_cam1_info += "   Model: "
         rpi_cam1_info += self.cam1_model
         print(rpi_cam1_info)
-        wirc_core.wirc_client_info.write_log("info", rpi_cam0_info)
-        wirc_core.wirc_client_info.write_log("info", rpi_cam1_info)
-        wirc_core.wirc_client_info.write_log("info", usb_thermal_info)
+        wirc_core.client_info.write_log("info", rpi_cam0_info)
+        wirc_core.client_info.write_log("info", rpi_cam1_info)
+        wirc_core.client_info.write_log("info", usb_thermal_info)
 
     async def startup(self):
         """ """
@@ -124,17 +124,17 @@ class WircManager(object):
             self.log_camera_info()
             # Inform client apps.
             # exp = config.get("rpi_cam0" + ".settings.exposure_time_us", "auto")
-            # wirc_core.wirc_client_status.set_exposure_time_us(
+            # wirc_core.client_status.set_exposure_time_us(
             #     exp, camera_id="rpi_cam0"
             # )
             # exp = config.get("rpi_cam1" + ".settings.exposure_time_us", "auto")
-            # wirc_core.wirc_client_status.set_exposure_time_us(
+            # wirc_core.client_status.set_exposure_time_us(
             #     exp, camera_id="rpi_cam1"
             # )
             # gain = config.get("rpi_cam0" + ".settings.camera_gain", "auto")
-            # wirc_core.wirc_client_status.set_camera_gain(gain, camera_id="rpi_cam0")
+            # wirc_core.client_status.set_camera_gain(gain, camera_id="rpi_cam0")
             # gain = config.get("rpi_cam1" + ".settings.camera_gain", "auto")
-            # wirc_core.wirc_client_status.set_camera_gain(gain, camera_id="rpi_cam1")
+            # wirc_core.client_status.set_camera_gain(gain, camera_id="rpi_cam1")
 
             # await wirc_core.rpi_cam0.start_camera()
             # await wirc_core.rpi_cam1.start_camera()

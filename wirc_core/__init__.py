@@ -11,7 +11,7 @@ import pathlib
 
 import wirc_utils
 
-__version__ = "2025.0.0-development"
+__version__ = "2026.0.0-development"
 
 # Absolute paths to working directory and executable.
 workdir_path = pathlib.Path(__file__).parent.parent.resolve()
@@ -57,8 +57,8 @@ usb_thermal1 = ThermalCamera(config, logger_name=logger_name, config_id="usb_the
 
 # Basic wirc.
 wirc_config = WircConfig(config, logger_name=logger_name)
-wirc_client_status = WircClientStatus(config, logger_name=logger_name)
-wirc_client_info = WircClientInfo(config, logger_name=logger_name)
+client_status = WircClientStatus(config, logger_name=logger_name)
+client_info = WircClientInfo(config, logger_name=logger_name)
 wirc_manager = WircManager(config, logger_name=logger_name)
 wirc_files = WircFiles(config, logger_name=logger_name)
 
