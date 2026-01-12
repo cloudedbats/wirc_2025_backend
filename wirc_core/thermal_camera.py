@@ -22,7 +22,7 @@ class ThermalCamera:
         self,
         config={},
         logger_name="DefaultLogger",
-        config_id="usb_thermal0",
+        config_id="usb_cam0",
     ):
         """ """
         self.config = config
@@ -51,9 +51,9 @@ class ThermalCamera:
         # self.video_framerate_fps = video_framerate_fps
         #
         self.cv2_device_index = 0
-        if self.config_id == "usb_thermal0":
+        if self.config_id == "usb_cam0":
             self.cv2_device_index = 0
-        elif self.config_id == "usb_thermal1":
+        elif self.config_id == "usb_cam1":
             self.cv2_device_index = 2
 
         self.camera_info = "Config id: " + self.config_id + "."

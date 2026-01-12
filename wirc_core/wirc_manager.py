@@ -39,15 +39,10 @@ class WircManager(object):
         elif camera_id == "camera-b":
             rpicam = wirc_core.rpi_cam1
         elif camera_id == "camera-c":
-            rpicam = wirc_core.usb_thermal0
+            rpicam = wirc_core.usb_cam0
         elif camera_id == "camera-d":
-            rpicam = wirc_core.usb_thermal1
+            rpicam = wirc_core.usb_cam1
         return rpicam
-
-    # def get_preview_streamer(self, camera_id="camera-a"):
-    #     """ """
-    #     rpicam = self._select_camera(camera_id)
-    #     return rpicam.get_preview_streamer()
 
     def get_preview_queue(self, camera_id="camera-a"):
         """ """
@@ -58,7 +53,7 @@ class WircManager(object):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_mode(camera_mode)
-        self.trigger_camera_status_event()
+        wirc_core.client_status.trigger_status_event()
 
     async def camera_trigger(self, camera_id):
         """ """
@@ -69,23 +64,19 @@ class WircManager(object):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(saturation=saturation)
-        self.trigger_camera_status_event()
+        wirc_core.client_status.trigger_status_event()
 
     async def set_exposure_time(self, camera_id, exposure_time_us):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
-        wirc_core.client_status.set_exposure_time_us(
-            exposure_time_us, camera_id=camera_id
-        )
-        self.trigger_camera_status_event()
+        wirc_core.client_status.trigger_status_event()
 
     async def set_camera_gain(self, camera_id, camera_gain):
         """ """
         rpicam = self._select_camera(camera_id)
         await rpicam.set_camera_controls(camera_gain=camera_gain)
-        wirc_core.client_status.set_camera_gain(camera_gain, camera_id=camera_id)
-        self.trigger_camera_status_event()
+        wirc_core.client_status.trigger_status_event()
 
     def log_camera_info(self):
         """ """
@@ -138,8 +129,8 @@ class WircManager(object):
 
             # await wirc_core.rpi_cam0.start_camera()
             # await wirc_core.rpi_cam1.start_camera()
-            # await wirc_core.usb_thermal0.start_camera()
-            # await wirc_core.usb_thermal1.start_camera()
+            # await wirc_core.usb_cam0.start_camera()
+            # await wirc_core.usb_cam1.start_camera()
         except Exception as e:
             self.logger.debug("Exception in WircManager - startup: " + str(e))
 
@@ -149,29 +140,7 @@ class WircManager(object):
             pass
             # await wirc_core.rpi_cam0.set_camera_mode("camera-off")
             # await wirc_core.rpi_cam1.set_camera_mode("camera-off")
-            # await wirc_core.usb_thermal0.set_camera_mode("camera-off")
-            # await wirc_core.usb_thermal1.set_camera_mode("camera-off")
+            # await wirc_core.usb_cam0.set_camera_mode("camera-off")
+            # await wirc_core.usb_cam1.set_camera_mode("camera-off")
         except Exception as e:
             self.logger.debug("Exception in WircManager - shutdown: " + str(e))
-
-    def trigger_camera_status_event(self):
-        """ """
-        # Event: Create a new and release the old.
-        old_event = self.get_camera_status_event()
-        self.camera_status_event = asyncio.Event()
-        old_event.set()
-
-    def get_camera_status_event(self):
-        """ """
-        if self.camera_status_event == None:
-            self.camera_status_event = asyncio.Event()
-        return self.camera_status_event
-
-    def get_camera_status_all(self):
-        """ """
-        camera_status_dict = {}
-        camera_status_dict["camera-a"] = wirc_core.rpi_cam0.get_camera_status()
-        camera_status_dict["camera-b"] = wirc_core.rpi_cam1.get_camera_status()
-        camera_status_dict["camera-c"] = wirc_core.usb_thermal0.get_camera_status()
-        camera_status_dict["camera-d"] = wirc_core.usb_thermal1.get_camera_status()
-        return camera_status_dict

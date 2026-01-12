@@ -52,8 +52,8 @@ config.load_config(
 # Camera.
 rpi_cam0 = RaspberryPiCamera(config, logger_name=logger_name, config_id="rpi_cam0")
 rpi_cam1 = RaspberryPiCamera(config, logger_name=logger_name, config_id="rpi_cam1")
-usb_thermal0 = ThermalCamera(config, logger_name=logger_name, config_id="usb_thermal0")
-usb_thermal1 = ThermalCamera(config, logger_name=logger_name, config_id="usb_thermal1")
+usb_cam0 = ThermalCamera(config, logger_name=logger_name, config_id="usb_cam0")
+usb_cam1 = ThermalCamera(config, logger_name=logger_name, config_id="usb_cam1")
 
 # Basic wirc.
 wirc_config = WircConfig(config, logger_name=logger_name)

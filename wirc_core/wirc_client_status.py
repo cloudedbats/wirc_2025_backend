@@ -9,6 +9,8 @@ import datetime
 import logging
 from logging import handlers
 
+import wirc_core
+
 
 class WircClientStatus:
     """ """
@@ -60,41 +62,6 @@ class WircClientStatus:
             self.cam1_camera_gain = camera_gain
             self.trigger_status_event()
 
-    # def write_log(self, msg_type, message):
-    #     """ """
-    #     try:
-    #         # Run the rest in the main asyncio event loop.
-    #         datetime_local = datetime.datetime.now()
-    #         asyncio.run_coroutine_threadsafe(
-    #             self.write_log_async(msg_type, datetime_local, message),
-    #             asyncio.get_event_loop(),
-    #         )
-    #     except Exception as e:
-    #         # Can't log this, must use print.
-    #         self.logger("Exception: WircClientInfo - write_log. " + str(e))
-
-    # async def write_log_async(self, msg_type, datetime_local, message):
-    #     """ """
-    #     try:
-    #         time_str = datetime_local.strftime("%H:%M:%S")
-    #         # datetime_str = datetime_local.strftime("%Y-%m-%d %H:%M:%S%z")
-    #         if message:
-    #             if msg_type in ["info", "warning", "error"]:
-    #                 if msg_type in ["warning", "error"]:
-    #                     self.client_messages.append(
-    #                         time_str + " - " + msg_type.capitalize() + ": " + message
-    #                     )
-    #                 else:
-    #                     self.client_messages.append(time_str + " - " + message)
-    #                 # Log list too large. Remove oldest item.
-    #                 if len(self.client_messages) > self.max_client_messages:
-    #                     del self.client_messages[0]
-    #                 # Trigger an event.
-    #                 self.trigger_logging_event()
-    #     except Exception as e:
-    #         # Can't log this, must use print.
-    #         self.logger("Exception: WircClientInfo - write_log_async: " + str(e))
-
     def trigger_status_event(self):
         """ """
         # Event: Create a new and release the old.
@@ -108,11 +75,11 @@ class WircClientStatus:
             self.status_event = asyncio.Event()
         return self.status_event
 
-    def get_status_dict(self):
+    def get_camera_status_all(self):
         """ """
-        status_dict = {}
-        status_dict["cam0_exposure_time_us"] = str(self.cam0_exposure_time_us)
-        status_dict["cam1_exposure_time_us"] = str(self.cam1_exposure_time_us)
-        status_dict["cam0_camera_gain"] = str(self.cam0_camera_gain)
-        status_dict["cam1_camera_gain"] = str(self.cam1_camera_gain)
-        return status_dict
+        camera_status_dict = {}
+        camera_status_dict["camera-a"] = wirc_core.rpi_cam0.get_camera_status()
+        camera_status_dict["camera-b"] = wirc_core.rpi_cam1.get_camera_status()
+        camera_status_dict["camera-c"] = wirc_core.usb_cam0.get_camera_status()
+        camera_status_dict["camera-d"] = wirc_core.usb_cam1.get_camera_status()
+        return camera_status_dict
