@@ -15,9 +15,14 @@ function activateModuleCamera() {
   byId('heroBodyCameraId').hidden = false;
 }
 
-function activateModuleAbout() {
-  hideModules();
-  byId('heroBodyAboutId').hidden = false;
+function toggleModuleAbout() {
+  if (byId('heroBodyAboutId').hidden) {
+    byId('heroBodyCameraId').hidden = true;
+    byId('heroBodyAboutId').hidden = false;
+  } else {
+    byId('heroBodyCameraId').hidden = false;
+    byId('heroBodyAboutId').hidden = true;
+  }
 }
 
 function fetchModuleCamera() {
