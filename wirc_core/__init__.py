@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Cloudedbats WIRC-2025.
+# Project: https://github.com/cloudedbats/wirc_2026
+# Author: Arnold Andreasson, info@cloudedbats.org
+# License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
 import os
 from os import getcwd
@@ -32,10 +34,8 @@ config_default_file = pathlib.Path(workdir_path, "wirc_config_default.yaml")
 from wirc_core.rpi_camera import RaspberryPiCamera
 from wirc_core.thermal_camera import ThermalCamera
 
-# from wirc_core.wirc_config import WircConfig
-# from wirc_core.wirc_control import WircControl
+from wirc_core.wirc_config import WircConfig
 from wirc_core.wirc_manager import WircManager
-from wirc_core.wirc_settings import WircSettings
 from wirc_core.wirc_client_status import WircClientStatus
 from wirc_core.wirc_client_info import WircClientInfo
 from wirc_core.wirc_files import WircFiles
@@ -56,7 +56,7 @@ usb_thermal0 = ThermalCamera(config, logger_name=logger_name, config_id="usb_the
 usb_thermal1 = ThermalCamera(config, logger_name=logger_name, config_id="usb_thermal1")
 
 # Basic wirc.
-wirc_settings = WircSettings(config, logger_name=logger_name)
+wirc_config = WircConfig(config, logger_name=logger_name)
 wirc_client_status = WircClientStatus(config, logger_name=logger_name)
 wirc_client_info = WircClientInfo(config, logger_name=logger_name)
 wirc_manager = WircManager(config, logger_name=logger_name)

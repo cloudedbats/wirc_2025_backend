@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://github.com/cloudedbats/wirc_2025_backend
+# Project: https://github.com/cloudedbats/wirc_2026
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -41,20 +41,6 @@ async def camera_mode(params: CameraMode):
     except Exception as e:
         message = "Exception: API - camera_mode" + str(e)
         logger.debug(message)
-
-
-# @camera_router.post(
-#     "/camera/saturation", tags=["Cameras"], description="Set saturation."
-# )
-# async def set_saturation(camera_id: str = "camera-a", saturation: float = "0"):
-#     """ """
-#     try:
-#         saturation = float(saturation)
-#         logger.debug("API called: set_saturation.")
-#         await wirc_core.wirc_manager.set_saturation(camera_id, saturation)
-#     except Exception as e:
-#         message = "API - set_saturation. Exception: " + str(e)
-#         logger.debug(message)
 
 
 class CameraExpTime(pydantic.BaseModel):

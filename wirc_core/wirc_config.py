@@ -1,3 +1,9 @@
+#!/usr/bin/python3
+# -*- coding:utf-8 -*-
+# Project: https://github.com/cloudedbats/wirc_2026
+# Author: Arnold Andreasson, info@cloudedbats.org
+# License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
+
 import asyncio
 import logging
 
@@ -20,6 +26,3 @@ class WircConfig(object):
     def configure(self):
         """ """
         config = self.config
-        # self.min_number_of_satellites = config.get(
-        #     "gps_reader.min_number_of_satellites", 3
-        # )

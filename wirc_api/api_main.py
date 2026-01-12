@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://github.com/cloudedbats/wirc_2025_backend
+# Project: https://github.com/cloudedbats/wirc_2026
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -10,10 +10,7 @@ import fastapi
 import fastapi.staticfiles
 import fastapi.templating
 import fastapi.responses
-from pydantic import BaseModel
-from typing import Optional
 
-# CloudedBats WIRC.
 import wirc_core
 import wirc_api
 
@@ -21,7 +18,7 @@ logger = logging.getLogger(wirc_core.logger_name)
 
 app = fastapi.FastAPI(
     title="CloudedBats WIRC-2025",
-    description="CloudedBats WIRC-2025, the DIY infrared/thermal camera system for bat monitoring.",
+    description="CloudedBats WIRC-2025. The DIY infrared/thermal camera system for bat monitoring.",
     version=wirc_core.__version__,
 )
 
@@ -37,16 +34,16 @@ app.mount(
 templates = fastapi.templating.Jinja2Templates(directory=templates_path)
 
 
-@app.on_event("startup")
-async def startup_event():
-    """ """
-    logger.debug("API called: startup.")
+# @app.on_event("startup")
+# async def startup_event():
+#     """ """
+#     logger.debug("API called: startup.")
 
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    """ """
-    logger.debug("API called: shutdown.")
+# @app.on_event("shutdown")
+# async def shutdown_event():
+#     """ """
+#     logger.debug("API called: shutdown.")
 
 
 # Include modules.
@@ -80,7 +77,11 @@ async def load_main_application_page(request: fastapi.Request):
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    favicon_path = pathlib.Path(
-        wirc_core.workdir_path, "wirc_app/static/images/favicon.ico"
-    )
-    return fastapi.responses.FileResponse(favicon_path)
+    try:
+        favicon_path = pathlib.Path(
+            wirc_core.workdir_path, "wirc_app/static/images/favicon.ico"
+        )
+        return fastapi.responses.FileResponse(favicon_path)
+    except Exception as e:
+        message = "API - favicon. Exception: " + str(e)
+        logger.debug(message)

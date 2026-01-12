@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://github.com/cloudedbats/wirc_2025_backend
+# Project: https://github.com/cloudedbats/wirc_2026
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
 import asyncio
 import logging
-import time
 import fastapi
 from fastapi.responses import StreamingResponse
 import websockets.exceptions
+
 import wirc_core
 
 
@@ -21,7 +21,7 @@ preview_router = fastapi.APIRouter()
 async def preview_streamer_mjpeg(request, camera_id, fps):
     """ """
     # Calculate sleep for used fps.
-    sleep_time_s = 0.2 # Use 5 fps as default.
+    sleep_time_s = 0.2  # Use 5 fps as default.
     try:
         sleep_time_s = 1.0 / float(fps)
     except:
@@ -68,7 +68,9 @@ async def preview_streamer_mjpeg(request, camera_id, fps):
     description="Preview streamed as Motion JPEG.",
 )
 # async def stream_mjpeg(request: fastapi.Request):
-async def preview_stream_mjpeg(request: fastapi.Request, camera_id: str = "camera-a", fps: str = "5"):
+async def preview_stream_mjpeg(
+    request: fastapi.Request, camera_id: str = "camera-a", fps: str = "5"
+):
     """ """
     try:
         logger.debug("API called: preview_stream_mjpeg.")

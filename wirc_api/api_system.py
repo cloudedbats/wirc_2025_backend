@@ -1,19 +1,15 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://github.com/cloudedbats/wirc_2025_backend
+# Project: https://github.com/cloudedbats/wirc_2026
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
+import asyncio
 import logging
 import pathlib
 import time
-
-# import datetime
-import asyncio
 import fastapi
 import fastapi.templating
-from pydantic import BaseModel
-from typing import Optional
 import websockets.exceptions
 
 import wirc_utils
@@ -139,7 +135,8 @@ async def websocket_endpoint(websocket: fastapi.WebSocket):
             await websocket.send_json(ws_json)
 
     except websockets.exceptions.ConnectionClosed as e:
-        pass
+        message = "API - websocket_endpoint: Connection closed."
+        logger.debug(message)
     except Exception as e:
         message = "API - websocket_endpoint. Exception: " + str(e)
         logger.debug(message)

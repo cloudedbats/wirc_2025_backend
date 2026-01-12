@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://github.com/cloudedbats/wirc_2025_backend
+# Project: https://github.com/cloudedbats/wirc_2026
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -8,7 +8,6 @@ import asyncio
 import logging
 import pathlib
 
-# from os import getcwd, remove
 import fastapi
 from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
@@ -73,7 +72,7 @@ async def delete_file(file_path: str):
         return JSONResponse(content={"removed": True}, status_code=200)
     except FileNotFoundError:
         return JSONResponse(
-            content={"removed": False, "error_message": "Directory not found."},
+            content={"removed": False, "error_message": "Selected file not found."},
             status_code=404,
         )
     except Exception as e:

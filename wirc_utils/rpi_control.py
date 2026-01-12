@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
-# Project: https://cloudedbats.github.io
+# Project: https://github.com/cloudedbats/wirc_2026
 # Author: Arnold Andreasson, info@cloudedbats.org
 # License: MIT License (see LICENSE or http://opensource.org/licenses/mit).
 
@@ -9,8 +9,6 @@ import logging
 import os
 import datetime
 import pathlib
-import psutil
-import platform
 
 
 class RaspberryPiControl(object):
@@ -30,26 +28,34 @@ class RaspberryPiControl(object):
 
     async def rpi_control(self, command):
         """ """
-        # First check: Debian. Only valid for Debian OS.
-        if self.is_os_debian():
-            # Select command.
-            if command == "rpiShutdown":
-                await self.rpi_shutdown()
-            elif command == "rpiReboot":
-                await self.rpi_reboot()
-            elif command == "rpi_sd_to_usb":
-                await self.rpi_sd_to_usb()
-            # elif command == "rpi_clear_sd_ok":
-            elif command == "rpi_clear_sd":
-                await self.rpi_clear_sd()
+        try:
+            # First check: Debian. Only valid for Debian OS.
+            if self.is_os_debian():
+                # Select command.
+                if command == "rpiShutdown":
+                    await self.rpi_shutdown()
+                elif command == "rpiReboot":
+                    await self.rpi_reboot()
+                elif command == "rpi_sd_to_usb":
+                    await self.rpi_sd_to_usb()
+                # elif command == "rpi_clear_sd_ok":
+                elif command == "rpi_clear_sd":
+                    await self.rpi_clear_sd()
+                else:
+                    # Logging.
+                    message = (
+                        "Raspberry Pi command failed. Not a valid command: " + command
+                    )
+                    self.logger.error(message)
             else:
                 # Logging.
-                message = "Raspberry Pi command failed. Not a valid command: " + command
-                self.logger.error(message)
-        else:
-            # Logging.
-            message = "Raspberry Pi command failed (" + command + "), not Debian OS."
-            self.logger.warning(message)
+                message = (
+                    "Raspberry Pi command failed (" + command + "), not Debian OS."
+                )
+                self.logger.warning(message)
+        except Exception as e:
+            message = "RaspberryPi - rpi_control. Exception: " + str(e)
+            self.logger.debug(message)
 
     async def set_detector_time(self, posix_time_s, cmd_source=""):
         """Only valid for Debian and user wurb."""
@@ -80,35 +86,45 @@ class RaspberryPiControl(object):
 
     def is_os_debian(self):
         """Check OS version for Raspberry Pi."""
-        if self.os_debian is not None:
+        try:
+            if self.os_debian is not None:
+                return self.os_debian
+            else:
+                try:
+                    os_version_path = pathlib.Path("/etc/os-release")
+                    if os_version_path.exists():
+                        with os_version_path.open("r") as os_file:
+                            os_file_content = os_file.read()
+                            # print("Content of /etc/os-release: ", os_file_content)
+                            if "DEBIAN" in os_file_content.upper():
+                                self.os_debian = True
+                            else:
+                                self.os_debian = False
+                    else:
+                        self.os_debian = False
+                except Exception as e:
+                    message = "RaspberryPi - is_os_debian. Exception: " + str(e)
+                    self.logger.debug(message)
+            #
             return self.os_debian
-        else:
-            try:
-                os_version_path = pathlib.Path("/etc/os-release")
-                if os_version_path.exists():
-                    with os_version_path.open("r") as os_file:
-                        os_file_content = os_file.read()
-                        # print("Content of /etc/os-release: ", os_file_content)
-                        if "DEBIAN" in os_file_content.upper():
-                            self.os_debian = True
-                        else:
-                            self.os_debian = False
-                else:
-                    self.os_debian = False
-            except Exception as e:
-                message = "RaspberryPi - is_os_debian. Exception: " + str(e)
-                self.logger.debug(message)
-        #
-        return self.os_debian
+        except Exception as e:
+            message = "RaspberryPi - is_os_debian. Exception: " + str(e)
+            self.logger.debug(message)
+            self.os_debian = None
+            return self.os_debian
 
     async def rpi_shutdown(self):
         """ """
-        # Logging.
-        message = "The Raspberry Pi command 'Shutdown' is activated."
-        self.logger.info(message)
-        await asyncio.sleep(1.0)
-        #
-        os.system("cd /home/wurb && sudo shutdown -h now")
+        try:
+            # Logging.
+            message = "The Raspberry Pi command 'Shutdown' is activated."
+            self.logger.info(message)
+            await asyncio.sleep(1.0)
+            #
+            os.system("cd /home/wurb && sudo shutdown -h now")
+        except Exception as e:
+            message = "RaspberryPi - rpi_shutdown. Exception: " + str(e)
+            self.logger.debug(message)
 
     async def rpi_reboot(self):
         """ """
