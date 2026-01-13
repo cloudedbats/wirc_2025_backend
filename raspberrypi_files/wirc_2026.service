@@ -1,5 +1,5 @@
 [Unit]
-Description=CloudedBats WIRC-2026 Infrared camera for bats 
+Description=CloudedBats WIRC-2026 Infrared/thermal cameras for bats 
 After=network.target
 ### Before=nginx.service
 
