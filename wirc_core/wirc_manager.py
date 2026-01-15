@@ -25,7 +25,10 @@ class WircManager(object):
 
     def clear(self):
         """ """
-        self.camera_status_event = None
+        self.rpi_cam0_active = False
+        self.rpi_cam1_active = False
+        self.usb_cam0_active = False
+        self.usb_cam1_active = False
 
     def configure(self):
         """ """
@@ -33,104 +36,112 @@ class WircManager(object):
 
     def _select_camera(self, camera_id="camera-a"):
         """ """
-        rpicam = wirc_core.rpi_cam0
+        rpicam = None
         if camera_id == "camera-a":
-            rpicam = wirc_core.rpi_cam0
+            if self.rpi_cam0_active == True:
+                rpicam = wirc_core.rpi_cam0
         elif camera_id == "camera-b":
-            rpicam = wirc_core.rpi_cam1
+            if self.rpi_cam1_active == True:
+                rpicam = wirc_core.rpi_cam1
         elif camera_id == "camera-c":
-            rpicam = wirc_core.usb_cam0
+            if self.usb_cam1_active == True:
+                rpicam = wirc_core.usb_cam0
         elif camera_id == "camera-d":
-            rpicam = wirc_core.usb_cam1
+            if self.usb_cam1_active == True:
+                rpicam = wirc_core.usb_cam1
         return rpicam
 
     def get_preview_queue(self, camera_id="camera-a"):
         """ """
         rpicam = self._select_camera(camera_id)
-        return rpicam.preview_queue
+        if rpicam:
+            return rpicam.preview_queue
+        return None
 
     async def camera_mode(self, camera_id, camera_mode):
         """ """
         rpicam = self._select_camera(camera_id)
-        await rpicam.set_camera_mode(camera_mode)
+        if rpicam:
+            await rpicam.set_camera_mode(camera_mode)
+            message = camera_id.capitalize() + ": " + camera_mode + "."
+            wirc_core.client_info.write_log("info", message)
         wirc_core.client_status.trigger_status_event()
 
     async def camera_trigger(self, camera_id):
         """ """
         rpicam = self._select_camera(camera_id)
-        await rpicam.camera_trigger()
+        if rpicam:
+            await rpicam.camera_trigger()
+            message = camera_id.capitalize() + ": triggered."
+            wirc_core.client_info.write_log("info", message)
+        wirc_core.client_status.trigger_status_event()
 
-    async def set_saturation(self, saturation, camera_id="rpi_cam0"):
+    async def set_saturation(self, saturation, camera_id="rpi-cam0"):
         """ """
         rpicam = self._select_camera(camera_id)
-        await rpicam.set_camera_controls(saturation=saturation)
+        if rpicam:
+            await rpicam.set_camera_controls(saturation=saturation)
         wirc_core.client_status.trigger_status_event()
 
     async def set_exposure_time(self, camera_id, exposure_time_us):
         """ """
         rpicam = self._select_camera(camera_id)
-        await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
+        if rpicam:
+            await rpicam.set_camera_controls(exposure_time_us=exposure_time_us)
         wirc_core.client_status.trigger_status_event()
 
     async def set_camera_gain(self, camera_id, camera_gain):
         """ """
         rpicam = self._select_camera(camera_id)
-        await rpicam.set_camera_controls(camera_gain=camera_gain)
+        if rpicam:
+            await rpicam.set_camera_controls(camera_gain=camera_gain)
         wirc_core.client_status.trigger_status_event()
 
     def log_camera_info(self):
         """ """
-        rpi_cam0_info = "Camera-A (cam0)"
-        rpi_cam1_info = "Camera-B (cam1)"
-        usb_thermal_info = "Thermal camera"
-        # Check if cameras are connected and available.
-        global_camera_info = wirc_core.rpi_cam0.get_global_camera_info()
-        self.cam0_model = "---"
-        self.cam1_model = "---"
-        cam0_available = False
-        cam1_available = False
-        if len(global_camera_info) >= 2:
-            self.cam1_model = global_camera_info[1].get("Model", "")
-            self.cam1_num = global_camera_info[1].get("Num", -1)
-            cam1_available = True
-        if len(global_camera_info) >= 1:
-            self.cam0_model = global_camera_info[0].get("Model", "")
-            self.cam0_num = global_camera_info[0].get("Num", -1)
-            cam0_available = True
-        # Camera info for logging.
-        rpi_cam0_info += "   Model: "
-        rpi_cam0_info += self.cam0_model
-        print(rpi_cam0_info)
-        rpi_cam1_info += "   Model: "
-        rpi_cam1_info += self.cam1_model
-        print(rpi_cam1_info)
-        wirc_core.client_info.write_log("info", rpi_cam0_info)
-        wirc_core.client_info.write_log("info", rpi_cam1_info)
-        wirc_core.client_info.write_log("info", usb_thermal_info)
+        status = wirc_core.usb_cam1.get_camera_status()
+        device = status.get("camera_device_name", None)
+        if device:
+            message = "Camera-D (usb1)   device: " + device + "."
+            wirc_core.client_info.write_log("info", message)
+        status = wirc_core.usb_cam0.get_camera_status()
+        device = status.get("camera_device_name", None)
+        if device:
+            message = "Camera-C (usb0)   device: " + device + "."
+            wirc_core.client_info.write_log("info", message)
+        status = wirc_core.rpi_cam1.get_camera_status()
+        model = status.get("camera_model", None)
+        if model:
+            message = "Camera-B (cam1)   model: " + model + "."
+            wirc_core.client_info.write_log("info", message)
+        status = wirc_core.rpi_cam0.get_camera_status()
+        model = status.get("camera_model", None)
+        if model:
+            message = "Camera-A (cam0)   model: " + model + "."
+            wirc_core.client_info.write_log("info", message)
 
     async def startup(self):
         """ """
         # config = self.config
         try:
-            self.log_camera_info()
-            # Inform client apps.
-            # exp = config.get("rpi_cam0" + ".settings.exposure_time_us", "auto")
-            # wirc_core.client_status.set_exposure_time_us(
-            #     exp, camera_id="rpi_cam0"
-            # )
-            # exp = config.get("rpi_cam1" + ".settings.exposure_time_us", "auto")
-            # wirc_core.client_status.set_exposure_time_us(
-            #     exp, camera_id="rpi_cam1"
-            # )
-            # gain = config.get("rpi_cam0" + ".settings.camera_gain", "auto")
-            # wirc_core.client_status.set_camera_gain(gain, camera_id="rpi_cam0")
-            # gain = config.get("rpi_cam1" + ".settings.camera_gain", "auto")
-            # wirc_core.client_status.set_camera_gain(gain, camera_id="rpi_cam1")
+            wirc_core.cameras.check_available_rpi_cameras()
+            wirc_core.cameras.check_available_usb_cameras()
+            rpi_cameras = wirc_core.cameras.get_available_rpi_camera_models()
+            usb_cameras = wirc_core.cameras.get_available_usb_camera_devices()
+            if len(rpi_cameras) >= 1:
+                self.rpi_cam0_active = True
+                wirc_core.rpi_cam0.set_camera_model(rpi_cameras[0])
+            if len(rpi_cameras) >= 2:
+                self.rpi_cam1_active = True
+                wirc_core.rpi_cam1.set_camera_model(rpi_cameras[1])
+            if len(usb_cameras) >= 1:
+                self.usb_cam0_active = True
+                wirc_core.usb_cam0.set_camera_device_name(usb_cameras[0])
+            if len(usb_cameras) >= 2:
+                self.usb_cam1_active = True
+                wirc_core.usb_cam1.set_camera_device_name(usb_cameras[1])
 
-            # await wirc_core.rpi_cam0.start_camera()
-            # await wirc_core.rpi_cam1.start_camera()
-            # await wirc_core.usb_cam0.start_camera()
-            # await wirc_core.usb_cam1.start_camera()
+            self.log_camera_info()
         except Exception as e:
             self.logger.debug("Exception in WircManager - startup: " + str(e))
 

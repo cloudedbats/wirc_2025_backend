@@ -22,7 +22,7 @@ class RaspberryPiCamera:
         self,
         config={},
         logger_name="DefaultLogger",
-        config_id="rpi_cam0",
+        config_id="rpi-cam0",
     ):
         """ """
         self.config = config
@@ -51,6 +51,11 @@ class RaspberryPiCamera:
         self.camera_video_active = False
         self.camera_task = None
         self.camera_info = ""
+        self.camera_model = None
+
+    def set_camera_model(self, camera_model):
+        """ """
+        self.camera_model = camera_model
 
     def configure(self):
         """ """
@@ -74,14 +79,10 @@ class RaspberryPiCamera:
 
         self.camera_info = "Config id: " + self.config_id + "."
 
-    def get_global_camera_info(self):
-        """ """
-        global_camera_info = Picamera2.global_camera_info()
-        return global_camera_info
-
     def get_camera_status(self):
         """ """
         camera_status = {}
+        camera_status["camera_model"] = self.camera_model
         camera_status["camera_mode"] = self.camera_mode
         camera_status["exposure_time_us"] = self.exposure_time_us
         camera_status["camera_gain"] = self.camera_gain
@@ -177,7 +178,7 @@ class RaspberryPiCamera:
                     pass
             # Create a new camera object, cam0 or cam1.
             camera_index = 0
-            if self.rpi_camera_id == "rpi_cam1":
+            if self.rpi_camera_id == "rpi-cam1":
                 camera_index = 1
             try:
                 self.picam2 = Picamera2(camera_num=camera_index)
@@ -360,10 +361,10 @@ class RaspberryPiCamera:
 
                     now = datetime.now()
                     date_and_time = now.strftime("%Y%m%dT%H%M%S")
-                    file_mp4_name = "cam0_" + date_and_time + ".mp4"
+                    file_mp4_name = self.config_id + "_" + date_and_time + ".mp4"
 
                     disc_path = wirc_core.wirc_files.get_target_disc_path()
-                    dir_path = wirc_core.wirc_files.get_target_dir_path(disc_path, date_option="date-post-after")
+                    dir_path = wirc_core.wirc_files.get_target_dir_path(disc_path, date_option="date-post-before")
                     video_mp4_path = pathlib.Path(dir_path, file_mp4_name)
 
                     try:

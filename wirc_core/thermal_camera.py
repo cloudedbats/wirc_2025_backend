@@ -22,7 +22,7 @@ class ThermalCamera:
         self,
         config={},
         logger_name="DefaultLogger",
-        config_id="usb_cam0",
+        config_id="usb-cam0",
     ):
         """ """
         self.config = config
@@ -42,6 +42,7 @@ class ThermalCamera:
         self.camera_video_active = False
         self.camera_task = ""
         self.camera_info = ""
+        self.camera_device_name = None
 
     def configure(self):
         """ """
@@ -51,16 +52,21 @@ class ThermalCamera:
         # self.video_framerate_fps = video_framerate_fps
         #
         self.cv2_device_index = 0
-        if self.config_id == "usb_cam0":
+        if self.config_id == "usb-cam0":
             self.cv2_device_index = 0
-        elif self.config_id == "usb_cam1":
+        elif self.config_id == "usb-cam1":
             self.cv2_device_index = 2
 
         self.camera_info = "Config id: " + self.config_id + "."
 
+    def set_camera_device_name(self, device_name):
+        """ """
+        self.camera_device_name = device_name
+
     def get_camera_status(self):
         """ """
         camera_status = {}
+        camera_status["camera_device_name"] = self.camera_device_name
         camera_status["camera_mode"] = self.camera_mode
         camera_status["exposure_time_us"] = "disabled"
         camera_status["camera_gain"] = "disabled"
@@ -304,7 +310,7 @@ class VideoFileWriter(object):
         """ """
         disc_path = wirc_core.wirc_files.get_target_disc_path()
         dir_path = wirc_core.wirc_files.get_target_dir_path(
-            disc_path, date_option="date-post-after"
+            disc_path, date_option="date-post-before"
         )
         self.out_path = pathlib.Path(dir_path, self.file_mp4_name)
 

@@ -190,7 +190,7 @@ class WircFiles(object):
 
         return None
 
-    def get_target_dir_path(self, disc_path, date_option="date-post-after"):
+    def get_target_dir_path(self, disc_path, date_option="date-post-before"):
         """ """
         target_directory = pathlib.Path(disc_path)
         file_directory = "WircStation"

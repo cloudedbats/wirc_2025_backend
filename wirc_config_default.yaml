@@ -5,7 +5,7 @@ wirc_app:
   host: "0.0.0.0"
   log_level: info
 
-rpi_cam0:
+rpi-cam0:
   name: Camera-A (rpi_cam0)
   startup_mode: preview
   monochrome: false
@@ -33,7 +33,7 @@ rpi_cam0:
   # picamera2_controls:
   #   AeEnable: false
 
-rpi_cam1:
+rpi-cam1:
   name: Camera-B (rpi_cam1)
   startup_mode: preview
   monochrome: false
@@ -61,7 +61,23 @@ rpi_cam1:
   # picamera2_controls:
   #   AeEnable: false
 
-usb_thermal:
+usb-cam0:
+  name: Thermal (usb_thermal)
+  startup_mode: preview
+  orientation:
+    rotation_deg: 0
+  video:
+    framerate_fps: 25
+    pre_buffer_frames: 25
+    single_length_s: 10
+    continuous_length_s: 60
+    file_prefix: Thermal
+  storage:
+    rec_dir: /home/wurb/wirc_recordings
+    remove_old_rec: true
+    free_space_limit_mb: 500
+
+usb-cam1:
   name: Thermal (usb_thermal)
   startup_mode: preview
   orientation:
