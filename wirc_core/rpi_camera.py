@@ -69,13 +69,13 @@ class RaspberryPiCamera:
         self.camera_gain = conf.get(cam + ".settings.camera_gain", "auto")
         self.hflip = conf.get(cam + ".orientation.hflip", 0)
         self.vflip = conf.get(cam + ".orientation.vflip", 0)
-        self.preview_size_divisor = conf.get(cam + ".preview.size_divisor", 0)
+        self.preview_size_divisor = conf.get(cam + ".preview.size_divisor", 2.0)
         self.video_horizontal_size_px = conf.get(
             cam + ".video.horizontal_size_px", "max"
         )
-        self.video_vertical_size_px = conf.get(cam + ".video.vertical_size_px", "max")
+        self.video_vertical_size_px = conf.get(cam + ".video.vertical_size_px", "auto")
         self.video_framerate_fps = conf.get(cam + ".video.framerate_fps", 30)
-        self.video_pre_buffer_frames = conf.get(cam + ".video.pre_buffer_frames", 60)
+        self.video_pre_buffer_frames = conf.get(cam + ".video.pre_buffer_frames", 30)
 
         self.camera_info = "Config id: " + self.config_id + "."
 
